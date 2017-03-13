@@ -1,0 +1,32 @@
+{
+   "devices":[
+      {
+         "device_id":"[DEVICE_ID]",
+         "entity_name":"[ENTITY_ID]",
+         "entity_type":"thing",
+         "timezone":"America/Fortaleza",
+         "endpoint": "http://[DEVICE_IP]:[PORT]",
+         "attributes":[
+            {
+               "object_id":"s",
+               "name":"state",
+               "type":"int"
+            }
+         ],
+         "commands":[
+            {
+               "name":"state",
+               "type":"command",
+               "value":"[DEVICE_ID]@state|%s"
+            }
+         ],
+         "static_attributes":[
+            {
+               "name":"id",
+               "type":"string",
+               "value":"[DEVICE_ID]"
+            }
+         ]
+      }
+   ]
+}

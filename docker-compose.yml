@@ -1,0 +1,111 @@
+mongodb:
+  image: mongo:3.4
+  hostname: mongodb
+  container_name: mongodb
+  expose:
+    - "27017"
+  command: --smallfiles
+
+orion:
+  image: fiware/orion:latest
+  hostname: orion
+  container_name: orion
+  links:
+    - mongodb
+  expose:
+    - "1026"
+  ports:
+    - "1026:1026"
+  command: -dbhost mongodb
+
+mosquitto:
+  image: ansi/mosquitto
+  hostname: mosquitto
+  container_name: mosquitto
+  expose:
+    - "1883"
+  ports:
+    - "1883:1883"
+
+idas:
+  image: fiware/iotagent-ul:develop
+  hostname: idas
+  container_name: idas
+  volumes:
+    - ./config-blank.js:/opt/iotaul/config-blank.js
+  links:
+    - mongodb:mongo
+    - orion
+    - mosquitto
+  expose:
+    - "7896"
+    - "4041"
+  ports:
+    - "7896:7896"
+    - "4041:4041"
+
+# authzforce:
+#   image: fiware/authzforce-ce-server:release-5.4.0b
+#   hostname: authzforce
+#   container_name: authzforce
+#   expose:
+#     - "8080"
+
+# keyrock:
+#   image: fiware/idm:v5.3.0
+#   hostname: keyrock
+#   container_name: keyrock
+#   links:
+#     - authzforce
+#   expose:
+#     - "5000"
+#     - "8000"
+#   ports:
+#     - "5000:5000"
+#     - "8000:8000"
+
+# mongodb-comet:
+#   image: mongo:3.4
+#   hostname: mongodb-comet
+#   container_name: mongodb-comet
+
+# sth-comet:
+#   image: telefonicaiot/fiware-sth-comet
+#   hostname: sth-comet
+#   container_name: sth-comet
+#   # volumes:
+#   #   - ./config/sth/config.js:/opt/sth/config.js
+#   links:
+#     - mongodb
+#   ports:
+#     - "8666:8666"
+#   environment:
+#     # - DEFAULT_SERVICE="OpenIoT"
+#     # - DEFAULT_SERVICE_PATH="/"
+#     - STH_HOST=0.0.0.0
+#     - DB_URI=mongodb:27017
+
+# mysql:
+#   image: mysql:5.5
+#   hostname: mysql
+#   container_name: mysql
+#   expose:
+#     - "3306"
+#   environment:
+#     - MYSQL_ROOT_PASSWORD=mysql
+
+# cygnus:
+#   image: fiware/cygnus-ngsi:develop
+#   hostname: cygnus
+#   container_name: cygnus
+#   volumes:
+#     - ./config/cygnus/agent.conf:/opt/apache-flume/conf/agent.conf
+#   links:
+#     - orion
+#     # - mysql:mysql
+#   expose:
+#     - "5050"
+#   # environment:
+#   #   - CYGNUS_MYSQL_HOST=mysql
+#   #   - CYGNUS_MYSQL_USER=root
+#   #   - CYGNUS_MYSQL_PASS=mysql
