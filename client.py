@@ -1,6 +1,5 @@
 import requests, json
 import configparser
-import sys
 import paho.mqtt.publish as publish
 
 
@@ -45,6 +44,9 @@ class FiwareIotClient:
 
         self.mosquitto_host = config.get('mosquitto', 'host')
         self.mosquitto_port = config.get('mosquitto', 'port')
+
+        self.perseo_host = config.get('perseo', 'host')
+        self.perseo_port = config.get('perseo', 'port')
 
         self.host_id = config.get('local', 'host_id')
         f.close()
@@ -381,11 +383,11 @@ class FiwareIotClient:
 
         url = "http://{}:{}/STH/v1/contextEntities/type/thing/id/{}/attributes/{}?lastN={}".format(self.sth_host, self.sth_port, device_id, attribute, items_number)
 
-        headers = { 'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-Auth-Token' : self.token,
-                    'Fiware-Service' : self.cb_fiware_service,
-                    'Fiware-ServicePath' : self.cb_fiware_service_path }
+        headers = {'Accept': 'application/json',
+                   'Content-Type': 'application/json',
+                   'X-Auth-Token': self.token,
+                   'Fiware-Service': self.cb_fiware_service,
+                   'Fiware-ServicePath': self.cb_fiware_service_path}
 
         payload = ''
 
@@ -433,3 +435,36 @@ class FiwareIotClient:
     #     payload = ''
     #
     #     self._send_request(url, headers, payload, 'GET', format_json_response=True)
+
+    def create_attribute_change_rule(self, attribute, attribute_type, condition, notification_url, action='post'):
+        print("===== CREATE ATTRIBUTE CHANGE RULE =====")
+
+        url = "http://{}:{}/rules".format(self.perseo_host, self.perseo_port)
+
+        headers = {'Accept': 'application/json',
+                   'Content-Type': 'application/json',
+                   'X-Auth-Token': self.token,
+                   'Fiware-Service': self.cb_fiware_service,
+                   'Fiware-ServicePath': self.cb_fiware_service_path}
+
+        payload = {
+            "name": "{}-rule".format(attribute),
+            "text": "select *,\"{}-rule\" as ruleName from pattern [every ev=iotEvent(cast(cast(ev.{}?,String),{}){})]".format(
+                attribute, attribute, attribute_type, condition),
+            "action": {
+                "type": "",
+                "template": "Alert! {0} is now ${{ev.{1}}}.".format(attribute, attribute),
+                "parameters": {}
+            }
+        }
+
+        if action == 'email':
+            payload["action"]["type"] = "email"
+            payload["action"]["parameters"] = {"to": "{}".format("lucascristiano27@gmail.com"),
+                                               "from": "{}".format("lucas.calixto.dantas@gmail.com"),
+                                               "subject": "Alert! High {} Detected".format(attribute.capitalize())}
+        else:  # if action == 'post':
+            payload["action"]["type"] = "post"
+            payload["action"]["parameters"] = {"url": "{}".format(notification_url)}
+
+        self._send_request(url, headers, payload, 'POST', format_json_response=True)
