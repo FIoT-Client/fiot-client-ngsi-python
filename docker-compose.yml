@@ -6,7 +6,7 @@ services:
     container_name: mongodb
     expose:
       - "27017"
-    command: --smallfiles
+    command: mongod --smallfiles
 
   orion:
     image: fiware/orion:latest
@@ -94,21 +94,11 @@ services:
     volumes:
       - ./config/sth/config.js:/opt/sth/config.js
     links:
-      - mongodb-comet
+      - mongodb-cygnus
     expose:
       - "8666"
     ports:
       - "8666:8666"
-
-  mongodb-comet:
-    image: mongo:3.4.2
-    hostname: mongodb-comet
-    container_name: mongodb-comet
-    expose:
-      - "27017"
-    ports:
-      - "27018:27017"
-    command: --smallfiles
 
   mongodb-cygnus:
     image: mongo:3.4.2
@@ -118,7 +108,7 @@ services:
       - "27017"
     ports:
       - "27017:27017"
-    command: --smallfiles
+    command: mongod --smallfiles
 
   mysql-cygnus:
     image: mysql
@@ -137,9 +127,12 @@ services:
     container_name: cygnus
     volumes:
       - ./config/cygnus/agent.conf:/opt/apache-flume/conf/agent.conf
+      - ./config/cygnus/lib/elasticsearch-0.90.2.jar:/opt/apache-flume/lib/elasticsearch-0.90.2.jar
+      - ./config/cygnus/lib/lucene-core-4.3.1.jar:/opt/apache-flume/lib/lucene-core-4.3.1.jar
     links:
       - orion
       - mysql-cygnus:mysql-cygnus
+      - elasticsearch
     expose:
       - "5050"
     ports:
@@ -150,10 +143,20 @@ services:
       - CYGNUS_MYSQL_USER=root
       - CYGNUS_MYSQL_PASS=mysql
       - CYGNUS_MONGO_HOSTS=mongodb-cygnus:27017
-#      - CYGNUS_MONGO_USER=mongo
-#      - CYGNUS_MONGO_PASS=mongo
+#      - CYGNUS_MONGO_USER=
+#      - CYGNUS_MONGO_PASS=
       - CYGNUS_LOG_LEVEL=DEBUG
 
+  elasticsearch:
+    image: tianjiang/elasticsearch-0.9
+    hostname: elasticsearch
+    container_name: elasticsearch
+    expose:
+      - "9200"
+      - "9300"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
 
   # authzforce:
   #   image: fiware/authzforce-ce-server:release-5.4.1
