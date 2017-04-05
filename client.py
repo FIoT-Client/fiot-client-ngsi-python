@@ -372,19 +372,24 @@ class FiwareIotClient:
 
         self._send_request(url, headers, payload, 'POST')
 
-    def subscribe_historical_data(self, device_id, attributes):
+    def subscribe_cygnus(self, entity_id, attributes):
+        print("===== SUBSCRIBING CYGNUS =====")
+
+        notification_url = "http://{}:{}/notify".format(self.cygnus_host, self.cygnus_port)
+        self.subscribe_attributes_change(entity_id, attributes, notification_url)
+
+    def subscribe_historical_data(self, entity_id, attributes):
         print("===== SUBSCRIBING TO HISTORICAL DATA =====")
 
         notification_url = "http://{}:{}/notify".format(self.sth_host, self.sth_port)
-        self.subscribe_attributes_change(device_id, attributes, notification_url)
+        self.subscribe_attributes_change(entity_id, attributes, notification_url)
 
-    def get_device_historical_data(self, device_id, attribute, items_number=10):
+    def get_device_historical_data(self, entity_id, attribute, items_number=10):
         print("===== GETTING DEVICE HISTORICAL DATA =====")
 
-        url = "http://{}:{}/STH/v1/contextEntities/type/thing/id/{}/attributes/{}?lastN={}".format(self.sth_host, self.sth_port, device_id, attribute, items_number)
+        url = "http://{}:{}/STH/v1/contextEntities/type/thing/id/{}/attributes/{}?lastN={}".format(self.sth_host, self.sth_port, entity_id, attribute, items_number)
 
         headers = {'Accept': 'application/json',
-                   'Content-Type': 'application/json',
                    'X-Auth-Token': self.token,
                    'Fiware-Service': self.cb_fiware_service,
                    'Fiware-ServicePath': self.cb_fiware_service_path}
