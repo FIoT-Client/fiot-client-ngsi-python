@@ -40,6 +40,7 @@ class FiwareIotClient:
         self.sth_port = config.get('sthcomet', 'port')
 
         self.cygnus_host = config.get('cygnus', 'host')
+        self.cygnus_notification_host = config.get('cygnus', 'notification_host')
         self.cygnus_port = config.get('cygnus', 'port')
 
         self.mosquitto_host = config.get('mosquitto', 'host')
@@ -375,7 +376,7 @@ class FiwareIotClient:
     def subscribe_cygnus(self, entity_id, attributes):
         print("===== SUBSCRIBING CYGNUS =====")
 
-        notification_url = "http://{}:{}/notify".format(self.cygnus_host, self.cygnus_port)
+        notification_url = "http://{}:{}/notify".format(self.cygnus_notification_host, self.cygnus_port)
         self.subscribe_attributes_change(entity_id, attributes, notification_url)
 
     def subscribe_historical_data(self, entity_id, attributes):
