@@ -127,8 +127,8 @@ services:
     container_name: cygnus
     volumes:
       - ./config/cygnus/agent.conf:/opt/apache-flume/conf/agent.conf
-      - ./config/cygnus/lib/elasticsearch-0.90.2.jar:/opt/apache-flume/lib/elasticsearch-0.90.2.jar
-      - ./config/cygnus/lib/lucene-core-4.3.1.jar:/opt/apache-flume/lib/lucene-core-4.3.1.jar
+      - ./config/cygnus/lib/elasticsearch-0.90.13.jar:/opt/apache-flume/lib/elasticsearch-0.90.13.jar
+      - ./config/cygnus/lib/lucene-core-4.6.1.jar:/opt/apache-flume/lib/lucene-core-4.6.1.jar
     links:
       - orion
       - mysql-cygnus:mysql-cygnus
@@ -143,12 +143,12 @@ services:
       - CYGNUS_MYSQL_USER=root
       - CYGNUS_MYSQL_PASS=mysql
       - CYGNUS_MONGO_HOSTS=mongodb-cygnus:27017
-#      - CYGNUS_MONGO_USER=
-#      - CYGNUS_MONGO_PASS=
+      - CYGNUS_MONGO_USER=
+      - CYGNUS_MONGO_PASS=
       - CYGNUS_LOG_LEVEL=DEBUG
 
   elasticsearch:
-    image: tianjiang/elasticsearch-0.9
+    image: barnybug/elasticsearch:0.90.13
     hostname: elasticsearch
     container_name: elasticsearch
     expose:
@@ -157,6 +157,21 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
+
+  kibana:
+    image: andrewh/kibana3
+    hostname: kibana
+    container_name: kibana
+    links:
+      - elasticsearch
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    environment:
+      - ES_PROTO=http
+      - ES_HOST=192.168.99.100
+      - ES_PORT=9200
 
   # authzforce:
   #   image: fiware/authzforce-ce-server:release-5.4.1

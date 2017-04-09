@@ -391,55 +391,12 @@ class FiwareIotClient:
 
         headers = {'Accept': 'application/json',
                    'X-Auth-Token': self.token,
-                   'Fiware-Service': self.cb_fiware_service,
-                   'Fiware-ServicePath': self.cb_fiware_service_path}
+                   'Fiware-Service': str(self.cb_fiware_service).lower(),
+                   'Fiware-ServicePath': str(self.cb_fiware_service_path).lower()}
 
         payload = ''
 
         self._send_request(url, headers, payload, 'GET', format_json_response=True)
-
-    # def subscribe_historical_data(self, device_id, attributes):
-    #     print("===== SUBSCRIBING TO HISTORICAL DATA =====")
-    #
-    #     url = "http://{}:{}/v1/subscribeContext".format(self.cb_host, self.cb_port)
-    #
-    #     headers = { 'Accept': 'application/json',
-    #                 'Content-Type': 'application/json',
-    #                 'X-Auth-Token' : self.token,
-    #                 'Fiware-Service' : self.cb_fiware_service,
-    #                 'Fiware-ServicePath' : self.cb_fiware_service_path }
-    #
-    #     payload = { "entities": [{
-    #                     "type": "thing",
-    #                     "isPattern": "false",
-    #                     "id": str(device_id)
-    #                 }],
-    #                 "attributes": attributes,
-    #                 "notifyConditions": [{
-    #                     "type": "ONCHANGE",
-    #                     "condValues": attributes
-    #                 }],
-    #                 "reference": "http://{}:{}/notify".format(self.cygnus_host, self.cygnus_port),
-    #                 "duration": "P1Y",
-    #                 "throttling": "PT1S"
-    #               }
-    #
-    #     self._send_request(url, headers, payload, 'POST')
-    #
-    # def get_device_historical_data(self, device_id, attribute, items_number=10):
-    #     print("===== GETTING DEVICE HISTORICAL DATA =====")
-    #
-    #     url = "http://{}:{}/STH/v1/contextEntities/type/thing/id/{}/attributes/{}?lastN={}".format(self.sth_host, self.sth_port, device_id, attribute, items_number)
-    #
-    #     headers = { 'Accept': 'application/json',
-    #                 'Content-Type': 'application/json',
-    #                 'X-Auth-Token' : self.token,
-    #                 'Fiware-Service' : self.cb_fiware_service,
-    #                 'Fiware-ServicePath' : self.cb_fiware_service_path }
-    #
-    #     payload = ''
-    #
-    #     self._send_request(url, headers, payload, 'GET', format_json_response=True)
 
     def create_attribute_change_rule(self, attribute, attribute_type, condition, notification_url, action='post'):
         print("===== CREATE ATTRIBUTE CHANGE RULE =====")
