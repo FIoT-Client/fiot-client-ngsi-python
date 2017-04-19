@@ -34,7 +34,7 @@ services:
     hostname: idas
     container_name: idas
     volumes:
-      - ./config-blank.js:/opt/iotaul/config-blank.js
+      - ./config/idas/config-blank.js:/opt/iotaul/config-blank.js
     links:
       - mongodb:mongo
       - orion
@@ -46,46 +46,46 @@ services:
       - "7896:7896"
       - "4041:4041"
 
-#  perseo:
-#    image: telefonicaiot/perseo-fe
-#    hostname: perseo
-#    container_name: perseo
-#    links:
-#      - mongodb-perseo
-#      - perseo-core
-#      - orion
-#    expose:
-#      - "9090"
-#    ports:
-#      - "9090:9090"
-#    environment:
-#      - PERSEO_MONGO_HOST=mongodb-perseo
-#      - PERSEO_CORE_URL=http://perseo-core:8080
-#      - PERSEO_ORION_URL=http://orion:1026/v1/updateContext
-##      - PERSEO_SMTP_HOST=
-##      - PERSEO_SMTP_PORT=
-##      - PERSEO_SMTP_SECURE=
-##      - PERSEO_SMTP_AUTH_USER=
-##      - PERSEO_SMTP_AUTH_PASS=
-#
-#  perseo-core:
-#    image: telefonicaiot/perseo-core
-#    hostname: perseo-core
-#    container_name: perseo-core
-#    volumes:
-#      - ./perseo-core.properties:/etc/perseo-core.properties
-#    expose:
-#      - "8080"
-#    ports:
-#      - "8080:8080"
-#
-#  mongodb-perseo:
-#    image: mongo:3.4.2
-#    hostname: mongodb-perseo
-#    container_name: mongodb-perseo
-#    expose:
-#      - "27017"
-#    command: --smallfiles
+  perseo:
+    image: telefonicaiot/perseo-fe
+    hostname: perseo
+    container_name: perseo
+    links:
+      - mongodb-perseo
+      - perseo-core
+      - orion
+    expose:
+      - "9090"
+    ports:
+      - "9090:9090"
+    environment:
+      - PERSEO_MONGO_HOST=mongodb-perseo
+      - PERSEO_CORE_URL=http://perseo-core:8080
+      - PERSEO_ORION_URL=http://orion:1026/v1/updateContext
+      # - PERSEO_SMTP_HOST=
+      # - PERSEO_SMTP_PORT=
+      # - PERSEO_SMTP_SECURE=
+      # - PERSEO_SMTP_AUTH_USER=
+      # - PERSEO_SMTP_AUTH_PASS=
+
+  perseo-core:
+    image: telefonicaiot/perseo-core
+    hostname: perseo-core
+    container_name: perseo-core
+    volumes:
+      - ./config/perseo/perseo-core.properties:/etc/perseo-core.properties
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+
+  mongodb-perseo:
+    image: mongo:3.4.2
+    hostname: mongodb-perseo
+    container_name: mongodb-perseo
+    expose:
+      - "27017"
+    command: --smallfiles
 
   sth-comet:
     image: telefonicaiot/fiware-sth-comet
@@ -167,7 +167,7 @@ services:
     expose:
       - "8080"
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       - ES_PROTO=http
       - ES_HOST=192.168.99.100

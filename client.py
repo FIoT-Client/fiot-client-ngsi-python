@@ -165,7 +165,7 @@ class FiwareIotClient:
 
         self._send_request(url, headers, payload, 'GET', format_json_response=True)
 
-    def register_device(self, device_file, device_id, entity_id, device_ip='', device_port='', protocol='IoTA-UL'):
+    def register_device(self, device_file_path, device_id, entity_id, device_ip='', device_port='', protocol='IoTA-UL'):
         print("===== REGISTERING DEVICE =====")
 
         url = "http://{}:{}/iot/devices?protocol={}".format(self.idas_host, self.idas_admin_port, protocol)
@@ -175,7 +175,6 @@ class FiwareIotClient:
                     'Fiware-Service' : self.fiware_service,
                     'Fiware-ServicePath' : self.fiware_service_path }
 
-        device_file_path = "./devices/" + device_file
         print("* opening: " + device_file_path)
         with open(device_file_path) as json_device_file:
             payload = json.load(json_device_file)
@@ -309,27 +308,6 @@ class FiwareIotClient:
                  }
 
         self._send_request(url, headers, payload, 'POST', format_json_response=True)
-
-    # def simulate_command(self, entity_id, device_id, command, params={}):
-    #     # http://telefonicaid.github.io/fiware-orion/api/v2/latest/
-    #     print("===== SIMULATING COMMAND =====")
-    #
-    #     url = "http://{}:{}/v2/entities/{}/attrs?type=thing".format(self.cb_host, self.cb_port, entity_id)
-    #
-    #     headers = { 'Content-Type': 'application/json',
-    #                 'X-Auth-Token' : self.token,
-    #                 'Fiware-Service' : self.cb_fiware_service,
-    #                 'Fiware-ServicePath' : self.cb_fiware_service_path }
-    #
-    #     params = '|'.join(['%s' % (str(value)) for (key, value) in params.items()])
-    #     if params != '':
-    #         params = '|' + params
-    #
-    #     value = '{}@{}{}'.format(device_id, command, params)
-    #
-    #     payload = { command : { "value": value } }
-    #
-    #     self._send_request(url, headers, payload, 'PUT')
 
     def get_pooling_commands(self, sensor_id):
         print("===== GETTING POOLING COMMANDS =====")
