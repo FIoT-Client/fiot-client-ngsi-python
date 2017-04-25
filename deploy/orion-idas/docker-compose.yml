@@ -1,0 +1,52 @@
+version: "2"
+services:
+  mongodb:
+    image: mongo:3.4.2
+    hostname: mongodb
+    container_name: mongodb
+    expose:
+      - "27017"
+    volumes:
+      - mongodb-volume:/data
+    command: mongod --smallfiles
+
+  orion:
+    image: fiware/orion:latest
+    hostname: orion
+    container_name: orion
+    links:
+      - mongodb
+    expose:
+      - "1026"
+    ports:
+      - "1026:1026"
+    command: -dbhost mongodb
+
+  mosquitto:
+    image: ansi/mosquitto
+    hostname: mosquitto
+    container_name: mosquitto
+    expose:
+      - "1883"
+    ports:
+      - "1883:1883"
+
+  idas:
+    image: fiware/iotagent-ul:develop
+    hostname: idas
+    container_name: idas
+    volumes:
+      - ./config/idas/config-blank.js:/opt/iotaul/config-blank.js
+    links:
+      - mongodb:mongo
+      - orion
+      - mosquitto
+    expose:
+      - "7896"
+      - "4041"
+    ports:
+      - "7896:7896"
+      - "4041:4041"
+
+volumes:
+  mongodb-volume:

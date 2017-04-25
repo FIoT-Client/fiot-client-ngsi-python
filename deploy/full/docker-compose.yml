@@ -6,6 +6,8 @@ services:
     container_name: mongodb
     expose:
       - "27017"
+    ports:
+      - "27019:27017"
     command: mongod --smallfiles
 
   orion:
