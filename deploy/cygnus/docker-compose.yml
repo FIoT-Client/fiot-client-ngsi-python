@@ -20,7 +20,7 @@ services:
       - CYGNUS_MONGO_HOSTS=mongodb-cygnus:27017
       - CYGNUS_MONGO_USER=
       - CYGNUS_MONGO_PASS=
-      - CYGNUS_LOG_LEVEL=DEBUG
+      - CYGNUS_LOG_LEVEL=INFO
 
   mysql-cygnus:
     image: mysql
