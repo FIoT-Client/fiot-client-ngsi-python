@@ -5,8 +5,8 @@
 
 // Update these with values suitable for your network.
 byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-IPAddress ip(192, 168, 1, 200);
-IPAddress server(192, 168, 1, 109);
+IPAddress ip(10, 7, 174, 14);
+IPAddress server(10, 7, 49, 20);
 
 EthernetClient ethClient;
 PubSubClient client(ethClient);
@@ -18,10 +18,10 @@ dht DHT;
 void publishMeasurements() {
   char strHumidity[6];
   char strTemperature[6];
-  
+
   char humidityPayloadBuf[20];
   char temperaturePayloadBuf[20];
-  
+
   int chk = DHT.read21(DHT21_PIN);
   switch (chk){
     case DHTLIB_OK:
@@ -34,10 +34,10 @@ void publishMeasurements() {
       Serial.print(humidityPayloadBuf);
       Serial.print(", ");
       Serial.println(temperaturePayloadBuf);
-      
-      client.publish("/4jggokgpepnvsb2uv4s40d59ov/STELA_DHT/attrs", humidityPayloadBuf);
-      client.publish("/4jggokgpepnvsb2uv4s40d59ov/STELA_DHT/attrs", temperaturePayloadBuf);
-      
+
+      client.publish("/4jggokgpepnvsb2uv4s40d59ov1/STELA_DHT/attrs", humidityPayloadBuf);
+      client.publish("/4jggokgpepnvsb2uv4s40d59ov1/STELA_DHT/attrs", temperaturePayloadBuf);
+
       delay(60000);
       break;
     default:
@@ -50,7 +50,7 @@ void publishMeasurements() {
 void reconnect() {
   while (!client.connected()) {
     Serial.println("Connecting to server...");
-    if (!client.connect("arduinoClient")) {      
+    if (!client.connect("arduinoClient")) {
       Serial.println("Connection failed. Trying again in 2 seconds.");
       delay(2000); // Wait until try again
     }
@@ -60,7 +60,7 @@ void reconnect() {
 void setup() {
   Serial.begin(115200);
   delay(2000);
-  
+
   client.setServer(server, 1883);
   Ethernet.begin(mac, ip);
   delay(1500);  // Allow the hardware to sort itself out

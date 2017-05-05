@@ -1,6 +1,8 @@
-import requests, json
 import configparser
+
+import json
 import paho.mqtt.publish as publish
+import requests
 
 
 class FiwareIotClient:
@@ -14,18 +16,15 @@ class FiwareIotClient:
         config = configparser.RawConfigParser(allow_no_value=True)
         config.read_string(sample_config)
 
+        self.fiware_service = config.get('service', 'fiware-service')
+        self.fiware_service_path = config.get('service', 'fiware-service-path')
+
         self.cb_host = config.get('contextbroker', 'host')
         self.cb_port = config.get('contextbroker', 'port')
-        self.cb_fiware_service = config.get('contextbroker', 'fiware-service')
-        self.cb_fiware_service_path = config.get('contextbroker', 'fiware-service-path')
 
         self.idas_host = config.get('idas', 'host')
         self.idas_admin_port = config.get('idas', 'adminport')
         self.idas_ul20_port = config.get('idas', 'ul20port')
-
-        self.fiware_service = config.get('idas', 'fiware-service')
-        self.fiware_service_path = config.get('idas', 'fiware-service-path')
-
         self.api_key = config.get('idas', 'apikey')
 
         self.idas_aaa = config.get('idas', 'OAuth')
@@ -52,7 +51,13 @@ class FiwareIotClient:
         self.host_id = config.get('local', 'host_id')
         f.close()
 
-    def _send_request(self, url, headers, payload, method, format_json_response=False):
+    def _send_request(self, url, payload, method, format_json_response=False, additional_headers={}):
+        default_headers = {'X-Auth-Token': self.token,
+                           'Fiware-Service': self.fiware_service,
+                           'Fiware-ServicePath': self.fiware_service_path}
+
+        headers = {**default_headers, **additional_headers}
+
         print("* Asking to ", url)
         print("* Headers: ")
         print(json.dumps(headers, indent=4))
@@ -74,7 +79,7 @@ class FiwareIotClient:
             r = requests.post(url, data=str_payload, headers=headers)
         elif method == 'PUT':
             r = requests.put(url, data=str_payload, headers=headers)
-        elif method == 'PUT':
+        elif method == 'DELETE':
             r = requests.delete(url, data=str_payload, headers=headers)
         else:
             print("Unsupported method '{}'. Select one of 'GET', 'POST', 'PUT' and 'DELETE'.".format(method))
@@ -115,7 +120,7 @@ class FiwareIotClient:
             }
         }
 
-        headers =  { 'Content-Type': 'application/json' }
+        headers = {'Content-Type': 'application/json'}
         url = tokens_url
 
         resp = requests.post(url, data=json.dumps(payload), headers=headers)
@@ -129,51 +134,45 @@ class FiwareIotClient:
         print("Token expires: ", self.expires)
         print()
 
-    def create_service(self):
+    def create_service(self, service, service_path):
         print("===== CREATING SERVICE =====")
 
         url = "http://{}:{}/iot/services".format(self.idas_host, self.idas_admin_port)
 
-        headers = { 'content-type': 'application/json',
-                    'X-Auth-Token' : self.token,
-                    'Fiware-Service' : self.fiware_service,
-                    'Fiware-ServicePath' : self.fiware_service_path }
+        additional_headers = {'Content-Type': 'application/json',
+                              'Fiware-Service': service,
+                              'Fiware-ServicePath': service_path}
 
-        payload = { "services": [{
+        payload = {"services": [{
                         "protocol": ["IoTA-UL"],
                         "apikey": str(self.api_key),
                         "token": "token2",
                         "cbroker": "http://{}:{}".format(self.cb_host, self.cb_port),
                         "entity_type": "thing",
                         "resource": "/iot/d"
-                    }]
-                 }
+                    }]}
 
-        self._send_request(url, headers, payload, 'POST')
+        self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+
+    def set_service(self, service, service_path):
+        self.fiware_service = service
+        self.fiware_service_path = service_path
 
     def list_devices(self):
         print("===== Listing devices =====")
 
         url = "http://{}:{}/iot/devices".format(self.idas_host, self.idas_admin_port)
-
-        headers = { 'Content-Type': 'application/json',
-                    'X-Auth-Token' : self.token,
-                    'Fiware-Service' : self.fiware_service,
-                    'Fiware-ServicePath' : self.fiware_service_path }
-
+        additional_headers = {'Content-Type': 'application/json'}
         payload = ''
 
-        self._send_request(url, headers, payload, 'GET', format_json_response=True)
+        self._send_request(url, payload, 'GET', format_json_response=True, additional_headers=additional_headers)
 
     def register_device(self, device_file_path, device_id, entity_id, device_ip='', device_port='', protocol='IoTA-UL'):
         print("===== REGISTERING DEVICE =====")
 
         url = "http://{}:{}/iot/devices?protocol={}".format(self.idas_host, self.idas_admin_port, protocol)
 
-        headers = { 'Content-Type': 'application/json',
-                    'X-Auth-Token' : self.token,
-                    'Fiware-Service' : self.fiware_service,
-                    'Fiware-ServicePath' : self.fiware_service_path }
+        additional_headers = {'Content-Type': 'application/json'}
 
         print("* opening: " + device_file_path)
         with open(device_file_path) as json_device_file:
@@ -189,7 +188,7 @@ class FiwareIotClient:
 
         payload = json.loads(json_str)
 
-        self._send_request(url, headers, payload, 'POST', format_json_response=True)
+        self._send_request(url, payload, 'POST', format_json_response=True, additional_headers=additional_headers)
 
     def send_observation(self, device_id, measurements, protocol='mqtt'):
         print("===== SENDING OBSERVATION =====")
@@ -213,38 +212,26 @@ class FiwareIotClient:
         else:
             print("* Transport: UL-HTTP")
             url = "http://{}:{}/iot/d?k={}&i={}".format(self.idas_host, self.idas_ul20_port, self.api_key, device_id)
+            additional_headers = {'Content-Type': 'text/plain'}
 
-            headers = { 'Content-Type': 'text/plain',
-                        'X-Auth-Token' : self.token,
-                        'Fiware-Service' : self.fiware_service,
-                        'Fiware-ServicePath' : self.fiware_service_path }
-
-            self._send_request(url, headers, payload, 'POST')
+            self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
     def get_entity_by_id(self, id):
         print("===== GETTING ENTITY BY ID '{}'=====".format(id))
 
         url = "http://{}:{}/v2/entities/{}/attrs?type=thing".format(self.cb_host, self.cb_port, id)
-
-        headers = { 'X-Auth-Token' : self.token,
-                    'Fiware-Service' : self.cb_fiware_service,
-                    'Fiware-ServicePath' : self.cb_fiware_service_path }
-
         payload = ''
 
-        self._send_request(url, headers, payload, 'GET', format_json_response=True)
+        self._send_request(url, payload, 'GET', format_json_response=True)
 
     def get_entities_by_type(self, type):
         print("===== GETTING ENTITIES BY TYPE '{}'=====".format(type))
 
-        from collections import Counter
-        import re
-
         url = "http://{}:{}/v2/entities?type={}".format(self.cb_host, self.cb_port, type)
 
-        headers = { 'X-Auth-Token' : self.token,
-                    'Fiware-Service' : self.cb_fiware_service,
-                    'Fiware-ServicePath' : self.cb_fiware_service_path }
+        headers = {'X-Auth-Token': self.token,
+                   'Fiware-Service': self.fiware_service,
+                   'Fiware-ServicePath': self.fiware_service_path}
 
         payload = ''
 
@@ -268,8 +255,8 @@ class FiwareIotClient:
             print(entity["id"])
         print()
 
-        ASK = str(input("Do you want me to print all entities data? (yes/no)"))
-        if ASK == "yes" or ASK == "y":
+        answer = str(input("Do you want me to print all entities data? (yes/no)"))
+        if answer == "yes" or answer == "y":
             print(json.dumps(entities, indent=4))
 
         print()
@@ -279,11 +266,8 @@ class FiwareIotClient:
         print("===== SIMULATING COMMAND =====")
         url = "http://{}:{}/v1/updateContext".format(self.idas_host, self.idas_admin_port)
 
-        headers = { 'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-Auth-Token' : self.token,
-                    'Fiware-Service' : self.cb_fiware_service,
-                    'Fiware-ServicePath' : self.cb_fiware_service_path }
+        additional_headers = {'Content-Type': 'application/json',
+                              'Accept': 'application/json'}
 
         params = '|'.join(['%s' % (str(value)) for (key, value) in params.items()])
         # if params != '':
@@ -307,32 +291,24 @@ class FiwareIotClient:
                     "updateAction": "UPDATE"
                  }
 
-        self._send_request(url, headers, payload, 'POST', format_json_response=True)
+        self._send_request(url, payload, 'POST', format_json_response=True, additional_headers=additional_headers)
 
     def get_pooling_commands(self, sensor_id):
         print("===== GETTING POOLING COMMANDS =====")
 
         url = "http://{}:{}/iot/d?k={}&i={}".format(self.idas_host, self.idas_ul20_port, self.api_key, sensor_id)
-
         payload = ''
+        additional_headers = {'Content-Type': 'application/json'}
 
-        headers = { 'Content-Type': 'application/json',
-                    'X-Auth-Token' : self.token,
-                    'Fiware-Service' : self.fiware_service,
-                    'Fiware-ServicePath' : self.fiware_service_path }
-
-        self._send_request(url, headers, payload, 'GET')
+        self._send_request(url, payload, 'GET', additional_headers=additional_headers)
 
     def subscribe_attributes_change(self, device_id, attributes, notification_url):
         print("===== SUBSCRIBING TO ATTRIBUTES '{}' CHANGE =====".format(attributes))
 
         url = "http://{}:{}/v1/subscribeContext".format(self.cb_host, self.cb_port)
 
-        headers = { 'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-Auth-Token' : self.token,
-                    'Fiware-Service' : self.cb_fiware_service,
-                    'Fiware-ServicePath' : self.cb_fiware_service_path }
+        additional_headers = {'Accept': 'application/json',
+                              'Content-Type': 'application/json'}
 
         payload = { "entities": [{
                         "type": "thing",
@@ -349,7 +325,7 @@ class FiwareIotClient:
                     "throttling": "PT1S"
                   }
 
-        self._send_request(url, headers, payload, 'POST')
+        self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
     def subscribe_cygnus(self, entity_id, attributes):
         print("===== SUBSCRIBING CYGNUS =====")
@@ -368,25 +344,21 @@ class FiwareIotClient:
 
         url = "http://{}:{}/STH/v1/contextEntities/type/thing/id/{}/attributes/{}?lastN={}".format(self.sth_host, self.sth_port, entity_id, attribute, items_number)
 
-        headers = {'Accept': 'application/json',
-                   'X-Auth-Token': self.token,
-                   'Fiware-Service': str(self.cb_fiware_service).lower(),
-                   'Fiware-ServicePath': str(self.cb_fiware_service_path).lower()}
+        additional_headers = {'Accept': 'application/json',
+                              'Fiware-Service': str(self.fiware_service).lower(),
+                              'Fiware-ServicePath': str(self.fiware_service_path).lower()}
 
         payload = ''
 
-        self._send_request(url, headers, payload, 'GET', format_json_response=True)
+        self._send_request(url, payload, 'GET', format_json_response=True, additional_headers=additional_headers)
 
     def create_attribute_change_rule(self, attribute, attribute_type, condition, notification_url, action='post'):
         print("===== CREATE ATTRIBUTE CHANGE RULE =====")
 
         url = "http://{}:{}/rules".format(self.perseo_host, self.perseo_port)
 
-        headers = {'Accept': 'application/json',
-                   'Content-Type': 'application/json',
-                   'X-Auth-Token': self.token,
-                   'Fiware-Service': self.cb_fiware_service,
-                   'Fiware-ServicePath': self.cb_fiware_service_path}
+        additional_headers = {'Accept': 'application/json',
+                              'Content-Type': 'application/json'}
 
         payload = {
             "name": "{}-rule".format(attribute),
@@ -408,4 +380,4 @@ class FiwareIotClient:
             payload["action"]["type"] = "post"
             payload["action"]["parameters"] = {"url": "{}".format(notification_url)}
 
-        self._send_request(url, headers, payload, 'POST', format_json_response=True)
+        self._send_request(url, payload, 'POST', format_json_response=True, additional_headers=additional_headers)
