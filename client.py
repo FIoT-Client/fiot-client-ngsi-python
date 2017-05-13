@@ -6,12 +6,11 @@ import requests
 
 
 class FiwareIotClient:
-
     def __init__(self):
         config_file = "config.ini"
 
-        # Load the configuration file
-        with open(config_file,'r+') as f:
+        # Load the default configuration file
+        with open(config_file, 'r+') as f:
             sample_config = f.read()
         config = configparser.RawConfigParser(allow_no_value=True)
         config.read_string(sample_config)
@@ -29,11 +28,11 @@ class FiwareIotClient:
 
         self.idas_aaa = config.get('idas', 'OAuth')
         if self.idas_aaa == "yes":
-           self.token = config.get('user', 'token')
-           self.token_show = self.token[1:5] + "*"*70 + self.token[-5:]
+            self.token = config.get('user', 'token')
+            self.token_show = self.token[1:5] + "*" * 70 + self.token[-5:]
         else:
-          self.token = "NULL"
-          self.token_show = "NULL"
+            self.token = "NULL"
+            self.token_show = "NULL"
 
         self.sth_host = config.get('sthcomet', 'host')
         self.sth_port = config.get('sthcomet', 'port')
@@ -126,13 +125,11 @@ class FiwareIotClient:
         resp = requests.post(url, data=json.dumps(payload), headers=headers)
         print()
         self.token = resp.json()["access"]["token"]["id"]
-        self.token_show = self.token[1:5] + "*"*70 + self.token[-5:]
+        self.token_show = self.token[1:5] + "*" * 70 + self.token[-5:]
         self.expires = resp.json()["access"]["token"]["expires"]
 
-        print("FIWARE Oauth2.0 Token: ", self.token)
-        print()
-        print("Token expires: ", self.expires)
-        print()
+        print("FIWARE OAuth2.0 Token: {}".format(self.token))
+        print("Token expires: {}".format(self.expires))
 
     def create_service(self, service, service_path):
         print("===== CREATING SERVICE =====")
@@ -144,13 +141,13 @@ class FiwareIotClient:
                               'Fiware-ServicePath': service_path}
 
         payload = {"services": [{
-                        "protocol": ["IoTA-UL"],
-                        "apikey": str(self.api_key),
-                        "token": "token2",
-                        "cbroker": "http://{}:{}".format(self.cb_host, self.cb_port),
-                        "entity_type": "thing",
-                        "resource": "/iot/d"
-                    }]}
+            "protocol": ["IoTA-UL"],
+            "apikey": str(self.api_key),
+            "token": "token2",
+            "cbroker": "http://{}:{}".format(self.cb_host, self.cb_port),
+            "entity_type": "thing",
+            "resource": "/iot/d"
+        }]}
 
         self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
@@ -159,7 +156,7 @@ class FiwareIotClient:
         self.fiware_service_path = service_path
 
     def list_devices(self):
-        print("===== Listing devices =====")
+        print("===== LISTING DEVICES =====")
 
         url = "http://{}:{}/iot/devices".format(self.idas_host, self.idas_admin_port)
         additional_headers = {'Content-Type': 'application/json'}
@@ -180,20 +177,33 @@ class FiwareIotClient:
 
         json_str = json.dumps(payload)
         json_str = json_str.replace('[DEVICE_ID]', str(device_id)) \
-                           .replace('[ENTITY_ID]', str(entity_id))
+            .replace('[ENTITY_ID]', str(entity_id))
 
         if '"endpoint"' in json_str:
             json_str = json_str.replace('[DEVICE_IP]', str(device_ip)) \
-                               .replace('[PORT]', str(device_port))
+                .replace('[PORT]', str(device_port))
 
         payload = json.loads(json_str)
 
         self._send_request(url, payload, 'POST', format_json_response=True, additional_headers=additional_headers)
 
+    @staticmethod
+    def _join_group_measurements(group_measurements):
+        return '|'.join(['%s|%s' % (str(key), str(value)) for (key, value) in group_measurements.items()])
+
     def send_observation(self, device_id, measurements, protocol='mqtt'):
         print("===== SENDING OBSERVATION =====")
 
-        payload = '#'.join(['%s|%s' % (str(key), str(value)) for (key, value) in measurements.items()])
+        if isinstance(measurements, list):  # multiple measurement groups list
+            groups_payload = []
+            for measurement_group in measurements:
+                group_payload = FiwareIotClient._join_group_measurements(measurement_group)
+                groups_payload.append(group_payload)
+
+            payload = '#'.join(groups_payload)
+
+        else:  # single measurement group dict
+            payload = FiwareIotClient._join_group_measurements(measurements)
 
         if protocol == 'mqtt':
             print("* Transport: MQTT")
@@ -209,12 +219,15 @@ class FiwareIotClient:
             publish.single(topic, payload, hostname=self.mosquitto_host)
             print("* OK ")
 
-        else:
+        elif protocol == 'http':
             print("* Transport: UL-HTTP")
             url = "http://{}:{}/iot/d?k={}&i={}".format(self.idas_host, self.idas_ul20_port, self.api_key, device_id)
             additional_headers = {'Content-Type': 'text/plain'}
 
             self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+
+        else:
+            print("Unknown transport protocol '{}'. Accepted values are 'mqtt' and 'http'".format(protocol))
 
     def get_entity_by_id(self, id):
         print("===== GETTING ENTITY BY ID '{}'=====".format(id))
@@ -262,8 +275,10 @@ class FiwareIotClient:
         print()
 
     def simulate_command(self, entity_id, device_id, command, params={}):
-        # http://fiware-orion.readthedocs.io/en/latest/user/walkthrough_apiv1/index.html#ngsi10-standard-operations , at "Update context elements"
+        # http://fiware-orion.readthedocs.io/en/latest/user/walkthrough_apiv1/index.html#ngsi10-standard-operations
+        # at "Update context elements"
         print("===== SIMULATING COMMAND =====")
+
         url = "http://{}:{}/v1/updateContext".format(self.idas_host, self.idas_admin_port)
 
         additional_headers = {'Content-Type': 'application/json',
@@ -278,18 +293,19 @@ class FiwareIotClient:
 
         value = params
 
-        payload = { "contextElements": [{
-                        "type": "thing",
-                        "isPattern": "false",
-                        "id": entity_id,
-                        "attributes": [{
-                            "name": command,
-                            "type": "command",
-                            "value": value
-                        }]
-                    }],
-                    "updateAction": "UPDATE"
-                 }
+        payload = {"contextElements": [
+            {
+                "type": "thing",
+                "isPattern": "false",
+                "id": entity_id,
+                "attributes": [{
+                    "name": command,
+                    "type": "command",
+                    "value": value
+                }]
+            }],
+            "updateAction": "UPDATE"
+        }
 
         self._send_request(url, payload, 'POST', format_json_response=True, additional_headers=additional_headers)
 
@@ -310,20 +326,20 @@ class FiwareIotClient:
         additional_headers = {'Accept': 'application/json',
                               'Content-Type': 'application/json'}
 
-        payload = { "entities": [{
-                        "type": "thing",
-                        "isPattern": "false",
-                        "id": str(device_id)
-                    }],
-                    "attributes": attributes,
-                    "notifyConditions": [{
-                        "type": "ONCHANGE",
-                        "condValues": attributes
-                    }],
-                    "reference": notification_url,
-                    "duration": "P1Y",
-                    "throttling": "PT1S"
-                  }
+        payload = {"entities": [{
+            "type": "thing",
+            "isPattern": "false",
+            "id": str(device_id)
+        }],
+            "attributes": attributes,
+            "notifyConditions": [{
+                "type": "ONCHANGE",
+                "condValues": attributes
+            }],
+            "reference": notification_url,
+            "duration": "P1Y",
+            "throttling": "PT1S"
+        }
 
         self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
@@ -342,7 +358,10 @@ class FiwareIotClient:
     def get_device_historical_data(self, entity_id, attribute, items_number=10):
         print("===== GETTING DEVICE HISTORICAL DATA =====")
 
-        url = "http://{}:{}/STH/v1/contextEntities/type/thing/id/{}/attributes/{}?lastN={}".format(self.sth_host, self.sth_port, entity_id, attribute, items_number)
+        url = "http://{}:{}/STH/v1/contextEntities/type/thing/id/{}/attributes/{}?lastN={}".format(self.sth_host,
+                                                                                                   self.sth_port,
+                                                                                                   entity_id, attribute,
+                                                                                                   items_number)
 
         additional_headers = {'Accept': 'application/json',
                               'Fiware-Service': str(self.fiware_service).lower(),
@@ -360,10 +379,11 @@ class FiwareIotClient:
         additional_headers = {'Accept': 'application/json',
                               'Content-Type': 'application/json'}
 
+        rule_template = "select *,\"{}-rule\" as ruleName from pattern " \
+                        "[every ev=iotEvent(cast(cast(ev.{}?,String),{}){})]"
         payload = {
             "name": "{}-rule".format(attribute),
-            "text": "select *,\"{}-rule\" as ruleName from pattern [every ev=iotEvent(cast(cast(ev.{}?,String),{}){})]".format(
-                attribute, attribute, attribute_type, condition),
+            "text": rule_template.format(attribute, attribute, attribute_type, condition),
             "action": {
                 "type": "",
                 "template": "Alert! {0} is now ${{ev.{1}}}.".format(attribute, attribute),
@@ -376,8 +396,12 @@ class FiwareIotClient:
             payload["action"]["parameters"] = {"to": "{}".format("lucascristiano27@gmail.com"),
                                                "from": "{}".format("lucas.calixto.dantas@gmail.com"),
                                                "subject": "Alert! High {} Detected".format(attribute.capitalize())}
-        else:  # if action == 'post':
+        elif action == 'post':
             payload["action"]["type"] = "post"
             payload["action"]["parameters"] = {"url": "{}".format(notification_url)}
+
+        else:
+            print("Unknown action '{}'".format(action))
+            return
 
         self._send_request(url, payload, 'POST', format_json_response=True, additional_headers=additional_headers)
