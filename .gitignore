@@ -6,4 +6,4 @@ __pycache__/
 *pyc
 
 #Virtualenv folder
-.iotclient/
+.env/
