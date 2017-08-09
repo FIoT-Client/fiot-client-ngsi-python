@@ -10,7 +10,7 @@ from common import SimpleClient
 class FiwareIotClient(SimpleClient):
 
     def __init__(self, config_file):
-        super(SimpleClient, self).__init__()
+        super().__init__(config_file)
 
         # Load the default configuration file
         with open(config_file, 'r+') as f:
@@ -27,51 +27,6 @@ class FiwareIotClient(SimpleClient):
         self.mosquitto_port = config.get('mosquitto', 'port')
 
         f.close()
-
-    def _send_request(self, url, payload, method, format_json_response=False, additional_headers={}):
-        default_headers = {'X-Auth-Token': self.token,
-                           'Fiware-Service': self.fiware_service,
-                           'Fiware-ServicePath': self.fiware_service_path}
-
-        headers = {**default_headers, **additional_headers}
-
-        print("* Asking to ", url)
-        print("* Headers: ")
-        print(json.dumps(headers, indent=4))
-
-        if not isinstance(payload, str):
-            str_payload = json.dumps(payload, indent=4)
-        else:
-            str_payload = payload
-
-        if str_payload != '':
-            print("* Sending PAYLOAD: ")
-            print(str_payload)
-            print()
-            print("...")
-
-        if method == 'GET':
-            r = requests.get(url, data=str_payload, headers=headers)
-        elif method == 'POST':
-            r = requests.post(url, data=str_payload, headers=headers)
-        elif method == 'PUT':
-            r = requests.put(url, data=str_payload, headers=headers)
-        elif method == 'DELETE':
-            r = requests.delete(url, data=str_payload, headers=headers)
-        else:
-            print("Unsupported method '{}'. Select one of 'GET', 'POST', 'PUT' and 'DELETE'.".format(method))
-            return
-
-        print()
-        print("* Status Code: ", str(r.status_code))
-        print("* Response: ")
-
-        if format_json_response:
-            print(json.dumps(json.loads(r.text), indent=4))
-        else:
-            print(r.text)
-
-        print()
 
     def get_token(self):
         import getpass
@@ -109,7 +64,7 @@ class FiwareIotClient(SimpleClient):
         print("FIWARE OAuth2.0 Token: {}".format(self.token))
         print("Token expires: {}".format(self.expires))
 
-    def create_service(self, service, service_path):
+    def create_service(self, service, service_path, api_key):
         print("===== CREATING SERVICE =====")
 
         url = "http://{}:{}/iot/services".format(self.idas_host, self.idas_admin_port)
@@ -120,7 +75,7 @@ class FiwareIotClient(SimpleClient):
 
         payload = {"services": [{
             "protocol": ["IoTA-UL"],
-            "apikey": str(self.api_key),
+            "apikey": str(api_key),
             "token": "token2",
             "cbroker": "http://{}:{}".format(self.cb_host, self.cb_port),
             "entity_type": "thing",
@@ -129,9 +84,8 @@ class FiwareIotClient(SimpleClient):
 
         self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
-    def set_service(self, service, service_path):
-        self.fiware_service = service
-        self.fiware_service_path = service_path
+    def set_api_key(self, api_key):
+        self.api_key = api_key
 
     def list_devices(self):
         print("===== LISTING DEVICES =====")

@@ -9,16 +9,13 @@ from common import SimpleClient
 class FiwareContextClient(SimpleClient):
 
     def __init__(self, config_file):
-        super(SimpleClient, self).__init__()
+        super().__init__(config_file)
 
         # Load the default configuration file
         with open(config_file, 'r+') as f:
             sample_config = f.read()
         config = configparser.RawConfigParser(allow_no_value=True)
         config.read_string(sample_config)
-
-        self.cb_host = config.get('contextbroker', 'host')
-        self.cb_port = config.get('contextbroker', 'port')
 
         self.sth_host = config.get('sthcomet', 'host')
         self.sth_port = config.get('sthcomet', 'port')

@@ -6,9 +6,7 @@ import requests
 
 class SimpleClient:
 
-    def __init__(self):
-        config_file = "config.ini"
-
+    def __init__(self, config_file):
         # Load the default configuration file
         with open(config_file, 'r+') as f:
             sample_config = f.read()
@@ -17,6 +15,9 @@ class SimpleClient:
 
         self.fiware_service = config.get('service', 'fiware-service')
         self.fiware_service_path = config.get('service', 'fiware-service-path')
+
+        self.cb_host = config.get('contextbroker', 'host')
+        self.cb_port = config.get('contextbroker', 'port')
 
         self.idas_aaa = config.get('idas', 'OAuth')  # TODO Mode to correct place
         if self.idas_aaa == "yes":
