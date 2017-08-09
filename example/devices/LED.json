@@ -15,9 +15,9 @@
          ],
          "commands":[
             {
-               "name":"state",
+               "name":"change_state",
                "type":"command",
-               "value":"[DEVICE_ID]@state|%s"
+               "value":"[DEVICE_ID]@change_state|%s"
             }
          ],
          "static_attributes":[
