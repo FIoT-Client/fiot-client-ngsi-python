@@ -1,0 +1,25 @@
+{
+   "devices":[
+      {
+         "device_id":"[DEVICE_ID]",
+         "entity_name":"[ENTITY_ID]",
+         "entity_type":"thing",
+         "timezone":"America/Fortaleza",
+         "transport":"MQTT",
+         "attributes":[
+            {
+               "object_id":"p",
+               "name":"presence",
+               "type":"bool"
+            }
+         ],
+         "static_attributes":[
+            {
+               "name":"id",
+               "type":"string",
+               "value":"[DEVICE_ID]"
+            }
+         ]
+      }
+   ]
+}

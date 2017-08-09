@@ -15,15 +15,40 @@ IPAddress gateway(10, 10, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 **/
 
+#define DHT21_PIN 2
+#define LED_PIN   3
+
+// Callback function header
+void callback(char* topic, byte* payload, unsigned int length);
+
 EthernetClient ethClient;
 PubSubClient client(ethClient);
 
 dht DHT;
 
-#define DHT21_PIN 2
-#define LED_PIN   3
+char* cmdAnswerTopic = "/4jggokgpepnvsb2uv4s40d59ov2/STELA_LED/cmdexe";
 
-char* cmdAnswerTopic = "/4jggokgpepnvsb2uv4s40d59ov1/STELA_LED/cmdexe"; // /API_KEY/DEVICE_ID/cmdexe + 5
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.println("] ");
+
+  for (int i=0; i < length; i++) {
+    Serial.print((char)payload[i]);
+  }
+
+  if (strcmp((char *) payload, "change_state|ON") == 0) {
+    digitalWrite(LED_PIN, HIGH);
+    client.publish(cmdAnswerTopic, "change_state|Done");
+  } else if (strcmp((char *) payload, "change_state|OFF") == 0) {
+    digitalWrite(LED_PIN, LOW);
+    client.publish(cmdAnswerTopic, "change_state|Done");
+  } else {
+    client.publish(cmdAnswerTopic, "change_state|Error");
+  }
+
+  Serial.println("Answer sent");
+}
 
 void setup() {
   Serial.begin(115200);
@@ -44,7 +69,6 @@ void publishMeasurements() {
   char strTemperature[6];
 
   char measurementPayloadBuf[40];
-  char measurementPayloadBuf[40];
 
   int chk = DHT.read21(DHT21_PIN);
   switch (chk){
@@ -55,7 +79,7 @@ void publishMeasurements() {
       sprintf(measurementPayloadBuf, "h|%s|t|%s", strHumidity, strTemperature);
       Serial.println(measurementPayloadBuf);
 
-      client.publish("/4jggokgpepnvsb2uv4s40d59ov1/STELA_DHT/attrs", measurementPayloadBuf);
+      client.publish("/4jggokgpepnvsb2uv4s40d59ov2/STELA_DHT/attrs", measurementPayloadBuf);
 
       delay(60000);
       break;
@@ -64,28 +88,6 @@ void publishMeasurements() {
       delay(2000);
       break;
   }
-}
-
-void callback(char* topic, byte* payload, unsigned int length) {
-	Serial.print("Message arrived [");
-	Serial.print(topic);
-	Serial.println("] ");
-
-	//for (int i=0; i < length; i++) {
-	//	Serial.print((char)payload[i]);
-	//}
-
-	if (cmd.strcmp((char *) payload, "ON")) {
-		digitalWrite(LED_PIN, HIGH);
-		client.publish(cmdAnswerTopic, "change_state|Done");
-	} else if (cmd.strcmp((char *) payload, "OFF")) {
-		digitalWrite(LED_PIN, LOW);
-		client.publish(cmdAnswerTopic, "change_state|Done");
-	} else {
-		client.publish(cmdAnswerTopic, "change_state|Error");
-	}
-
-	Serial.println("Answer sent");
 }
 
 void reconnect() {
@@ -100,6 +102,8 @@ void reconnect() {
 
 void loop() {
   if (client.connected()){
+    Serial.println("Subscribing LED command topic");
+    client.subscribe("/4jggokgpepnvsb2uv4s40d59ov2/STELA_LED/cmd");
     publishMeasurements();
   } else {
     reconnect();
