@@ -1,3 +1,0 @@
-FiwareIoT-Orion-IDAS-Mosquitto: 	10.7.49.163
-FiwareIoT-Cygnus-MySQL-MongoDB-STH: 10.7.49.164
-Cloud-admin:  						10.7.49.201
