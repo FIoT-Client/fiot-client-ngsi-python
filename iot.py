@@ -1,10 +1,19 @@
-import configparser
 import json
 
 import paho.mqtt.publish as publish
 import requests
 
+import utils
 from common import SimpleClient
+
+__author__ = "Lucas Cristiano Calixto Dantas"
+__copyright__ = "Copyright 2017, Lucas Cristiano Calixto Dantas"
+__credits__ = ["Lucas Cristiano Calixto Dantas"]
+__license__ = "GPL"
+__version__ = "0.1.0"
+__maintainer__ = "Lucas Cristiano Calixto Dantas"
+__email__ = "lucascristiano27@gmail.com"
+__status__ = "Development"
 
 
 class FiwareIotClient(SimpleClient):
@@ -12,21 +21,15 @@ class FiwareIotClient(SimpleClient):
     def __init__(self, config_file):
         super().__init__(config_file)
 
-        # Load the default configuration file
-        with open(config_file, 'r+') as f:
-            sample_config = f.read()
-        config = configparser.RawConfigParser(allow_no_value=True)
-        config.read_string(sample_config)
+        config_dict = utils.read_config_file(config_file)
 
-        self.idas_host = config.get('idas', 'host')
-        self.idas_admin_port = config.get('idas', 'adminport')
-        self.idas_ul20_port = config.get('idas', 'ul20port')
-        self.api_key = config.get('idas', 'apikey')
+        self.idas_host = config_dict['idas_host']
+        self.idas_admin_port = config_dict['idas_admin_port']
+        self.idas_ul20_port = config_dict['idas_ul20_port']
+        self.api_key = config_dict['api_key']
 
-        self.mosquitto_host = config.get('mosquitto', 'host')
-        self.mosquitto_port = config.get('mosquitto', 'port')
-
-        f.close()
+        self.mosquitto_host = config_dict['mosquitto_host']
+        self.mosquitto_port = config_dict['mosquitto_port']
 
     def get_token(self):
         import getpass
@@ -161,10 +164,13 @@ class FiwareIotClient(SimpleClient):
         else:
             print("Unknown transport protocol '{}'. Accepted values are 'mqtt' and 'http'".format(protocol))
 
-    def simulate_command(self, entity_id, device_id, command, params={}):
+    def simulate_command(self, entity_id, device_id, command, params=None):
         # http://fiware-orion.readthedocs.io/en/latest/user/walkthrough_apiv1/index.html#ngsi10-standard-operations
         # at "Update context elements"
         print("===== SIMULATING COMMAND =====")
+
+        if params is None:
+            params = {}
 
         url = "http://{}:{}/v1/updateContext".format(self.idas_host, self.idas_admin_port)
 

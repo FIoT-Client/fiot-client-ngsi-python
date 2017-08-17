@@ -1,42 +1,45 @@
-import configparser
 import json
 
 import requests
+
+import utils
+
+__author__ = "Lucas Cristiano Calixto Dantas"
+__copyright__ = "Copyright 2017, Lucas Cristiano Calixto Dantas"
+__credits__ = ["Lucas Cristiano Calixto Dantas"]
+__license__ = "GPL"
+__version__ = "0.1.0"
+__maintainer__ = "Lucas Cristiano Calixto Dantas"
+__email__ = "lucascristiano27@gmail.com"
+__status__ = "Development"
 
 
 class SimpleClient:
 
     def __init__(self, config_file):
-        # Load the default configuration file
-        with open(config_file, 'r+') as f:
-            sample_config = f.read()
-        config = configparser.RawConfigParser(allow_no_value=True)
-        config.read_string(sample_config)
+        config_dict = utils.read_config_file(config_file)
 
-        self.fiware_service = config.get('service', 'fiware-service')
-        self.fiware_service_path = config.get('service', 'fiware-service-path')
+        self.fiware_service = config_dict['fiware_service']
+        self.fiware_service_path = config_dict['fiware_service_path']
 
-        self.cb_host = config.get('contextbroker', 'host')
-        self.cb_port = config.get('contextbroker', 'port')
+        self.cb_host = config_dict['cb_host']
+        self.cb_port = config_dict['cb_port']
 
-        self.idas_aaa = config.get('idas', 'OAuth')  # TODO Mode to correct place
-        if self.idas_aaa == "yes":
-            self.token = config.get('user', 'token')
-            self.token_show = self.token[1:5] + "*" * 70 + self.token[-5:]
-        else:
-            self.token = "NULL"
-            self.token_show = "NULL"
+        self.idas_aaa = config_dict['idas_aaa']
+        self.token = config_dict['token']
+        self.token_show = config_dict['token_show']
 
-        self.host_id = config.get('local', 'host_id')
+        self.host_id = config_dict['host_id']
 
-        f.close()
-
-    def _send_request(self, url, payload, method, format_json_response=False, additional_headers={}):
+    def _send_request(self, url, payload, method, format_json_response=False, additional_headers=None):
         default_headers = {'X-Auth-Token': self.token,
                            'Fiware-Service': self.fiware_service,
                            'Fiware-ServicePath': self.fiware_service_path}
 
-        headers = {**default_headers, **additional_headers}
+        if additional_headers is None:
+            additional_headers = {}
+
+        headers = utils.merge_dicts(default_headers, additional_headers)
 
         print("* Asking to ", url)
         print("* Headers: ")

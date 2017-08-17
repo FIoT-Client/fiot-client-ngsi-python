@@ -1,9 +1,18 @@
-import configparser
 import json
 
 import requests
 
+import utils
 from common import SimpleClient
+
+__author__ = "Lucas Cristiano Calixto Dantas"
+__copyright__ = "Copyright 2017, Lucas Cristiano Calixto Dantas"
+__credits__ = ["Lucas Cristiano Calixto Dantas"]
+__license__ = "GPL"
+__version__ = "0.1.0"
+__maintainer__ = "Lucas Cristiano Calixto Dantas"
+__email__ = "lucascristiano27@gmail.com"
+__status__ = "Development"
 
 
 class FiwareContextClient(SimpleClient):
@@ -11,25 +20,25 @@ class FiwareContextClient(SimpleClient):
     def __init__(self, config_file):
         super().__init__(config_file)
 
-        # Load the default configuration file
-        with open(config_file, 'r+') as f:
-            sample_config = f.read()
-        config = configparser.RawConfigParser(allow_no_value=True)
-        config.read_string(sample_config)
+        config_dict = utils.read_config_file(config_file)
 
-        self.sth_host = config.get('sthcomet', 'host')
-        self.sth_port = config.get('sthcomet', 'port')
+        self.sth_host = config_dict['sth_host']
+        self.sth_port = config_dict['sth_port']
 
-        self.cygnus_host = config.get('cygnus', 'host')
-        self.cygnus_notification_host = config.get('cygnus', 'notification_host')
-        self.cygnus_port = config.get('cygnus', 'port')
+        self.cygnus_host = config_dict['cygnus_host']
+        self.cygnus_notification_host = config_dict['cygnus_notification_host']
+        self.cygnus_port = config_dict['cygnus_port']
 
-        self.perseo_host = config.get('perseo', 'host')
-        self.perseo_port = config.get('perseo', 'port')
-
-        f.close()
+        self.perseo_host = config_dict['perseo_host']
+        self.perseo_port = config_dict['perseo_port']
 
     def get_entity_by_id(self, id):
+        """
+        Queries an entity information give its entity id
+        :param id: The id of the entity to be searched
+        :return: The information of the entity found with the given id or None if no entity was found with the id
+        """
+
         print("===== GETTING ENTITY BY ID '{}'=====".format(id))
 
         url = "http://{}:{}/v2/entities/{}/attrs?type=thing".format(self.cb_host, self.cb_port, id)
