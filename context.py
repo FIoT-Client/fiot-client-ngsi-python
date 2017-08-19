@@ -1,6 +1,4 @@
-import json
-
-import requests
+import logging
 
 import utils
 from common import SimpleClient
@@ -32,68 +30,49 @@ class FiwareContextClient(SimpleClient):
         self.perseo_host = config_dict['perseo_host']
         self.perseo_port = config_dict['perseo_port']
 
-    def get_entity_by_id(self, id):
+    def get_entity_by_id(self, entity_id):
         """
         Queries an entity information give its entity id
-        :param id: The id of the entity to be searched
+        :param entity_id: The id of the entity to be searched
         :return: The information of the entity found with the given id or None if no entity was found with the id
         """
+        logging.info("Getting entity by id '{}'".format(entity_id))
 
-        print("===== GETTING ENTITY BY ID '{}'=====".format(id))
-
-        url = "http://{}:{}/v2/entities/{}/attrs?type=thing".format(self.cb_host, self.cb_port, id)
-        payload = ''
-
-        self._send_request(url, payload, 'GET', format_json_response=True)
-
-    def get_entities_by_type(self, type):
-        print("===== GETTING ENTITIES BY TYPE '{}'=====".format(type))
-
-        url = "http://{}:{}/v2/entities?type={}".format(self.cb_host, self.cb_port, type)
-
-        headers = {'X-Auth-Token': self.token,  # TODO Use token from common client
-                   'Fiware-Service': self.fiware_service,
-                   'Fiware-ServicePath': self.fiware_service_path}
+        # TODO Remove hardcoded type from url
+        url = "http://{}:{}/v2/entities/{}/attrs?type=thing".format(self.cb_host, self.cb_port, entity_id)
 
         payload = ''
 
-        print("* Asking to ", url)
-        print("* Headers: ")
-        print(json.dumps(headers, indent=4))
-        print("* Sending PAYLOAD: ")
-        print(json.dumps(payload, indent=4))
-        print()
-        print("...")
-        r = requests.get(url, payload, headers=headers)
-        print()
-        print("* Status Code: ", str(r.status_code))
-        print("* Response: ")
+        return self._send_request(url, payload, 'GET')
 
-        entities = json.loads(r.text)
+    def get_entities_by_type(self, entity_type):
+        logging.info("Getting entities by type '{}'".format(type))
 
-        print("***** Number of entities found: ", len(entities))
-        print("**** List of entity IDs")
-        for entity in entities:
-            print(entity["id"])
-        print()
+        url = "http://{}:{}/v2/entities?type={}".format(self.cb_host, self.cb_port, entity_type)
+        payload = ''
 
-        answer = str(input("Do you want me to print all entities data? (yes/no)"))
-        if answer == "yes" or answer == "y":
-            print(json.dumps(entities, indent=4))
+        return self._send_request(url, payload, 'GET')
 
-        print()
+    def get_subscription_by_id(self, subscription_id):
+        logging.info("Getting subscription by id '{}'".format(subscription_id))
+
+        url = "http://{}:{}/v2/subscriptions/{}".format(self.cb_host, self.cb_port, subscription_id)
+
+        payload = ''
+
+        return self._send_request(url, payload, 'GET')
 
     def list_subscriptions(self):
-        print("===== LISTING SUBSCRIPTIONS =====")
+        logging.info("Listing subscriptions")
 
         url = "http://{}:{}/v2/subscriptions".format(self.cb_host, self.cb_port)
 
         payload = ''
 
-        self._send_request(url, payload, 'GET', format_json_response=True)
+        return self._send_request(url, payload, 'GET')
 
     def unsubscribe(self, subscription_id):
-        print("===== REMOVING SUBSCRIPTION =====")
+        logging.info("Removing subscriptions")
 
         url = "http://{}:{}/v1/unsubscribeContext".format(self.cb_host, self.cb_port)
         
@@ -102,10 +81,10 @@ class FiwareContextClient(SimpleClient):
 
         payload = {"subscriptionId": str(subscription_id)}
 
-        self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
     def subscribe_attributes_change(self, device_id, attributes, notification_url):
-        print("===== SUBSCRIBING TO ATTRIBUTES '{}' CHANGE =====".format(attributes))
+        logging.info("Subscribing for change on attributes '{}' on device with id '{}'".format(attributes, device_id))
 
         url = "http://{}:{}/v1/subscribeContext".format(self.cb_host, self.cb_port)
 
@@ -127,22 +106,22 @@ class FiwareContextClient(SimpleClient):
             "throttling": "PT1S"
         }
 
-        self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
     def subscribe_cygnus(self, entity_id, attributes):
-        print("===== SUBSCRIBING CYGNUS =====")
+        logging.info("Subscribing Cygnus")
 
         notification_url = "http://{}:{}/notify".format(self.cygnus_notification_host, self.cygnus_port)
-        self.subscribe_attributes_change(entity_id, attributes, notification_url)
+        return self.subscribe_attributes_change(entity_id, attributes, notification_url)
 
     def subscribe_historical_data(self, entity_id, attributes):
-        print("===== SUBSCRIBING TO HISTORICAL DATA =====")
+        logging.info("Subscribing to historical data")
 
         notification_url = "http://{}:{}/notify".format(self.sth_host, self.sth_port)
-        self.subscribe_attributes_change(entity_id, attributes, notification_url)
+        return self.subscribe_attributes_change(entity_id, attributes, notification_url)
 
     def create_attribute_change_rule(self, attribute, attribute_type, condition, notification_url, action='post'):
-        print("===== CREATE ATTRIBUTE CHANGE RULE =====")
+        logging.info("Creating attribute change rule")
 
         url = "http://{}:{}/rules".format(self.perseo_host, self.perseo_port)
 
@@ -172,13 +151,14 @@ class FiwareContextClient(SimpleClient):
             payload["action"]["parameters"] = {"url": "{}".format(notification_url)}
 
         else:
-            print("Unknown action '{}'".format(action))
-            return
+            error_msg = "Unknown action '{}'".format(action)
+            logging.error(error_msg)
+            return {'error': error_msg}
 
-        self._send_request(url, payload, 'POST', format_json_response=True, additional_headers=additional_headers)
+        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
     def get_historical_data(self, entity_type, entity_id, attribute, items_number=10):
-        print("===== GETTING HISTORICAL DATA =====")
+        logging.info("Getting historical data")
 
         url = "http://{}:{}/STH/v1/contextEntities/type/{}/id/{}/attributes/{}?lastN={}".format(self.sth_host,
                                                                                                 self.sth_port,
@@ -193,4 +173,4 @@ class FiwareContextClient(SimpleClient):
 
         payload = ''
 
-        self._send_request(url, payload, 'GET', format_json_response=True, additional_headers=additional_headers)
+        return self._send_request(url, payload, 'GET', additional_headers=additional_headers)

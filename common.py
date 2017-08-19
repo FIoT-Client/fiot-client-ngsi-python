@@ -1,4 +1,5 @@
 import json
+import logging
 
 import requests
 
@@ -17,6 +18,8 @@ __status__ = "Development"
 class SimpleClient:
 
     def __init__(self, config_file):
+        logging.basicConfig(filename='fiot-client.log', level=logging.WARNING)
+
         config_dict = utils.read_config_file(config_file)
 
         self.fiware_service = config_dict['fiware_service']
@@ -31,7 +34,7 @@ class SimpleClient:
 
         self.host_id = config_dict['host_id']
 
-    def _send_request(self, url, payload, method, format_json_response=False, additional_headers=None):
+    def _send_request(self, url, payload, method, additional_headers=None):
         default_headers = {'X-Auth-Token': self.token,
                            'Fiware-Service': self.fiware_service,
                            'Fiware-ServicePath': self.fiware_service_path}
@@ -41,9 +44,9 @@ class SimpleClient:
 
         headers = utils.merge_dicts(default_headers, additional_headers)
 
-        print("* Asking to ", url)
-        print("* Headers: ")
-        print(json.dumps(headers, indent=4))
+        logging.debug("Asking to {}".format(url))
+        logging.debug("Headers:")
+        logging.debug(json.dumps(headers, indent=4))
 
         if not isinstance(payload, str):
             str_payload = json.dumps(payload, indent=4)
@@ -51,10 +54,8 @@ class SimpleClient:
             str_payload = payload
 
         if str_payload != '':
-            print("* Sending PAYLOAD: ")
-            print(str_payload)
-            print()
-            print("...")
+            logging.debug("Sending payload:")
+            logging.debug(str_payload)
 
         if method == 'GET':
             r = requests.get(url, data=str_payload, headers=headers)
@@ -65,39 +66,37 @@ class SimpleClient:
         elif method == 'DELETE':
             r = requests.delete(url, data=str_payload, headers=headers)
         else:
-            print("Unsupported method '{}'. Select one of 'GET', 'POST', 'PUT' and 'DELETE'.".format(method))
-            return
+            logging.error("Unsupported method '{}'".format(str(method)))
+            error_msg = "Unsupported method. Select one of 'GET', 'POST', 'PUT' and 'DELETE'".format(method)
+            return {'error': error_msg}
 
-        print()
-        print("* Status Code: ", str(r.status_code))
-        print("* Response: ")
+        logging.debug("Status Code: {}".format(str(r.status_code)))
 
-        if format_json_response:
-            print(json.dumps(json.loads(r.text), indent=4))
-        else:
-            print(r.text)
+        response = json.dumps(json.loads(r.text), indent=4)
 
-        print()
+        logging.debug("Response: ")
+        logging.debug(response)
 
-    def get_token(self):
-        import getpass
+        return json.loads(response)
 
-        print("===== GENERATING self.token =====")
+    def authenticate(self, username, password):
+        """
+        Creates an authentication token based on user credentials using FIWARE Lab OAuth2.0 Authentication system
+        If you didn't have a user, go and register first at http://cloud.fiware.org
+
+        :param username: the user's username from Fiware authentication account
+        :param password: the user's password from Fiware authentication account
+        :return: the generated token and expiration
+        """
+
+        logging.info('Generating token')
 
         tokens_url = "http://cloud.lab.fi-ware.org:4730/v2.0/tokens"
-
-        print()
-        print("Now you will be prompted for your user/password within FIWARE Lab Oauth2.0 Authentication system")
-        print("If you didn't go and register first at http://cloud.fiware.org")
-        print()
-
-        user = input("FIWARE Lab Username: ")
-        password = getpass.getpass("FIWARE Lab Password: ")
 
         payload = {
             "auth": {
                 "passwordCredentials": {
-                    "username": str(user),
+                    "username": str(username),
                     "password": str(password)
                 }
             }
@@ -107,13 +106,13 @@ class SimpleClient:
         url = tokens_url
 
         resp = requests.post(url, data=json.dumps(payload), headers=headers)
-        print()
+
         self.token = resp.json()["access"]["token"]["id"]
         self.token_show = self.token[1:5] + "*" * 70 + self.token[-5:]
         self.expires = resp.json()["access"]["token"]["expires"]
 
-        print("FIWARE OAuth2.0 Token: {}".format(self.token))
-        print("Token expires: {}".format(self.expires))
+        logging.debug("FIWARE OAuth2.0 Token: {}".format(self.token))
+        logging.debug("Token expires: {}".format(self.expires))
 
     def set_service(self, service, service_path):
         self.fiware_service = service
