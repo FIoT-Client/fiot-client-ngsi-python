@@ -31,7 +31,7 @@ class FiwareIotClient(SimpleClient):
         self.mosquitto_host = config_dict['mosquitto_host']
         self.mosquitto_port = config_dict['mosquitto_port']
 
-    def create_service(self, service, service_path, api_key):
+    def create_service(self, service, service_path, api_key=None):
         logging.info("CREATING SERVICE")
 
         url = "http://{}:{}/iot/services".format(self.idas_host, self.idas_admin_port)
@@ -40,8 +40,29 @@ class FiwareIotClient(SimpleClient):
                               'Fiware-Service': service,
                               'Fiware-ServicePath': service_path}
 
+        if api_key is not None:
+            response = self._create_service(url, api_key, additional_headers)
+
+        else:
+            api_key = self.generate_api_key()
+
+            created = False
+            response = None
+
+            while not created:
+                response = self._create_service(url, api_key, additional_headers)
+
+                if response['status_code'] == 201:
+                    created = True
+                else:
+                    api_key = self.generate_api_key()
+
+        response['api_key'] = api_key
+        return response
+
+    def _create_service(self, url, api_key, additional_headers):
         payload = {"services": [{
-            "protocol": ["IoTA-UL"],
+            "protocol": ["IoTA-UL"],  # TODO Remove hardcoded protocol
             "apikey": str(api_key),
             "token": "token2",
             "cbroker": "http://{}:{}".format(self.cb_host, self.cb_port),

@@ -70,14 +70,16 @@ class SimpleClient:
             error_msg = "Unsupported method. Select one of 'GET', 'POST', 'PUT' and 'DELETE'".format(method)
             return {'error': error_msg}
 
-        logging.debug("Status Code: {}".format(str(r.status_code)))
+        status_code = r.status_code
+        logging.debug("Status Code: {}".format(str(status_code)))
 
-        response = json.dumps(json.loads(r.text), indent=4)
+        response = json.loads(r.text)
 
         logging.debug("Response: ")
-        logging.debug(response)
+        logging.debug(json.dumps(response, indent=4))
 
-        return json.loads(response)
+        return {'status_code': status_code,
+                'response': response}
 
     def authenticate(self, username, password):
         """
@@ -117,3 +119,8 @@ class SimpleClient:
     def set_service(self, service, service_path):
         self.fiware_service = service
         self.fiware_service_path = service_path
+
+    @staticmethod
+    def generate_api_key():
+        import uuid
+        return uuid.uuid1().hex
