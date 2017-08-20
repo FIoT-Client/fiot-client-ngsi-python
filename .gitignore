@@ -1,9 +1,19 @@
-node_modules/
-other/
+# general things to ignore
+build/
+dist/
+*.egg-info/
+*.egg
+*.py[cod]
+*.pyc
 __pycache__/
-.ipynb_checkpoints/
+*.so
+*~
 .idea/
-*pyc
+.ipynb_checkpoints/
+
+# due to using tox and pytest
+.tox
+.cache
 
 #Virtualenv folder
 .env/
