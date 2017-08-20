@@ -4,7 +4,7 @@ import logging
 import paho.mqtt.publish as publish
 
 import utils
-from common import SimpleClient
+from . import SimpleClient
 
 __author__ = "Lucas Cristiano Calixto Dantas"
 __copyright__ = "Copyright 2017, Lucas Cristiano Calixto Dantas"

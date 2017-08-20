@@ -1,7 +1,7 @@
 import logging
 
 import utils
-from common import SimpleClient
+from . import SimpleClient
 
 __author__ = "Lucas Cristiano Calixto Dantas"
 __copyright__ = "Copyright 2017, Lucas Cristiano Calixto Dantas"
@@ -160,12 +160,9 @@ class FiwareContextClient(SimpleClient):
     def get_historical_data(self, entity_type, entity_id, attribute, items_number=10):
         logging.info("Getting historical data")
 
-        url = "http://{}:{}/STH/v1/contextEntities/type/{}/id/{}/attributes/{}?lastN={}".format(self.sth_host,
-                                                                                                self.sth_port,
-                                                                                                entity_type,
-                                                                                                entity_id,
-                                                                                                attribute,
-                                                                                                items_number)
+        url = "http://{}:{}/STH/v1/contextEntities" \
+              "/type/{}/id/{}/attributes/{}?lastN={}".format(self.sth_host, self.sth_port, entity_type, entity_id,
+                                                             attribute, items_number)
 
         additional_headers = {'Accept': 'application/json',
                               'Fiware-Service': str(self.fiware_service).lower(),

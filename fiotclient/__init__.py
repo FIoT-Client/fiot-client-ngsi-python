@@ -18,7 +18,7 @@ __status__ = "Development"
 class SimpleClient:
 
     def __init__(self, config_file):
-        logging.basicConfig(filename='fiot-client.log', level=logging.WARNING)
+        logging.basicConfig(filename='fiotclient.log', level=logging.WARNING)
 
         config_dict = utils.read_config_file(config_file)
 
