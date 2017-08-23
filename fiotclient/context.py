@@ -1,12 +1,12 @@
 import logging
 
-import utils
+from fiotclient import utils
 from . import SimpleClient
 
 __author__ = "Lucas Cristiano Calixto Dantas"
 __copyright__ = "Copyright 2017, Lucas Cristiano Calixto Dantas"
 __credits__ = ["Lucas Cristiano Calixto Dantas"]
-__license__ = "GPL"
+__license__ = "MIT"
 __version__ = "0.1.0"
 __maintainer__ = "Lucas Cristiano Calixto Dantas"
 __email__ = "lucascristiano27@gmail.com"
@@ -16,6 +16,10 @@ __status__ = "Development"
 class FiwareContextClient(SimpleClient):
 
     def __init__(self, config_file):
+        """Client for doing context management operations on FIWARE platform
+
+        :param config_file: The file in which load the default configuration
+        """
         super().__init__(config_file)
 
         config_dict = utils.read_config_file(config_file)
@@ -31,10 +35,11 @@ class FiwareContextClient(SimpleClient):
         self.perseo_port = config_dict['perseo_port']
 
     def get_entity_by_id(self, entity_id):
-        """
-        Queries an entity information give its entity id
+        """Get an entity information from its entity id
+
         :param entity_id: The id of the entity to be searched
-        :return: The information of the entity found with the given id or None if no entity was found with the id
+        :return: The information of the entity found with the given id
+                 or None if no entity was found with the id
         """
         logging.info("Getting entity by id '{}'".format(entity_id))
 
@@ -46,6 +51,11 @@ class FiwareContextClient(SimpleClient):
         return self._send_request(url, payload, 'GET')
 
     def get_entities_by_type(self, entity_type):
+        """Get entities from its entity type
+
+        :param entity_type: The type of the entities to be searched
+        :return: A list with the information of the entities found with the given type
+        """
         logging.info("Getting entities by type '{}'".format(type))
 
         url = "http://{}:{}/v2/entities?type={}".format(self.cb_host, self.cb_port, entity_type)
@@ -54,6 +64,12 @@ class FiwareContextClient(SimpleClient):
         return self._send_request(url, payload, 'GET')
 
     def get_subscription_by_id(self, subscription_id):
+        """Get subscription information from its subscription id
+
+        :param subscription_id: The id of the subscription to be searched
+        :return: The information of the subscription found with the given id
+                 or None if no subscription was found with the id
+        """
         logging.info("Getting subscription by id '{}'".format(subscription_id))
 
         url = "http://{}:{}/v2/subscriptions/{}".format(self.cb_host, self.cb_port, subscription_id)
@@ -63,6 +79,10 @@ class FiwareContextClient(SimpleClient):
         return self._send_request(url, payload, 'GET')
 
     def list_subscriptions(self):
+        """Get all subscriptions
+
+        :return: A list with the ids of all the subscriptions
+        """
         logging.info("Listing subscriptions")
 
         url = "http://{}:{}/v2/subscriptions".format(self.cb_host, self.cb_port)
@@ -72,6 +92,12 @@ class FiwareContextClient(SimpleClient):
         return self._send_request(url, payload, 'GET')
 
     def unsubscribe(self, subscription_id):
+        """Remove a subscription with the given subscription id
+
+        :param subscription_id: The id of the subscription to be removed
+        :return: True if the subscription with the given id was removed
+                 False if no subscription with the given id was removed
+        """
         logging.info("Removing subscriptions")
 
         url = "http://{}:{}/v1/unsubscribeContext".format(self.cb_host, self.cb_port)
@@ -84,6 +110,13 @@ class FiwareContextClient(SimpleClient):
         return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
     def subscribe_attributes_change(self, device_id, attributes, notification_url):
+        """Create a new subscription on given attributes of the device with id specified
+
+        :param device_id: The id of the device to be monitored
+        :param attributes: The list of attributes do be monitored
+        :param notification_url: The URL to which the notification will be sent on changes
+        :return: The information of the subscription
+        """
         logging.info("Subscribing for change on attributes '{}' on device with id '{}'".format(attributes, device_id))
 
         url = "http://{}:{}/v1/subscribeContext".format(self.cb_host, self.cb_port)
@@ -109,18 +142,40 @@ class FiwareContextClient(SimpleClient):
         return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
     def subscribe_cygnus(self, entity_id, attributes):
+        """Create a new subscription on attributes to send changes on its values to Cygnus
+
+        :param entity_id: The id of the entity to be monitored
+        :param attributes: The list of attributes do be monitored
+        :return: The information of the subscription
+        """
         logging.info("Subscribing Cygnus")
 
         notification_url = "http://{}:{}/notify".format(self.cygnus_notification_host, self.cygnus_port)
         return self.subscribe_attributes_change(entity_id, attributes, notification_url)
 
     def subscribe_historical_data(self, entity_id, attributes):
+        """Create a new subscription on attributes to store changes on its values as historical data
+
+        :param entity_id: The id of the entity to be monitored
+        :param attributes: The list of attributes do be monitored
+        :return: The information of the subscription
+        """
         logging.info("Subscribing to historical data")
 
         notification_url = "http://{}:{}/notify".format(self.sth_host, self.sth_port)
         return self.subscribe_attributes_change(entity_id, attributes, notification_url)
 
-    def create_attribute_change_rule(self, attribute, attribute_type, condition, notification_url, action='post'):
+    def create_attribute_change_rule(self, attribute, attribute_type, condition, action='post', notification_url=None):
+        """Register a new rule to be evaluated on attribute values change and a action to be taken when rule evaluated to true
+
+        :param attribute: The attribute to be monitored
+        :param attribute_type: The type of the attribute to be monitored
+        :param condition: The condition to be evaluated on changes on attribute's value
+        :param action: The action type to be taken when condition is evaluated true.
+                       Currently accepted values to this parameter are 'email' and 'post'
+        :param notification_url: The endpoint to which POST notifications will be sent
+        :return: The information of the created rule
+        """
         logging.info("Creating attribute change rule")
 
         url = "http://{}:{}/rules".format(self.perseo_host, self.perseo_port)
@@ -158,6 +213,15 @@ class FiwareContextClient(SimpleClient):
         return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
     def get_historical_data(self, entity_type, entity_id, attribute, items_number=10):
+        """Get historical data from a specific attribute of an entity
+
+        :param entity_type: The type of the entity to get historical data
+        :param entity_id: The id of the entity to get historical data
+        :param attribute: The attribute of the entity to get historical data
+        :param items_number: The number of last entries to be queried.
+                             If no value is provided, the default value (10 entries) will be used
+        :return: The historical data on the specified attribute of the given entity
+        """
         logging.info("Getting historical data")
 
         url = "http://{}:{}/STH/v1/contextEntities" \

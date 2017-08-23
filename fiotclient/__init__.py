@@ -3,12 +3,12 @@ import logging
 
 import requests
 
-import utils
+from fiotclient import utils
 
 __author__ = "Lucas Cristiano Calixto Dantas"
 __copyright__ = "Copyright 2017, Lucas Cristiano Calixto Dantas"
 __credits__ = ["Lucas Cristiano Calixto Dantas"]
-__license__ = "GPL"
+__license__ = "MIT"
 __version__ = "0.1.0"
 __maintainer__ = "Lucas Cristiano Calixto Dantas"
 __email__ = "lucascristiano27@gmail.com"
@@ -18,6 +18,10 @@ __status__ = "Development"
 class SimpleClient:
 
     def __init__(self, config_file):
+        """Default client for making requests to FIWARE APIs
+
+        :param config_file: The file in which load the default configuration
+        """
         logging.basicConfig(filename='fiotclient.log', level=logging.WARNING)
 
         config_dict = utils.read_config_file(config_file)
@@ -35,6 +39,14 @@ class SimpleClient:
         self.host_id = config_dict['host_id']
 
     def _send_request(self, url, payload, method, additional_headers=None):
+        """Auxiliary method to configure and execute a request to FIWARE APIs
+
+        :param url: The url to be called on the request
+        :param payload: The payload to be sent on the request
+        :param method: The method to be used on the request
+        :param additional_headers: Additional http headers to be used in the request
+        :return: The response from the request execution
+        """
         default_headers = {'X-Auth-Token': self.token,
                            'Fiware-Service': self.fiware_service,
                            'Fiware-ServicePath': self.fiware_service_path}
@@ -82,9 +94,8 @@ class SimpleClient:
                 'response': response}
 
     def authenticate(self, username, password):
-        """
-        Creates an authentication token based on user credentials using FIWARE Lab OAuth2.0 Authentication system
-        If you didn't have a user, go and register first at http://cloud.fiware.org
+        """Creates an authentication token based on user credentials using FIWARE Lab OAuth2.0 Authentication system
+           If you didn't have a user, go and register first at http://cloud.fiware.org
 
         :param username: the user's username from Fiware authentication account
         :param password: the user's password from Fiware authentication account
@@ -117,10 +128,20 @@ class SimpleClient:
         logging.debug("Token expires: {}".format(self.expires))
 
     def set_service(self, service, service_path):
+        """Specify the service context to use on operations
+
+        :param service: The name of the service to be used
+        :param service_path: The service path of the service to be used
+        :return: None
+        """
         self.fiware_service = service
         self.fiware_service_path = service_path
 
     @staticmethod
     def generate_api_key():
+        """Generate a random api key to be used on service creation
+
+        :return: The generated api key string
+        """
         import uuid
         return uuid.uuid1().hex

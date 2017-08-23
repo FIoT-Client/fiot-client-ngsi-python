@@ -3,7 +3,7 @@ import configparser
 __author__ = "Lucas Cristiano Calixto Dantas"
 __copyright__ = "Copyright 2017, Lucas Cristiano Calixto Dantas"
 __credits__ = ["Lucas Cristiano Calixto Dantas"]
-__license__ = "GPL"
+__license__ = "MIT"
 __version__ = "0.1.0"
 __maintainer__ = "Lucas Cristiano Calixto Dantas"
 __email__ = "lucascristiano27@gmail.com"
@@ -11,6 +11,12 @@ __status__ = "Development"
 
 
 def merge_dicts(*dict_args):
+    """Merge two dicts into a single dictionary
+
+    :param dict_args: The dicts to be merged
+    :return: The resulting dictionary from the merge
+    """
+
     result = {}
     for dictionary in dict_args:
         result.update(dictionary)
@@ -18,7 +24,11 @@ def merge_dicts(*dict_args):
 
 
 def read_config_file(config_file):
-    # Load the default configuration file
+    """Load configuration file and creates a dict with the necessary attributes
+
+    :param config_file: The file to be read
+    :return: A dict with the attributes read from the file
+    """
     with open(config_file, 'r+') as f:
         sample_config = f.read()
     config = configparser.RawConfigParser(allow_no_value=True)
