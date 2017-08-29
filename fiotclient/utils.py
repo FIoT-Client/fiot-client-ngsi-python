@@ -37,21 +37,21 @@ def read_config_file(config_file):
     config_dict = {'fiware_service': config.get('service', 'fiware-service'),
                    'fiware_service_path': config.get('service', 'fiware-service-path'),
                    'cb_host': config.get('contextbroker', 'host'),
-                   'cb_port': config.get('contextbroker', 'port'),
+                   'cb_port': config.getint('contextbroker', 'port'),
                    'idas_aaa': config.get('idas', 'OAuth'),
                    'idas_host': config.get('idas', 'host'),
                    'idas_admin_port': config.get('idas', 'adminport'),
-                   'idas_ul20_port': config.get('idas', 'ul20port'),
+                   'idas_ul20_port': config.getint('idas', 'ul20port'),
                    'api_key': config.get('idas', 'apikey'),
                    'mosquitto_host': config.get('mosquitto', 'host'),
-                   'mosquitto_port': config.get('mosquitto', 'port'),
+                   'mosquitto_port': config.getint('mosquitto', 'port'),
                    'sth_host': config.get('sthcomet', 'host'),
-                   'sth_port': config.get('sthcomet', 'port'),
+                   'sth_port': config.getint('sthcomet', 'port'),
                    'cygnus_host': config.get('cygnus', 'host'),
                    'cygnus_notification_host': config.get('cygnus', 'notification_host'),
-                   'cygnus_port': config.get('cygnus', 'port'),
+                   'cygnus_port': config.getint('cygnus', 'port'),
                    'perseo_host': config.get('perseo', 'host'),
-                   'perseo_port': config.get('perseo', 'port')
+                   'perseo_port': config.getint('perseo', 'port')
                    }
 
     if config_dict['idas_aaa'] == "yes":

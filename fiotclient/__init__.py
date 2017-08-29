@@ -22,7 +22,7 @@ class SimpleClient:
 
         :param config_file: The file in which load the default configuration
         """
-        logging.basicConfig(filename='fiotclient.log', level=logging.WARNING)
+        logging.basicConfig(filename='fiotclient.log', level=logging.DEBUG)
 
         config_dict = utils.read_config_file(config_file)
 
@@ -85,7 +85,7 @@ class SimpleClient:
         status_code = r.status_code
         logging.debug("Status Code: {}".format(str(status_code)))
 
-        response = json.loads(r.text)
+        response = json.loads(r.text) if r.text != '' else {}
 
         logging.debug("Response: ")
         logging.debug(json.dumps(response, indent=4))

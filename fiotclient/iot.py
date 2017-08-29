@@ -46,14 +46,8 @@ class FiwareIotClient(SimpleClient):
         """
         logging.info("Creating service")
 
-        url = "http://{}:{}/iot/services".format(self.idas_host, self.idas_admin_port)
-
-        additional_headers = {'Content-Type': 'application/json',
-                              'Fiware-Service': service,
-                              'Fiware-ServicePath': service_path}
-
         if api_key is not None:
-            response = self._create_service(url, api_key, additional_headers)
+            response = self._create_service(service, service_path, api_key)
 
         else:
             api_key = self.generate_api_key()
@@ -62,7 +56,7 @@ class FiwareIotClient(SimpleClient):
             response = None
 
             while not created:
-                response = self._create_service(url, api_key, additional_headers)
+                response = self._create_service(service, service_path, api_key)
 
                 if response['status_code'] == 201:
                     created = True
@@ -72,24 +66,61 @@ class FiwareIotClient(SimpleClient):
         response['api_key'] = api_key
         return response
 
-    def _create_service(self, url, api_key, additional_headers):
+    def _create_service(self, service, service_path, api_key):
         """Auxiliary method to try to create a service with the given information
 
-        :param url: The url to send the request
+        :param service: The name of the service to be created
+        :param service_path: The service path of the service to be created
         :param api_key: The api key to use to create the service
-        :param additional_headers: The additional headers set to send the request
         :return: The response of the creation request
         """
-        payload = {"services": [{
-            "protocol": ["IoTA-UL"],  # TODO Remove hardcoded protocol
-            "apikey": str(api_key),
-            "token": "token2",
-            "cbroker": "http://{}:{}".format(self.cb_host, self.cb_port),
-            "entity_type": "thing",
-            "resource": "/iot/d"
-        }]}
+        url = "http://{}:{}/iot/services".format(self.idas_host, self.idas_admin_port)
+
+        additional_headers = {'Content-Type': 'application/json',
+                              'Fiware-Service': service,
+                              'Fiware-ServicePath': service_path}
+
+        payload = {
+                    "services": [
+                        {
+                          "protocol": ["IoTA-UL"],  # TODO Remove hardcoded protocol
+                          "apikey": str(api_key),
+                          "token": "token2",
+                          "cbroker": "http://{}:{}".format(self.cb_host, self.cb_port),
+                          "entity_type": "thing",
+                          "resource": "/iot/d"
+                        }
+                    ]
+                  }
 
         return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+
+    def remove_service(self, service, service_path, api_key="", remove_devices=False):
+        """Remove a subservice into a service.
+        If Fiware-ServicePath is '/*' or '/#' remove service and all subservices.
+
+        :param service: The name of the service to be removed
+        :param service_path: The service path of the service to be removed
+        :param api_key: The api key of the service.
+                        If no value is provided, default value "" will be used
+        :param remove_devices: If either its to remove devices in service/subservice or not.
+                               If no value is provided, the default value (False) will be used.
+                               This parameter is not valid when Fiware-ServicePath is '/*' or '/#'.
+        :return: The response of the removal request
+        """
+        logging.info("Removing service")
+
+        url = "http://{}:{}/iot/services?resource={}&apikey={}".format(self.idas_host, self.idas_admin_port, '/iot/d', api_key)
+
+        if service_path != '/*' and service_path != '/#':
+            remove_devices_str = 'true' if remove_devices else 'false'
+            url += '&device={}'.format(remove_devices_str)
+
+        additional_headers = {'Fiware-Service': service,
+                              'Fiware-ServicePath': service_path}
+        payload = ''
+
+        return self._send_request(url, payload, 'DELETE', additional_headers=additional_headers)
 
     def set_api_key(self, api_key):
         """Sets the api key to use to send measurements from device
@@ -124,7 +155,6 @@ class FiwareIotClient(SimpleClient):
                          If no value is provided the default protocol (IoTA-UL) will be used
         :return: Information of the registered device
         """
-
         logging.info("Registering device")
 
         url = "http://{}:{}/iot/devices?protocol={}".format(self.idas_host, self.idas_admin_port, protocol)
@@ -147,6 +177,19 @@ class FiwareIotClient(SimpleClient):
 
         return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
+    def remove_device(self, device_id):
+        """Removes a device with the given id in the currently selected service
+
+        :param device_id: The id to the device to be removed
+        :return: Response of the removal request
+        """
+
+        url = "http://{}:{}/iot/devices/{}".format(self.idas_host, self.idas_admin_port, device_id)
+        additional_headers = {'Content-Type': 'application/json'}
+        payload = ''
+
+        return self._send_request(url, payload, 'DELETE', additional_headers=additional_headers)
+
     @staticmethod
     def _join_group_measurements(group_measurements):
         """Auxiliary method to create a standardized string from measurements group dict
@@ -156,6 +199,30 @@ class FiwareIotClient(SimpleClient):
         :return: A string representing the measurement group
         """
         return '|'.join(['%s|%s' % (str(key), str(value)) for (key, value) in group_measurements.items()])
+
+    @staticmethod
+    def _create_ul_payload_from_measurements(measurements):
+        """Auxiliary method to create a UL formatted payload string from measurement group or a list
+        of measurement groups to the FIWARE platform from a device
+
+        :param measurements: A measurement group (a dict where keys are device attributes and values are measurements
+                             for each attribute) or a list of measurement groups obtained in the device
+        :return:
+        """
+        if isinstance(measurements, list):
+            # multiple measurement groups list
+            groups_payload = []
+            for measurement_group in measurements:
+                group_payload = FiwareIotClient._join_group_measurements(measurement_group)
+                groups_payload.append(group_payload)
+
+            payload = '#'.join(groups_payload)
+
+        else:
+            # single measurement group dict
+            payload = FiwareIotClient._join_group_measurements(measurements)
+
+        return payload
 
     def send_observation(self, device_id, measurements, protocol='MQTT'):
         """Sends a measurement group or a list of measurement groups to the FIWARE platform from a device
@@ -170,18 +237,7 @@ class FiwareIotClient(SimpleClient):
         """
         logging.info("Sending observation")
 
-        if isinstance(measurements, list):
-            # multiple measurement groups list
-            groups_payload = []
-            for measurement_group in measurements:
-                group_payload = FiwareIotClient._join_group_measurements(measurement_group)
-                groups_payload.append(group_payload)
-
-            payload = '#'.join(groups_payload)
-
-        else:
-            # single measurement group dict
-            payload = FiwareIotClient._join_group_measurements(measurements)
+        payload = self._create_ul_payload_from_measurements(measurements)
 
         if protocol == 'MQTT':
             logging.info("Transport protocol: MQTT")
@@ -191,7 +247,7 @@ class FiwareIotClient(SimpleClient):
             logging.info("Sending payload: ")
             logging.info(payload)
 
-            publish.single(topic, payload, hostname=self.mosquitto_host)
+            publish.single(topic, payload=payload, hostname=self.mosquitto_host, port=self.mosquitto_port)
             logging.info("Message sent")
             return {'result': 'OK'}
 
@@ -238,33 +294,40 @@ class FiwareIotClient(SimpleClient):
 
         value = params
 
-        payload = {"contextElements": [
-            {
-                "type": "thing",
-                "isPattern": "false",
-                "id": entity_id,
-                "attributes": [{
-                    "name": command,
-                    "type": "command",
-                    "value": value
-                }]
-            }],
-            "updateAction": "UPDATE"
-        }
+        payload = {
+                    "contextElements": [
+                      {
+                        "type": "thing",
+                        "isPattern": "false",
+                        "id": entity_id,
+                        "attributes": [
+                          {
+                            "name": command,
+                            "type": "command",
+                            "value": value
+                          }
+                        ]
+                      }
+                    ],
+                    "updateAction": "UPDATE"
+                  }
 
         self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
-    def get_pooling_commands(self, device_id):
-        """Get a list of pooling commands of the device with the given id
+    def get_polling_commands(self, device_id, measurements):
+        """Get a list of polling commands of the device with the given id when sending a measurement group
+        or a list of measurement groups to the FIWARE platform from a device with POST request
 
         :param device_id: The id of the device to verify pooling commands
+        :param measurements: A measurement group (a dict where keys are device attributes and values are measurements
+                             for each attribute) or a list of measurement groups obtained in the device
         :return: The list of pooling commands of the device
         """
+        logging.info("Sending measurement and getting pooling commands")
 
-        logging.info("Getting pooling commands")
+        url = "http://{}:{}/iot/d?k={}&i={}&getCmd=1".format(self.idas_host, self.idas_ul20_port, self.api_key,
+                                                             device_id)
+        payload = self._create_ul_payload_from_measurements(measurements)
+        additional_headers = {'Content-Type': 'text/plain'}
 
-        url = "http://{}:{}/iot/d?k={}&i={}".format(self.idas_host, self.idas_ul20_port, self.api_key, device_id)
-        payload = ''
-        additional_headers = {'Content-Type': 'application/json'}
-
-        self._send_request(url, payload, 'GET', additional_headers=additional_headers)
+        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
