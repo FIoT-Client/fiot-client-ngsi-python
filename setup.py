@@ -11,7 +11,7 @@ from codecs import open
 import os
 
 
-README = os.path.join(os.path.dirname(__file__), 'README.rst')
+README = os.path.join(os.path.dirname(__file__), 'README.md')
 
 setup(
     name='fiotclient',
