@@ -19,3 +19,5 @@ __pycache__/
 .env/
 
 .DS_Store
+
+fiotclient.log

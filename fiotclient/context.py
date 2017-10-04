@@ -50,6 +50,8 @@ class FiwareContextClient(SimpleClient):
 
         return self._send_request(url, payload, 'GET')
 
+    # TODO Implement get all entities of all types of selected service
+
     def get_entities_by_type(self, entity_type):
         """Get entities from its entity type
 

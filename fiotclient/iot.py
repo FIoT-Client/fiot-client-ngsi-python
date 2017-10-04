@@ -46,7 +46,7 @@ class FiwareIotClient(SimpleClient):
         """
         logging.info("Creating service")
 
-        if api_key is not None:
+        if api_key:
             response = self._create_service(service, service_path, api_key)
 
         else:
@@ -143,14 +143,13 @@ class FiwareIotClient(SimpleClient):
 
         return self._send_request(url, payload, 'GET', additional_headers=additional_headers)
 
-    def register_device(self, device_file_path, device_id, entity_id, device_ip='', device_port='', protocol='IoTA-UL'):
+    def register_device(self, device_schema, device_id, entity_id, endpoint='', protocol='IoTA-UL'):
         """Register a new device with the given structure in the currently selected service
 
-        :param device_file_path: The path to the description file for the device
+        :param device_schema: JSON string representing device schema
         :param device_id: The id to the device to be created
         :param entity_id: The id to the NGSI entity created representing the device
-        :param device_ip: The endpoint of the device to which actions will be sent
-        :param device_port: The port of the device to which actions will be sent
+        :param endpoint: The endpoint of the device to which actions will be sent on format IP:PORT
         :param protocol: The protocol to be used on device registration.
                          If no value is provided the default protocol (IoTA-UL) will be used
         :return: Information of the registered device
@@ -161,21 +160,38 @@ class FiwareIotClient(SimpleClient):
 
         additional_headers = {'Content-Type': 'application/json'}
 
+        device_schema = device_schema.replace('[DEVICE_ID]', str(device_id)) \
+            .replace('[ENTITY_ID]', str(entity_id))
+
+        if '"endpoint"' in device_schema:
+            endpoint_split = endpoint.split(':')
+            device_ip = endpoint_split[0]
+            device_port = endpoint_split[1]
+            device_schema = device_schema.replace('[DEVICE_IP]', str(device_ip)) \
+                                         .replace('[PORT]', str(device_port))
+
+        payload = json.loads(device_schema)
+
+        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+
+    def register_device_from_file(self, device_file_path, device_id, entity_id, endpoint='', protocol='IoTA-UL'):
+        """Register a new device loading its structure from a given file
+
+        :param device_file_path: The path to the description file for the device
+        :param device_id: The id to the device to be created
+        :param entity_id: The id to the NGSI entity created representing the device
+        :param endpoint: The endpoint of the device to which actions will be sent on format IP:PORT
+        :param protocol: The protocol to be used on device registration.
+                         If no value is provided the default protocol (IoTA-UL) will be used
+        :return: Information of the registered device
+        """
+
         logging.info("Opening file '{}'".format(device_file_path))
         with open(device_file_path) as json_device_file:
             payload = json.load(json_device_file)
 
-        json_str = json.dumps(payload)
-        json_str = json_str.replace('[DEVICE_ID]', str(device_id)) \
-                           .replace('[ENTITY_ID]', str(entity_id))
-
-        if '"endpoint"' in json_str:
-            json_str = json_str.replace('[DEVICE_IP]', str(device_ip)) \
-                               .replace('[PORT]', str(device_port))
-
-        payload = json.loads(json_str)
-
-        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+        device_schema_json_str = json.dumps(payload)
+        return self.register_device(device_schema_json_str, device_id, entity_id, endpoint=endpoint, protocol=protocol)
 
     def remove_device(self, device_id):
         """Removes a device with the given id in the currently selected service
