@@ -69,6 +69,8 @@ class SimpleClient:
             logging.debug("Sending payload:")
             logging.debug(str_payload)
 
+        # TODO Adicionar timeout ou verificação dos servidores nas chamadas às APIs
+
         if method == 'GET':
             r = requests.get(url, data=str_payload, headers=headers)
         elif method == 'POST':
@@ -94,7 +96,7 @@ class SimpleClient:
                 'response': response}
 
     def authenticate(self, username, password):
-        """Creates an authentication token based on user credentials using FIWARE Lab OAuth2.0 Authentication system
+        """Generates an authentication token based on user credentials using FIWARE Lab OAuth2.0 Authentication system
            If you didn't have a user, go and register first at http://cloud.fiware.org
 
         :param username: the user's username from Fiware authentication account
@@ -136,12 +138,3 @@ class SimpleClient:
         """
         self.fiware_service = service
         self.fiware_service_path = service_path
-
-    @staticmethod
-    def generate_api_key():
-        """Generate a random api key to be used on service creation
-
-        :return: The generated api key string
-        """
-        import uuid
-        return uuid.uuid1().hex
