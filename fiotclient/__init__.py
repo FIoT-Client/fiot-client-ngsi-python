@@ -34,7 +34,7 @@ class SimpleClient:
 
         self.idas_aaa = config_dict['idas_aaa']
         self.token = config_dict['token']
-        self.token_show = config_dict['token_show']
+        self.expires_at = ''
 
         self.host_id = config_dict['host_id']
 
@@ -123,11 +123,10 @@ class SimpleClient:
         resp = requests.post(url, data=json.dumps(payload), headers=headers)
 
         self.token = resp.json()["access"]["token"]["id"]
-        self.token_show = self.token[1:5] + "*" * 70 + self.token[-5:]
-        self.expires = resp.json()["access"]["token"]["expires"]
+        self.expires_at = resp.json()["access"]["token"]["expires"]
 
         logging.debug("FIWARE OAuth2.0 Token: {}".format(self.token))
-        logging.debug("Token expires: {}".format(self.expires))
+        logging.debug("Token expiration: {}".format(self.expires_at))
 
     def set_service(self, service, service_path):
         """Specify the service context to use on operations
