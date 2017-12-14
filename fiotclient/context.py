@@ -20,7 +20,7 @@ class FiwareContextClient(SimpleClient):
 
         :param config_file: The file in which load the default configuration
         """
-        super().__init__(config_file)
+        super(FiwareContextClient, self).__init__(config_file)
 
         config_dict = utils.read_config_file(config_file)
 

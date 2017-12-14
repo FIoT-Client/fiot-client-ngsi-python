@@ -2,7 +2,7 @@
 
 See:
 https://fiot-client.imd.ufrn.br/en/latest
-https://projetos.imd.ufrn.br/FIoT-Client/fiot-client-python
+https://github.com/FIoT-Client/fiot-client-python
 """
 
 from setuptools import setup, find_packages
@@ -18,7 +18,7 @@ setup(
     version='0.1.0',
     description='Python client library for IoT and Context related API management on FIWARE platform',
     long_description=open(README).read(),
-    url='https://projetos.imd.ufrn.br/FIoT-Client/fiot-client-python',
+    url='https://github.com/FIoT-Client/fiot-client-python',
     author='Lucas Cristiano Calixto Dantas',
     author_email='lucascristiano27@gmail.com',
     license='MIT',
@@ -36,6 +36,6 @@ setup(
     ],
     keywords='fiware api iot things context development',
     py_modules=["fiotclient"],
-    install_requires=['requests', 'paho-mqtt'],
+    install_requires=['requests', 'paho-mqtt', 'configparser'],
     python_requires='>=2.7, <4',
 )

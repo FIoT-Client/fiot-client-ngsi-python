@@ -23,7 +23,7 @@ class FiwareIotClient(SimpleClient):
 
         :param config_file: The file in which load the default configuration
         """
-        super().__init__(config_file)
+        super(FiwareIotClient, self).__init__(config_file)
 
         config_dict = utils.read_config_file(config_file)
 
@@ -106,7 +106,7 @@ class FiwareIotClient(SimpleClient):
 
     def remove_service(self, service, service_path, api_key="", remove_devices=False):
         """Remove a subservice into a service.
-        If Fiware-ServicePath is '/*' or '/#' remove service and all its sub-services.
+        If Fiware-ServicePath is '/\*' or '/#' remove service and all its sub-services.
 
         :param service: The name of the service to be removed
         :param service_path: The service path of the service to be removed
@@ -114,7 +114,7 @@ class FiwareIotClient(SimpleClient):
                         If no value is provided, default value "" will be used
         :param remove_devices: If either its to remove devices in service/subservice or not.
                                If no value is provided, the default value (False) will be used.
-                               This parameter is not valid when Fiware-ServicePath is '/*' or '/#'.
+                               This parameter is not valid when Fiware-ServicePath is '/\*' or '/#'.
         :return: The response of the removal request
         """
         logging.info("Removing service")

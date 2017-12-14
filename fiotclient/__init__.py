@@ -15,7 +15,7 @@ __email__ = "lucascristiano27@gmail.com"
 __status__ = "Development"
 
 
-class SimpleClient:
+class SimpleClient(object):
 
     def __init__(self, config_file):
         """Default client for making requests to FIWARE APIs
@@ -69,7 +69,7 @@ class SimpleClient:
             logging.debug("Sending payload:")
             logging.debug(str_payload)
 
-        # TODO Adicionar timeout ou verificação dos servidores nas chamadas às APIs
+        # TODO Adds timeout or verifications of servers on calls to APIs
 
         if method == 'GET':
             r = requests.get(url, data=str_payload, headers=headers)

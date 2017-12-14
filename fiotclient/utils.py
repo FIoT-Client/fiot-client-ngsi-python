@@ -1,4 +1,5 @@
 import configparser
+import sys
 
 __author__ = "Lucas Cristiano Calixto Dantas"
 __copyright__ = "Copyright 2017, Lucas Cristiano Calixto Dantas"
@@ -32,7 +33,13 @@ def read_config_file(config_file):
     with open(config_file, 'r+') as f:
         sample_config = f.read()
     config = configparser.RawConfigParser(allow_no_value=True)
-    config.read_string(sample_config)
+
+    if sys.version_info[0] > 2:
+        config.read_string(sample_config)
+    else:
+        reload(sys)
+        sys.setdefaultencoding('utf8')
+        config.read_string(unicode(sample_config))
 
     config_dict = {'fiware_service': config.get('service', 'fiware-service'),
                    'fiware_service_path': config.get('service', 'fiware-service-path'),
@@ -40,7 +47,7 @@ def read_config_file(config_file):
                    'cb_port': config.getint('contextbroker', 'port'),
                    'idas_aaa': config.get('idas', 'OAuth'),
                    'idas_host': config.get('idas', 'host'),
-                   'idas_admin_port': config.get('idas', 'adminport'),
+                   'idas_admin_port': config.getint('idas', 'adminport'),
                    'idas_ul20_port': config.getint('idas', 'ul20port'),
                    'api_key': config.get('idas', 'apikey'),
                    'mosquitto_host': config.get('mosquitto', 'host'),
