@@ -23,7 +23,7 @@ class FiwareIotClient(SimpleClient):
 
         :param config_file: The file in which load the default configuration
         """
-        super().__init__(config_file)
+        super(FiwareIotClient, self).__init__(config_file)
 
         config_dict = utils.read_config_file(config_file)
 
@@ -34,6 +34,15 @@ class FiwareIotClient(SimpleClient):
 
         self.mosquitto_host = config_dict['mosquitto_host']
         self.mosquitto_port = config_dict['mosquitto_port']
+
+    @staticmethod
+    def generate_api_key():
+        """Generate a random api key to be used on service creation
+
+        :return: The generated api key string
+        """
+        import uuid
+        return uuid.uuid1().hex
 
     def create_service(self, service, service_path, api_key=None):
         """Creates a new service with the given information
@@ -46,7 +55,7 @@ class FiwareIotClient(SimpleClient):
         """
         logging.info("Creating service")
 
-        if api_key is not None:
+        if api_key:
             response = self._create_service(service, service_path, api_key)
 
         else:
@@ -97,7 +106,7 @@ class FiwareIotClient(SimpleClient):
 
     def remove_service(self, service, service_path, api_key="", remove_devices=False):
         """Remove a subservice into a service.
-        If Fiware-ServicePath is '/*' or '/#' remove service and all subservices.
+        If Fiware-ServicePath is '/\*' or '/#' remove service and all its sub-services.
 
         :param service: The name of the service to be removed
         :param service_path: The service path of the service to be removed
@@ -105,7 +114,7 @@ class FiwareIotClient(SimpleClient):
                         If no value is provided, default value "" will be used
         :param remove_devices: If either its to remove devices in service/subservice or not.
                                If no value is provided, the default value (False) will be used.
-                               This parameter is not valid when Fiware-ServicePath is '/*' or '/#'.
+                               This parameter is not valid when Fiware-ServicePath is '/\*' or '/#'.
         :return: The response of the removal request
         """
         logging.info("Removing service")
@@ -122,6 +131,14 @@ class FiwareIotClient(SimpleClient):
 
         return self._send_request(url, payload, 'DELETE', additional_headers=additional_headers)
 
+    def list_services(self):
+        """Get all registered services
+
+        :return: A list with the registered services
+        """
+        # TODO Implement
+        pass
+
     def set_api_key(self, api_key):
         """Sets the api key to use to send measurements from device
 
@@ -130,28 +147,14 @@ class FiwareIotClient(SimpleClient):
         """
         self.api_key = api_key
 
-    def list_devices(self):
-        """List the devices registered in the currently selected service
-
-        :return: The list of devices registered in the service
-        """
-        logging.info("Listing devices")
-
-        url = "http://{}:{}/iot/devices".format(self.idas_host, self.idas_admin_port)
-        additional_headers = {'Content-Type': 'application/json'}
-        payload = ''
-
-        return self._send_request(url, payload, 'GET', additional_headers=additional_headers)
-
-    def register_device(self, device_file_path, device_id, entity_id, device_ip='', device_port='', protocol='IoTA-UL'):
+    def register_device(self, device_schema, device_id, entity_id, endpoint='', protocol='IoTA-UL'):
         """Register a new device with the given structure in the currently selected service
 
-        :param device_file_path: The path to the description file for the device
+        :param device_schema: JSON string representing device schema
         :param device_id: The id to the device to be created
         :param entity_id: The id to the NGSI entity created representing the device
-        :param device_ip: The endpoint of the device to which actions will be sent
-        :param device_port: The port of the device to which actions will be sent
-        :param protocol: The protocol to be used on device registration.
+        :param endpoint: The endpoint of the device to which actions will be sent on format IP:PORT
+        :param protocol: The protocol to be used on device.
                          If no value is provided the default protocol (IoTA-UL) will be used
         :return: Information of the registered device
         """
@@ -161,21 +164,51 @@ class FiwareIotClient(SimpleClient):
 
         additional_headers = {'Content-Type': 'application/json'}
 
+        device_schema = device_schema.replace('[DEVICE_ID]', str(device_id)) \
+            .replace('[ENTITY_ID]', str(entity_id))
+
+        if '"endpoint"' in device_schema:
+            endpoint_split = endpoint.split(':')
+            device_ip = endpoint_split[0]
+            device_port = endpoint_split[1]
+            device_schema = device_schema.replace('[DEVICE_IP]', str(device_ip)) \
+                                         .replace('[PORT]', str(device_port))
+
+        payload = json.loads(device_schema)
+
+        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+
+    def register_device_from_file(self, device_file_path, device_id, entity_id, endpoint='', protocol='IoTA-UL'):
+        """Register a new device loading its structure from a given file
+
+        :param device_file_path: The path to the description file for the device
+        :param device_id: The id to the device to be created
+        :param entity_id: The id to the NGSI entity created representing the device
+        :param endpoint: The endpoint of the device to which actions will be sent on format IP:PORT
+        :param protocol: The protocol to be used on device.
+                         If no value is provided the default protocol (IoTA-UL) will be used
+        :return: Information of the registered device
+        """
         logging.info("Opening file '{}'".format(device_file_path))
         with open(device_file_path) as json_device_file:
             payload = json.load(json_device_file)
 
-        json_str = json.dumps(payload)
-        json_str = json_str.replace('[DEVICE_ID]', str(device_id)) \
-                           .replace('[ENTITY_ID]', str(entity_id))
+        device_schema_json_str = json.dumps(payload)
+        return self.register_device(device_schema_json_str, device_id, entity_id, endpoint=endpoint, protocol=protocol)
 
-        if '"endpoint"' in json_str:
-            json_str = json_str.replace('[DEVICE_IP]', str(device_ip)) \
-                               .replace('[PORT]', str(device_port))
+    def update_device(self, device_schema, device_id, entity_id, endpoint='', protocol='IoTA-UL'):
+        """Updates a registered device with the given structure in the currently selected service
 
-        payload = json.loads(json_str)
-
-        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+        :param device_schema: JSON string representing device schema
+        :param device_id: The id to the device to be updated
+        :param entity_id: The id to the NGSI entity that represents the device
+        :param endpoint: The endpoint of the device to which actions will be sent on format IP:PORT
+        :param protocol: The protocol to be used on device.
+                         If no value is provided the default protocol (IoTA-UL) will be used
+        :return: Information of the updated device
+        """
+        pass
+        # TODO Implement
 
     def remove_device(self, device_id):
         """Removes a device with the given id in the currently selected service
@@ -189,6 +222,29 @@ class FiwareIotClient(SimpleClient):
         payload = ''
 
         return self._send_request(url, payload, 'DELETE', additional_headers=additional_headers)
+
+    def get_device_by_id(self, device_id):
+        """Get device information given its device id
+
+        :param device_id: The id of the device to be searched
+        :return: The information of the device found with the given id
+                 or None if no device was found with the id
+        """
+        pass
+        # TODO Implement
+
+    def list_devices(self):
+        """List the devices registered in the currently selected service
+
+        :return: The list of devices registered in the service
+        """
+        logging.info("Listing devices")
+
+        url = "http://{}:{}/iot/devices".format(self.idas_host, self.idas_admin_port)
+        additional_headers = {'Content-Type': 'application/json'}
+        payload = ''
+
+        return self._send_request(url, payload, 'GET', additional_headers=additional_headers)
 
     @staticmethod
     def _join_group_measurements(group_measurements):
@@ -225,7 +281,7 @@ class FiwareIotClient(SimpleClient):
         return payload
 
     def send_observation(self, device_id, measurements, protocol='MQTT'):
-        """Sends a measurement group or a list of measurement groups to the FIWARE platform from a device
+        """Sends a measurement group or a list of measurement groups from a device to the FIWARE platform
 
         :param device_id: The id of the device in which the measurement was obtained
         :param measurements: A measurement group (a dict where keys are device attributes and values are measurements
@@ -265,7 +321,7 @@ class FiwareIotClient(SimpleClient):
             return {'error': error_msg}
 
     def send_command(self, entity_id, device_id, command, params=None):
-        """Sends a command to a device the FIWARE platform
+        """Sends a command from the FIWARE platform to a specific device
            (http://fiware-orion.readthedocs.io/en/latest/user/walkthrough_apiv1/index.html#ngsi10-standard-operations at
            "Update context elements" section)
 

@@ -15,7 +15,7 @@ __email__ = "lucascristiano27@gmail.com"
 __status__ = "Development"
 
 
-class SimpleClient:
+class SimpleClient(object):
 
     def __init__(self, config_file):
         """Default client for making requests to FIWARE APIs
@@ -34,7 +34,7 @@ class SimpleClient:
 
         self.idas_aaa = config_dict['idas_aaa']
         self.token = config_dict['token']
-        self.token_show = config_dict['token_show']
+        self.expires_at = ''
 
         self.host_id = config_dict['host_id']
 
@@ -69,6 +69,8 @@ class SimpleClient:
             logging.debug("Sending payload:")
             logging.debug(str_payload)
 
+        # TODO Adds timeout or verifications of servers on calls to APIs
+
         if method == 'GET':
             r = requests.get(url, data=str_payload, headers=headers)
         elif method == 'POST':
@@ -94,7 +96,7 @@ class SimpleClient:
                 'response': response}
 
     def authenticate(self, username, password):
-        """Creates an authentication token based on user credentials using FIWARE Lab OAuth2.0 Authentication system
+        """Generates an authentication token based on user credentials using FIWARE Lab OAuth2.0 Authentication system
            If you didn't have a user, go and register first at http://cloud.fiware.org
 
         :param username: the user's username from Fiware authentication account
@@ -121,11 +123,10 @@ class SimpleClient:
         resp = requests.post(url, data=json.dumps(payload), headers=headers)
 
         self.token = resp.json()["access"]["token"]["id"]
-        self.token_show = self.token[1:5] + "*" * 70 + self.token[-5:]
-        self.expires = resp.json()["access"]["token"]["expires"]
+        self.expires_at = resp.json()["access"]["token"]["expires"]
 
         logging.debug("FIWARE OAuth2.0 Token: {}".format(self.token))
-        logging.debug("Token expires: {}".format(self.expires))
+        logging.debug("Token expiration: {}".format(self.expires_at))
 
     def set_service(self, service, service_path):
         """Specify the service context to use on operations
@@ -136,12 +137,3 @@ class SimpleClient:
         """
         self.fiware_service = service
         self.fiware_service_path = service_path
-
-    @staticmethod
-    def generate_api_key():
-        """Generate a random api key to be used on service creation
-
-        :return: The generated api key string
-        """
-        import uuid
-        return uuid.uuid1().hex
