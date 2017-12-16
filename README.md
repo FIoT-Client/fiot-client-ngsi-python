@@ -1,6 +1,7 @@
 # FIoT-Client Python
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![DOI](https://zenodo.org/badge/105537359.svg)](https://zenodo.org/badge/latestdoi/105537359)
 
 The FIoT-Client Python is a Python library that eases the use of IoT and Context APIs from FIWARE platform.
 
