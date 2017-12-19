@@ -42,8 +42,19 @@ class FiwareContextClient(SimpleClient):
 
         :return: Information of the registered entity
         """
-        # TODO Implement
-        pass
+        """Get entity information given its entity id
+
+        :param entity_id: The id of the entity to be searched
+        :return: The information of the entity found with the given id
+                 or None if no entity was found with the id
+        """
+        logging.info("Creating entity by id '{}'".format(entity_id))
+
+        url = "http://{}:{}/v2/entities".format(self.cb_host, self.cb_port)
+        payload = entity_schema or ''
+        additional_headers = {"Content-Type": "application/json"}
+
+        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
     def update_entity(self, entity_id, entity_schema):
         """Updates an entity with the given id for the new structure in the currently selected service
@@ -56,14 +67,22 @@ class FiwareContextClient(SimpleClient):
         # TODO Implement
         pass
 
-    def remove_entity(self, entity_id):
+    def remove_entity(self, entity_id, type_id=False):
         """Removes an entity with the given id
 
         :param entity_id: The id to the entity to be removed
 
         :return: Information of the removed entity
         """
-        # TODO Implement
+        logging.info("Deletin entity by id '{}'".format(entity_id))
+        if type_id:
+            url = "http://{}:{}/v2/entities/{}?type={}".format(self.cb_host, self.cb_port, entity_id, type_id)
+        else:
+            url = "http://{}:{}/v2/entities/{}".format(self.cb_host, self.cb_port, entity_id)
+
+        payload = ''
+        print(url)
+        return self._send_request(url, payload, 'DELETE')
         pass
 
     def get_entity_by_id(self, entity_id):
