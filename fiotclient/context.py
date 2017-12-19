@@ -96,14 +96,15 @@ class FiwareContextClient(SimpleClient):
         payload = ''
 
         return self._send_request(url, payload, 'GET')
-    def list_entities(self):
+
+    def get_entities(self):
         """List all entities
 
-        :return: A list with the id and type of all entities
+        :return: A list with the id and type of all entities (1.000 first entities)
         """
         logging.info("Getting id of all entities")
-
-        url = "http://{}:{}/v2/entities?attr=null".format(self.cb_host, self.cb_port, entity_type)
+        offset = 'offset=0&limit=1000'
+        url = "http://{}:{}/v2/entities?attrs=null&{}".format(self.cb_host, self.cb_port, offset)
         payload = ''
 
         return self._send_request(url, payload, 'GET')
