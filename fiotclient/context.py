@@ -96,6 +96,17 @@ class FiwareContextClient(SimpleClient):
         payload = ''
 
         return self._send_request(url, payload, 'GET')
+    def list_entities(self):
+        """List all entities
+
+        :return: A list with the id and type of all entities
+        """
+        logging.info("Getting id of all entities")
+
+        url = "http://{}:{}/v2/entities?attr=null".format(self.cb_host, self.cb_port, entity_type)
+        payload = ''
+
+        return self._send_request(url, payload, 'GET')
 
     def subscribe_attributes_change(self, device_id, attributes, notification_url):
         """Create a new subscription on given attributes of the device with the specified id
