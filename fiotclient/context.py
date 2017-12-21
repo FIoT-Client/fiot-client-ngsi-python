@@ -84,7 +84,7 @@ class FiwareContextClient(SimpleClient):
         print(url)
         return self._send_request(url, payload, 'DELETE')
 
-    def get_entity_by_id(self, entity_id):
+    def get_entity_by_id(self, entity_id, type_id=None):
         """Get entity information given its entity id
 
         :param entity_id: The id of the entity to be searched
@@ -94,7 +94,10 @@ class FiwareContextClient(SimpleClient):
         logging.info("Getting entity by id '{}'".format(entity_id))
 
         # TODO Remove hardcoded type from url
-        url = "http://{}:{}/v2/entities/{}/attrs?type=thing".format(self.cb_host, self.cb_port, entity_id)
+        if type_id:
+            url = "http://{}:{}/v2/entities/{}/?attrs=null&type={}".format(self.cb_host, self.cb_port, entity_id,type_id)
+        else:
+            url = "http://{}:{}/v2/entities/{}/?attrs=null".format(self.cb_host, self.cb_port, entity_id)
 
         payload = ''
 
