@@ -83,7 +83,6 @@ class FiwareContextClient(SimpleClient):
         payload = ''
         print(url)
         return self._send_request(url, payload, 'DELETE')
-        pass
 
     def get_entity_by_id(self, entity_id):
         """Get entity information given its entity id
