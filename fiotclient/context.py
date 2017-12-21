@@ -118,14 +118,27 @@ class FiwareContextClient(SimpleClient):
 
         return self._send_request(url, payload, 'GET')
 
-    def get_entities(self):
+    def get_entities(self, type_id=None, offset=0, offset_limit=None):
         """List all entities
-
+        :param type_id: The type of the entities to be searched
+        :param offset: The first entity registry to be searched
+        :param offset_limit: The quantity of entity registry to be searched, from offset parameter. Default: 1000
         :return: A list with the id and type of all entities (1.000 first entities)
         """
         logging.info("Getting id of all entities")
-        offset = 'offset=0&limit=1000'
-        url = "http://{}:{}/v2/entities?attrs=null&{}".format(self.cb_host, self.cb_port, offset)
+        # TODO Implement an elegant way
+        # TODO Define a offset_limit. 1000 its ok?
+        if offset_limit:
+            pass
+        else:
+            offset_limit = 1000
+
+        offset = 'offset={}&limit={}'.format(offset, offset_limit)
+        # TODO creae a method create_url
+        if type_id:
+            url = "http://{}:{}/v2/entities?attrs=null&{}&type={}".format(self.cb_host, self.cb_port, offset,type_id)
+        else:
+            url = "http://{}:{}/v2/entities?attrs=null&{}".format(self.cb_host, self.cb_port, offset)
         payload = ''
 
         return self._send_request(url, payload, 'GET')
