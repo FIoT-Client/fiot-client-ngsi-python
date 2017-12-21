@@ -71,6 +71,7 @@ class FiwareContextClient(SimpleClient):
         """Removes an entity with the given id
 
         :param entity_id: The id to the entity to be removed
+        :param entity_type: The entity type of the entity to be removed
 
         :return: Information of the removed entity
         """
@@ -81,9 +82,33 @@ class FiwareContextClient(SimpleClient):
             url = "http://{}:{}/v2/entities/{}".format(self.cb_host, self.cb_port, entity_id)
 
         payload = ''
-        print(url)
+
         return self._send_request(url, payload, 'DELETE')
-    def get_entitiesID_by_type(self, entity_type):
+
+    def remove_entities(self, entity_type):
+        """Removes all entities with the given entity_type (Remove the first 1000 entities)
+
+        :param entity_type: The entity type of the entities to be removed
+
+        :return: Information of the removed entity
+        """
+
+        if isinstance(entity_type, str):
+            entities = self.get_entitiesID(entity_type=entity_type)
+            for e in entities:
+                self.remove_entity(e)
+        else:
+            print("ERROR: entity_type must be string")
+            #TODO Exception?
+
+
+    def get_entitiesID(self, entity_type):
+        """Get a list of entities Ids of the provided entity type
+
+        :param entity_type: The entity type of the entities to be searched
+        :return: A list with ids of the entities found with the given entity type (max 1.000)
+                 or None if no entity was found with the id
+        """
         resp = self.get_entities(entity_type)
         entities = resp['response']
         entityID_list = []
@@ -95,7 +120,8 @@ class FiwareContextClient(SimpleClient):
         """Get entity information given its entity id
 
         :param entity_id: The id of the entity to be searched
-        :return: The information of the entity found with the given id
+        :param entity_type: The entity type of the entity to be searched
+        :return: The information of the entity found with the given id (and entity type)
                  or None if no entity was found with the id
         """
         logging.info("Getting entity by id '{}'".format(entity_id))
