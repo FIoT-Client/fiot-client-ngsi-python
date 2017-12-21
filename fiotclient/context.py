@@ -83,6 +83,13 @@ class FiwareContextClient(SimpleClient):
         payload = ''
         print(url)
         return self._send_request(url, payload, 'DELETE')
+    def get_entitiesID_by_type(self, entity_type):
+        resp = self.get_entities(entity_type)
+        entities = resp['response']
+        entityID_list = []
+        for e in entities:
+            entityID_list.append(e['id'])
+        return entityID_list
 
     def get_entity_by_id(self, entity_id, entity_type=None):
         """Get entity information given its entity id
