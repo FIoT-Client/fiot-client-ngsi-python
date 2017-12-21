@@ -67,7 +67,7 @@ class FiwareContextClient(SimpleClient):
         # TODO Implement
         pass
 
-    def remove_entity(self, entity_id, type_id=False):
+    def remove_entity(self, entity_id, entity_type=False):
         """Removes an entity with the given id
 
         :param entity_id: The id to the entity to be removed
@@ -75,8 +75,8 @@ class FiwareContextClient(SimpleClient):
         :return: Information of the removed entity
         """
         logging.info("Deletin entity by id '{}'".format(entity_id))
-        if type_id:
-            url = "http://{}:{}/v2/entities/{}?type={}".format(self.cb_host, self.cb_port, entity_id, type_id)
+        if entity_type:
+            url = "http://{}:{}/v2/entities/{}?type={}".format(self.cb_host, self.cb_port, entity_id, entity_type)
         else:
             url = "http://{}:{}/v2/entities/{}".format(self.cb_host, self.cb_port, entity_id)
 
@@ -84,7 +84,7 @@ class FiwareContextClient(SimpleClient):
         print(url)
         return self._send_request(url, payload, 'DELETE')
 
-    def get_entity_by_id(self, entity_id, type_id=None):
+    def get_entity_by_id(self, entity_id, entity_type=None):
         """Get entity information given its entity id
 
         :param entity_id: The id of the entity to be searched
@@ -94,8 +94,8 @@ class FiwareContextClient(SimpleClient):
         logging.info("Getting entity by id '{}'".format(entity_id))
 
         # TODO Remove hardcoded type from url
-        if type_id:
-            url = "http://{}:{}/v2/entities/{}/?attrs=null&type={}".format(self.cb_host, self.cb_port, entity_id,type_id)
+        if entity_type:
+            url = "http://{}:{}/v2/entities/{}/?attrs=null&type={}".format(self.cb_host, self.cb_port, entity_id, entity_type)
         else:
             url = "http://{}:{}/v2/entities/{}/?attrs=null".format(self.cb_host, self.cb_port, entity_id)
 
@@ -105,22 +105,35 @@ class FiwareContextClient(SimpleClient):
 
     # TODO Implement get all entities of all types of selected service
 
-    def get_entities_by_type(self, entity_type):
+    def get_entities_types(self, entity_type=None):
         """Get entities created with a given entity type
 
         :param entity_type: The type of the entities to be searched
         :return: A list with the information of the entities found with the given type
         """
-        logging.info("Getting entities by type '{}'".format(type))
+        logging.info("Getting entities types '{}'".format(entity_type))
 
-        url = "http://{}:{}/v2/entities?type={}".format(self.cb_host, self.cb_port, entity_type)
+        if entity_type:
+            url = "http://{}:{}/v2/types/{}".format(self.cb_host, self.cb_port, entity_type)
+        else:
+            url = "http://{}:{}/v2/types".format(self.cb_host, self.cb_port)
         payload = ''
 
         return self._send_request(url, payload, 'GET')
 
-    def get_entities(self, type_id=None, offset=0, offset_limit=None):
+    def get_entities_by_type(self, entity_type, offset=0, offset_limit=None):
+        """Get entities created with a given entity type
+
+        :param entity_type: The type of the entities to be searched
+        :return: A list with the information of the entities found with the given type
+        """
+        logging.info("Getting entities by type '{}'".format(entity_type))
+        return self.get_entities(entity_type=entity_type, offset=0, offset_limit=None)
+
+
+    def get_entities(self, entity_type=None, offset=0, offset_limit=None):
         """List all entities
-        :param type_id: The type of the entities to be searched
+        :param entity_type: The type of the entities to be searched
         :param offset: The first entity registry to be searched
         :param offset_limit: The quantity of entity registry to be searched, from offset parameter. Default: 1000
         :return: A list with the id and type of all entities (1.000 first entities)
@@ -135,8 +148,8 @@ class FiwareContextClient(SimpleClient):
 
         offset = 'offset={}&limit={}'.format(offset, offset_limit)
         # TODO creae a method create_url
-        if type_id:
-            url = "http://{}:{}/v2/entities?attrs=null&{}&type={}".format(self.cb_host, self.cb_port, offset,type_id)
+        if entity_type:
+            url = "http://{}:{}/v2/entities?attrs=null&{}&type={}".format(self.cb_host, self.cb_port, offset, entity_type)
         else:
             url = "http://{}:{}/v2/entities?attrs=null&{}".format(self.cb_host, self.cb_port, offset)
         payload = ''
