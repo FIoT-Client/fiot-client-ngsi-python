@@ -128,9 +128,9 @@ class FiwareContextClient(SimpleClient):
 
         # TODO Remove hardcoded type from url
         if entity_type:
-            url = "http://{}:{}/v2/entities/{}/?attrs=null&type={}".format(self.cb_host, self.cb_port, entity_id, entity_type)
+            url = "http://{}:{}/v2/entities{}?attrs=null&type={}".format(self.cb_host, self.cb_port, entity_id, entity_type)
         else:
-            url = "http://{}:{}/v2/entities/{}/?attrs=null".format(self.cb_host, self.cb_port, entity_id)
+            url = "http://{}:{}/v2/entities{}?attrs=null".format(self.cb_host, self.cb_port, entity_id)
 
         payload = ''
 
