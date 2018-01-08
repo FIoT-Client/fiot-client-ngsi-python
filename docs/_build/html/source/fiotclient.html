@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fiotclient package &mdash; fiot-client-python 0.1.0 documentation</title>
+  <title>fiotclient package &mdash; biblioteca fiotClient  documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="fiot-client-python 0.1.0 documentation" href="../index.html"/> 
+    <link rel="top" title="biblioteca fiotClient  documentation" href="../index.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -54,7 +54,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> fiot-client-python
+            <a href="../index.html" class="icon icon-home"> biblioteca fiotClient
           
 
           
@@ -62,10 +62,6 @@
 
           
             
-            
-              <div class="version">
-                0.1.0
-              </div>
             
           
 
@@ -92,10 +88,10 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">fiotclient package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-fiotclient.context">fiotclient.context module</a></li>
-<li><a class="reference internal" href="#module-fiotclient.iot">fiotclient.iot module</a></li>
-<li><a class="reference internal" href="#module-fiotclient.utils">fiotclient.utils module</a></li>
-<li><a class="reference internal" href="#module-fiotclient">Module contents</a></li>
+<li><a class="reference internal" href="#fiotclient-context-module">fiotclient.context module</a></li>
+<li><a class="reference internal" href="#fiotclient-iot-module">fiotclient.iot module</a></li>
+<li><a class="reference internal" href="#fiotclient-utils-module">fiotclient.utils module</a></li>
+<li><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -112,7 +108,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">fiot-client-python</a>
+          <a href="../index.html">biblioteca fiotClient</a>
         
       </nav>
 
@@ -166,655 +162,17 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-fiotclient.context">
-<span id="fiotclient-context-module"></span><h2>fiotclient.context module<a class="headerlink" href="#module-fiotclient.context" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="fiotclient.context.FiwareContextClient">
-<em class="property">class </em><code class="descclassname">fiotclient.context.</code><code class="descname">FiwareContextClient</code><span class="sig-paren">(</span><em>config_file</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fiotclient.SimpleClient" title="fiotclient.SimpleClient"><code class="xref py py-class docutils literal"><span class="pre">fiotclient.SimpleClient</span></code></a></p>
-<dl class="method">
-<dt id="fiotclient.context.FiwareContextClient.create_entity">
-<code class="descname">create_entity</code><span class="sig-paren">(</span><em>entity_id</em>, <em>entity_schema</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient.create_entity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new NGSI entity with the given structure in the currently selected service</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>entity_id</strong> – The id to the entity to be created</li>
-<li><strong>entity_schema</strong> – JSON string representing entity schema</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Information of the registered entity</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.context.FiwareContextClient.get_entities_by_type">
-<code class="descname">get_entities_by_type</code><span class="sig-paren">(</span><em>entity_type</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient.get_entities_by_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get entities created with a given entity type</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>entity_type</strong> – The type of the entities to be searched</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list with the information of the entities found with the given type</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.context.FiwareContextClient.get_entity_by_id">
-<code class="descname">get_entity_by_id</code><span class="sig-paren">(</span><em>entity_id</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient.get_entity_by_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get entity information given its entity id</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>entity_id</strong> – The id of the entity to be searched</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The information of the entity found with the given id
-or None if no entity was found with the id</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.context.FiwareContextClient.get_historical_data">
-<code class="descname">get_historical_data</code><span class="sig-paren">(</span><em>entity_type</em>, <em>entity_id</em>, <em>attribute</em>, <em>items_number=10</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient.get_historical_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get historical data from a specific attribute of an entity</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>entity_type</strong> – The type of the entity to get historical data</li>
-<li><strong>entity_id</strong> – The id of the entity to get historical data</li>
-<li><strong>attribute</strong> – The attribute of the entity to get historical data</li>
-<li><strong>items_number</strong> – The number of last entries to be queried.
-If no value is provided, the default value (10 entries) will be used</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The historical data on the specified attribute of the given entity</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.context.FiwareContextClient.get_subscription_by_id">
-<code class="descname">get_subscription_by_id</code><span class="sig-paren">(</span><em>subscription_id</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient.get_subscription_by_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get subscription information given its subscription id</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subscription_id</strong> – The id of the subscription to be searched</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The information of the subscription found with the given id
-or None if no subscription was found with the id</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.context.FiwareContextClient.list_subscriptions">
-<code class="descname">list_subscriptions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient.list_subscriptions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get all subscriptions</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list with the ids of all the subscriptions</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.context.FiwareContextClient.remove_entity">
-<code class="descname">remove_entity</code><span class="sig-paren">(</span><em>entity_id</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient.remove_entity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes an entity with the given id</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>entity_id</strong> – The id to the entity to be removed</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Information of the removed entity</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.context.FiwareContextClient.subscribe_attribute_change_with_rule">
-<code class="descname">subscribe_attribute_change_with_rule</code><span class="sig-paren">(</span><em>attribute</em>, <em>attribute_type</em>, <em>condition</em>, <em>action='post'</em>, <em>notification_url=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient.subscribe_attribute_change_with_rule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register a new rule to be evaluated on attribute values change and a action to be taken when rule evaluated to true</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>attribute</strong> – The attribute to be monitored</li>
-<li><strong>attribute_type</strong> – The type of the attribute to be monitored</li>
-<li><strong>condition</strong> – The condition to be evaluated on changes on attribute’s value</li>
-<li><strong>action</strong> – The action type to be taken when condition is evaluated true.
-Currently accepted values to this parameter are ‘email’ and ‘post’</li>
-<li><strong>notification_url</strong> – The endpoint to which POST notifications will be sent</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The information of the created rule</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.context.FiwareContextClient.subscribe_attributes_change">
-<code class="descname">subscribe_attributes_change</code><span class="sig-paren">(</span><em>device_id</em>, <em>attributes</em>, <em>notification_url</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient.subscribe_attributes_change" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a new subscription on given attributes of the device with the specified id</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>device_id</strong> – The id of the device to be monitored</li>
-<li><strong>attributes</strong> – The list of attributes do be monitored</li>
-<li><strong>notification_url</strong> – The URL to which the notification will be sent on changes</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The information of the subscription</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.context.FiwareContextClient.subscribe_cygnus">
-<code class="descname">subscribe_cygnus</code><span class="sig-paren">(</span><em>entity_id</em>, <em>attributes</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient.subscribe_cygnus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a new subscription on attributes to send changes on its values to sinks configured on Cygnus</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>entity_id</strong> – The id of the entity to be monitored</li>
-<li><strong>attributes</strong> – The list of attributes do be monitored</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The information of the subscription</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.context.FiwareContextClient.subscribe_historical_data">
-<code class="descname">subscribe_historical_data</code><span class="sig-paren">(</span><em>entity_id</em>, <em>attributes</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient.subscribe_historical_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a new subscription on attributes to store changes on its values as historical data</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>entity_id</strong> – The id of the entity to be monitored</li>
-<li><strong>attributes</strong> – The list of attributes do be monitored</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The information of the subscription</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.context.FiwareContextClient.unsubscribe">
-<code class="descname">unsubscribe</code><span class="sig-paren">(</span><em>subscription_id</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient.unsubscribe" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove a subscription with the given subscription id</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subscription_id</strong> – The id of the subscription to be removed</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the subscription with the given id was removed
-False if no subscription with the given id was removed</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.context.FiwareContextClient.update_entity">
-<code class="descname">update_entity</code><span class="sig-paren">(</span><em>entity_id</em>, <em>entity_schema</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.context.FiwareContextClient.update_entity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates an entity with the given id for the new structure in the currently selected service</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>entity_id</strong> – The id to the entity to be updated</li>
-<li><strong>entity_schema</strong> – JSON string representing new entity schema</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Information of the updated entity</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="fiotclient-context-module">
+<h2>fiotclient.context module<a class="headerlink" href="#fiotclient-context-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-fiotclient.iot">
-<span id="fiotclient-iot-module"></span><h2>fiotclient.iot module<a class="headerlink" href="#module-fiotclient.iot" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="fiotclient.iot.FiwareIotClient">
-<em class="property">class </em><code class="descclassname">fiotclient.iot.</code><code class="descname">FiwareIotClient</code><span class="sig-paren">(</span><em>config_file</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#fiotclient.SimpleClient" title="fiotclient.SimpleClient"><code class="xref py py-class docutils literal"><span class="pre">fiotclient.SimpleClient</span></code></a></p>
-<dl class="method">
-<dt id="fiotclient.iot.FiwareIotClient.create_service">
-<code class="descname">create_service</code><span class="sig-paren">(</span><em>service</em>, <em>service_path</em>, <em>api_key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.create_service" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new service with the given information</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>service</strong> – The name of the service to be created</li>
-<li><strong>service_path</strong> – The service path of the service to be created</li>
-<li><strong>api_key</strong> – A specific api key to use to create the service.
-If no api key is provided, a random one will be generated.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The information of the created service</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="staticmethod">
-<dt id="fiotclient.iot.FiwareIotClient.generate_api_key">
-<em class="property">static </em><code class="descname">generate_api_key</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.generate_api_key" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a random api key to be used on service creation</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The generated api key string</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.iot.FiwareIotClient.get_device_by_id">
-<code class="descname">get_device_by_id</code><span class="sig-paren">(</span><em>device_id</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.get_device_by_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get device information given its device id</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>device_id</strong> – The id of the device to be searched</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The information of the device found with the given id
-or None if no device was found with the id</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.iot.FiwareIotClient.get_polling_commands">
-<code class="descname">get_polling_commands</code><span class="sig-paren">(</span><em>device_id</em>, <em>measurements</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.get_polling_commands" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a list of polling commands of the device with the given id when sending a measurement group
-or a list of measurement groups to the FIWARE platform from a device with POST request</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>device_id</strong> – The id of the device to verify pooling commands</li>
-<li><strong>measurements</strong> – A measurement group (a dict where keys are device attributes and values are measurements
-for each attribute) or a list of measurement groups obtained in the device</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The list of pooling commands of the device</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.iot.FiwareIotClient.list_devices">
-<code class="descname">list_devices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.list_devices" title="Permalink to this definition">¶</a></dt>
-<dd><p>List the devices registered in the currently selected service</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The list of devices registered in the service</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.iot.FiwareIotClient.list_services">
-<code class="descname">list_services</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.list_services" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get all registered services</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list with the registered services</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.iot.FiwareIotClient.register_device">
-<code class="descname">register_device</code><span class="sig-paren">(</span><em>device_schema</em>, <em>device_id</em>, <em>entity_id</em>, <em>endpoint=''</em>, <em>protocol='IoTA-UL'</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.register_device" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register a new device with the given structure in the currently selected service</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>device_schema</strong> – JSON string representing device schema</li>
-<li><strong>device_id</strong> – The id to the device to be created</li>
-<li><strong>entity_id</strong> – The id to the NGSI entity created representing the device</li>
-<li><strong>endpoint</strong> – The endpoint of the device to which actions will be sent on format IP:PORT</li>
-<li><strong>protocol</strong> – The protocol to be used on device.
-If no value is provided the default protocol (IoTA-UL) will be used</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Information of the registered device</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.iot.FiwareIotClient.register_device_from_file">
-<code class="descname">register_device_from_file</code><span class="sig-paren">(</span><em>device_file_path</em>, <em>device_id</em>, <em>entity_id</em>, <em>endpoint=''</em>, <em>protocol='IoTA-UL'</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.register_device_from_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register a new device loading its structure from a given file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>device_file_path</strong> – The path to the description file for the device</li>
-<li><strong>device_id</strong> – The id to the device to be created</li>
-<li><strong>entity_id</strong> – The id to the NGSI entity created representing the device</li>
-<li><strong>endpoint</strong> – The endpoint of the device to which actions will be sent on format IP:PORT</li>
-<li><strong>protocol</strong> – The protocol to be used on device.
-If no value is provided the default protocol (IoTA-UL) will be used</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Information of the registered device</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.iot.FiwareIotClient.remove_device">
-<code class="descname">remove_device</code><span class="sig-paren">(</span><em>device_id</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.remove_device" title="Permalink to this definition">¶</a></dt>
-<dd><p>Removes a device with the given id in the currently selected service</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>device_id</strong> – The id to the device to be removed</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Response of the removal request</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.iot.FiwareIotClient.remove_service">
-<code class="descname">remove_service</code><span class="sig-paren">(</span><em>service</em>, <em>service_path</em>, <em>api_key=''</em>, <em>remove_devices=False</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.remove_service" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove a subservice into a service.
-If Fiware-ServicePath is ‘/*’ or ‘/#’ remove service and all its sub-services.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>service</strong> – The name of the service to be removed</li>
-<li><strong>service_path</strong> – The service path of the service to be removed</li>
-<li><strong>api_key</strong> – The api key of the service.
-If no value is provided, default value “” will be used</li>
-<li><strong>remove_devices</strong> – If either its to remove devices in service/subservice or not.
-If no value is provided, the default value (False) will be used.
-This parameter is not valid when Fiware-ServicePath is ‘/*’ or ‘/#’.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The response of the removal request</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.iot.FiwareIotClient.send_command">
-<code class="descname">send_command</code><span class="sig-paren">(</span><em>entity_id</em>, <em>device_id</em>, <em>command</em>, <em>params=None</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.send_command" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Sends a command from the FIWARE platform to a specific device</dt>
-<dd>(<a class="reference external" href="http://fiware-orion.readthedocs.io/en/latest/user/walkthrough_apiv1/index.html#ngsi10-standard-operations">http://fiware-orion.readthedocs.io/en/latest/user/walkthrough_apiv1/index.html#ngsi10-standard-operations</a> at
-“Update context elements” section)</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>entity_id</strong> – The id of the entity that represents the device</li>
-<li><strong>device_id</strong> – The id of the device to which the command will be sent</li>
-<li><strong>command</strong> – The name of the command to be called on the device</li>
-<li><strong>params</strong> – The command parameters to be sent</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The result of the command call</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.iot.FiwareIotClient.send_observation">
-<code class="descname">send_observation</code><span class="sig-paren">(</span><em>device_id</em>, <em>measurements</em>, <em>protocol='MQTT'</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.send_observation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sends a measurement group or a list of measurement groups from a device to the FIWARE platform</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>device_id</strong> – The id of the device in which the measurement was obtained</li>
-<li><strong>measurements</strong> – A measurement group (a dict where keys are device attributes and values are measurements
-for each attribute) or a list of measurement groups obtained in the device</li>
-<li><strong>protocol</strong> – The transport protocol to be used to send measurements.
-Currently accepted values are ‘MQTT’ and ‘HTTP’.
-If no value is provided the default value (MQTT) will be used</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The summary of the sent measurements</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.iot.FiwareIotClient.set_api_key">
-<code class="descname">set_api_key</code><span class="sig-paren">(</span><em>api_key</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.set_api_key" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the api key to use to send measurements from device</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>api_key</strong> – The api key of the service to use</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.iot.FiwareIotClient.update_device">
-<code class="descname">update_device</code><span class="sig-paren">(</span><em>device_schema</em>, <em>device_id</em>, <em>entity_id</em>, <em>endpoint=''</em>, <em>protocol='IoTA-UL'</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.iot.FiwareIotClient.update_device" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates a registered device with the given structure in the currently selected service</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>device_schema</strong> – JSON string representing device schema</li>
-<li><strong>device_id</strong> – The id to the device to be updated</li>
-<li><strong>entity_id</strong> – The id to the NGSI entity that represents the device</li>
-<li><strong>endpoint</strong> – The endpoint of the device to which actions will be sent on format IP:PORT</li>
-<li><strong>protocol</strong> – The protocol to be used on device.
-If no value is provided the default protocol (IoTA-UL) will be used</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Information of the updated device</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="fiotclient-iot-module">
+<h2>fiotclient.iot module<a class="headerlink" href="#fiotclient-iot-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-fiotclient.utils">
-<span id="fiotclient-utils-module"></span><h2>fiotclient.utils module<a class="headerlink" href="#module-fiotclient.utils" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="fiotclient.utils.merge_dicts">
-<code class="descclassname">fiotclient.utils.</code><code class="descname">merge_dicts</code><span class="sig-paren">(</span><em>*dict_args</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.utils.merge_dicts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Merge two dicts into a single dictionary</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dict_args</strong> – The dicts to be merged</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The resulting dictionary from the merge</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="fiotclient.utils.read_config_file">
-<code class="descclassname">fiotclient.utils.</code><code class="descname">read_config_file</code><span class="sig-paren">(</span><em>config_file</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.utils.read_config_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load configuration file and creates a dict with the necessary attributes</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config_file</strong> – The file to be read</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A dict with the attributes read from the file</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+<div class="section" id="fiotclient-utils-module">
+<h2>fiotclient.utils module<a class="headerlink" href="#fiotclient-utils-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-fiotclient">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fiotclient" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="fiotclient.SimpleClient">
-<em class="property">class </em><code class="descclassname">fiotclient.</code><code class="descname">SimpleClient</code><span class="sig-paren">(</span><em>config_file</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.SimpleClient" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="fiotclient.SimpleClient.authenticate">
-<code class="descname">authenticate</code><span class="sig-paren">(</span><em>username</em>, <em>password</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.SimpleClient.authenticate" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Generates an authentication token based on user credentials using FIWARE Lab OAuth2.0 Authentication system</dt>
-<dd>If you didn’t have a user, go and register first at <a class="reference external" href="http://cloud.fiware.org">http://cloud.fiware.org</a></dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>username</strong> – the user’s username from Fiware authentication account</li>
-<li><strong>password</strong> – the user’s password from Fiware authentication account</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the generated token and expiration</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="fiotclient.SimpleClient.set_service">
-<code class="descname">set_service</code><span class="sig-paren">(</span><em>service</em>, <em>service_path</em><span class="sig-paren">)</span><a class="headerlink" href="#fiotclient.SimpleClient.set_service" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specify the service context to use on operations</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>service</strong> – The name of the service to be used</li>
-<li><strong>service_path</strong> – The service path of the service to be used</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -831,7 +189,7 @@ If no value is provided the default protocol (IoTA-UL) will be used</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Lucas Cristiano C Dantas.
+        &copy; Copyright 2018, Lucas Cristiano.
 
     </p>
   </div>
@@ -853,7 +211,7 @@ If no value is provided the default protocol (IoTA-UL) will be used</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.1.0',
+            VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,

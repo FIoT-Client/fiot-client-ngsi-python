@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to fiot-client-python’s documentation! &mdash; fiot-client-python 0.1.0 documentation</title>
+  <title>Welcome to the FIoT-Client Python Documentation! &mdash; biblioteca fiotClient  documentation</title>
   
 
   
@@ -35,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="fiot-client-python 0.1.0 documentation" href="#"/> 
+    <link rel="top" title="biblioteca fiotClient  documentation" href="#"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -54,7 +54,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> fiot-client-python
+            <a href="#" class="icon icon-home"> biblioteca fiotClient
           
 
           
@@ -62,10 +62,6 @@
 
           
             
-            
-              <div class="version">
-                0.1.0
-              </div>
             
           
 
@@ -90,8 +86,53 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Welcome to fiot-client-python’s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#">Welcome to the FIoT-Client Python Documentation!</a><ul>
+<li><a class="reference internal" href="#authors">Authors</a></li>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#function-list">Function List</a><ul>
+<li><a class="reference internal" href="#utils-py">utils.py</a><ul>
+<li><a class="reference internal" href="#merge-dicts">merge_dicts()</a></li>
+<li><a class="reference internal" href="#read-config-file">read_config_file()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#init-py">init.py</a><ul>
+<li><a class="reference internal" href="#authenticate">authenticate()</a></li>
+<li><a class="reference internal" href="#generate-api-key">generate_api_key()</a></li>
+<li><a class="reference internal" href="#send-request">_send_request()</a></li>
+<li><a class="reference internal" href="#set-service">set_service()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#context-py">context.py</a><ul>
+<li><a class="reference internal" href="#create-attribute-change-rule">ĉreate_attribute_change_rule()</a></li>
+<li><a class="reference internal" href="#get-entities-by-type">get_entities_by_type()</a></li>
+<li><a class="reference internal" href="#get-entity-by-id">get_entity_by_id()</a></li>
+<li><a class="reference internal" href="#get-historical-data">get_historical_data()</a></li>
+<li><a class="reference internal" href="#get-subscription-by-id">get_subscription_by_id()</a></li>
+<li><a class="reference internal" href="#list-subscriptions">list_subscriptions()</a></li>
+<li><a class="reference internal" href="#subscribe-attributes-change">subscribe_attributes_change()</a></li>
+<li><a class="reference internal" href="#subscribe-cygnus">subscribe_cygnus()</a></li>
+<li><a class="reference internal" href="#subscribe-historical-data">subscribe_historical_data()</a></li>
+<li><a class="reference internal" href="#unsubscribe">unsubscribe()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#iot-py">iot.py</a><ul>
+<li><a class="reference internal" href="#create-service">create_service()</a></li>
+<li><a class="reference internal" href="#id3">_create_service()</a></li>
+<li><a class="reference internal" href="#create-ul-payload">_create_ul_payload()</a></li>
+<li><a class="reference internal" href="#get-polling-commands">get_polling_commands()</a></li>
+<li><a class="reference internal" href="#register-device">register_device()</a></li>
+<li><a class="reference internal" href="#register-device-from-file">register_device_from_file()</a></li>
+<li><a class="reference internal" href="#remove-device">remove_device()</a></li>
+<li><a class="reference internal" href="#remove-service">remove_service()</a></li>
+<li><a class="reference internal" href="#send-command">send_command()</a></li>
+<li><a class="reference internal" href="#send-observation">send_observation()</a></li>
+<li><a class="reference internal" href="#set-api-key">set_api_key()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
             
@@ -106,7 +147,7 @@
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">fiot-client-python</a>
+          <a href="#">biblioteca fiotClient</a>
         
       </nav>
 
@@ -136,7 +177,7 @@
     
       <li><a href="#">Docs</a> &raquo;</li>
         
-      <li>Welcome to fiot-client-python’s documentation!</li>
+      <li>Welcome to the FIoT-Client Python Documentation!</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -155,18 +196,234 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="welcome-to-fiot-client-python-s-documentation">
-<h1>Welcome to fiot-client-python’s documentation!<a class="headerlink" href="#welcome-to-fiot-client-python-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="welcome-to-the-fiot-client-python-documentation">
+<h1><a class="toc-backref" href="#id8">Welcome to the FIoT-Client Python Documentation!</a><a class="headerlink" href="#welcome-to-the-fiot-client-python-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#welcome-to-the-fiot-client-python-documentation" id="id8">Welcome to the FIoT-Client Python Documentation!</a><ul>
+<li><a class="reference internal" href="#authors" id="id9">Authors</a></li>
+<li><a class="reference internal" href="#introduction" id="id10">Introduction</a></li>
+<li><a class="reference internal" href="#function-list" id="id11">Function List</a><ul>
+<li><a class="reference internal" href="#utils-py" id="id12">utils.py</a><ul>
+<li><a class="reference internal" href="#merge-dicts" id="id13">merge_dicts()</a></li>
+<li><a class="reference internal" href="#read-config-file" id="id14">read_config_file()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#init-py" id="id15">init.py</a><ul>
+<li><a class="reference internal" href="#authenticate" id="id16">authenticate()</a></li>
+<li><a class="reference internal" href="#generate-api-key" id="id17">generate_api_key()</a></li>
+<li><a class="reference internal" href="#send-request" id="id18">_send_request()</a></li>
+<li><a class="reference internal" href="#set-service" id="id19">set_service()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#context-py" id="id20">context.py</a><ul>
+<li><a class="reference internal" href="#create-attribute-change-rule" id="id21">ĉreate_attribute_change_rule()</a></li>
+<li><a class="reference internal" href="#get-entities-by-type" id="id22">get_entities_by_type()</a></li>
+<li><a class="reference internal" href="#get-entity-by-id" id="id23">get_entity_by_id()</a></li>
+<li><a class="reference internal" href="#get-historical-data" id="id24">get_historical_data()</a></li>
+<li><a class="reference internal" href="#get-subscription-by-id" id="id25">get_subscription_by_id()</a></li>
+<li><a class="reference internal" href="#list-subscriptions" id="id26">list_subscriptions()</a></li>
+<li><a class="reference internal" href="#subscribe-attributes-change" id="id27">subscribe_attributes_change()</a></li>
+<li><a class="reference internal" href="#subscribe-cygnus" id="id28">subscribe_cygnus()</a></li>
+<li><a class="reference internal" href="#subscribe-historical-data" id="id29">subscribe_historical_data()</a></li>
+<li><a class="reference internal" href="#unsubscribe" id="id30">unsubscribe()</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#iot-py" id="id31">iot.py</a><ul>
+<li><a class="reference internal" href="#create-service" id="id32">create_service()</a></li>
+<li><a class="reference internal" href="#id3" id="id33">_create_service()</a></li>
+<li><a class="reference internal" href="#create-ul-payload" id="id34">_create_ul_payload()</a></li>
+<li><a class="reference internal" href="#get-polling-commands" id="id35">get_polling_commands()</a></li>
+<li><a class="reference internal" href="#register-device" id="id36">register_device()</a></li>
+<li><a class="reference internal" href="#register-device-from-file" id="id37">register_device_from_file()</a></li>
+<li><a class="reference internal" href="#remove-device" id="id38">remove_device()</a></li>
+<li><a class="reference internal" href="#remove-service" id="id39">remove_service()</a></li>
+<li><a class="reference internal" href="#send-command" id="id40">send_command()</a></li>
+<li><a class="reference internal" href="#send-observation" id="id41">send_observation()</a></li>
+<li><a class="reference internal" href="#set-api-key" id="id42">set_api_key()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
 <div class="toctree-wrapper compound">
 </div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="authors">
+<span id="id1"></span><h2><a class="toc-backref" href="#id9">Authors</a><a class="headerlink" href="#authors" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+<li><strong>Lucas Cristiano Calixto Dantas</strong> - Initial work and developer</li>
+<li><strong>Lucas Ramon Bandeira da Silva</strong> - Project collaborator</li>
+<li><strong>Carlos Eduardo da Silva</strong> - Professor advisor</li>
 </ul>
+</div>
+<div class="section" id="introduction">
+<span id="id2"></span><h2><a class="toc-backref" href="#id10">Introduction</a><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The FIoT-Client Python is a Python library that eases the use of IoT and Context APIs from FIWARE platform. The functions of each file of the library are listed in alphabetical order.</p>
+</div>
+<div class="section" id="function-list">
+<span id="functionlist"></span><h2><a class="toc-backref" href="#id11">Function List</a><a class="headerlink" href="#function-list" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="utils-py">
+<h3><a class="toc-backref" href="#id12">utils.py</a><a class="headerlink" href="#utils-py" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="merge-dicts">
+<h4><a class="toc-backref" href="#id13">merge_dicts()</a><a class="headerlink" href="#merge-dicts" title="Permalink to this headline">¶</a></h4>
+<p><strong>merge_dicts(dict_args)</strong></p>
+<p>Merge two dicts into a single dictionary. The argument is the dicts to be merged, and the function returns the resulting dictionary from the merge</p>
+</div>
+<div class="section" id="read-config-file">
+<h4><a class="toc-backref" href="#id14">read_config_file()</a><a class="headerlink" href="#read-config-file" title="Permalink to this headline">¶</a></h4>
+<p><strong>read_config_file(config_file)</strong></p>
+<p>Load configuration file and creates a dict with the necessary attributes. The argument is the file to be read, and the function returns a dict with the attributs read from the file.</p>
+</div>
+</div>
+<div class="section" id="init-py">
+<h3><a class="toc-backref" href="#id15">init.py</a><a class="headerlink" href="#init-py" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="authenticate">
+<h4><a class="toc-backref" href="#id16">authenticate()</a><a class="headerlink" href="#authenticate" title="Permalink to this headline">¶</a></h4>
+<p><strong>authenticate(self, username, password)</strong></p>
+<p>Creates an authentication token based on user credentials using FIWARE Lab OAuth2.0 Authentication system. If you didn’t have a user, go and register first at <a class="reference external" href="http://cloud.fiware.org">http://cloud.fiware.org</a> . The arguments of this function are the username and password of the user from Fiware authentication account, and returns the generated token and expiration.</p>
+</div>
+<div class="section" id="generate-api-key">
+<h4><a class="toc-backref" href="#id17">generate_api_key()</a><a class="headerlink" href="#generate-api-key" title="Permalink to this headline">¶</a></h4>
+<p><strong>generate_api_key()</strong></p>
+<p>Generate a random api key to be used on service creation. This function doesn’t have arguments and return the generated api key string.</p>
+</div>
+<div class="section" id="send-request">
+<h4><a class="toc-backref" href="#id18">_send_request()</a><a class="headerlink" href="#send-request" title="Permalink to this headline">¶</a></h4>
+<p><strong>_send_request(self, url, payload, method, additional_headers=None)</strong></p>
+<p>Auxiliary method to configure and execute a request to FIWARE APIs. The arguments of this function are the url to be called on the request, the payload to be sent on the request, the method to be used on the request and additional http headers to be used in the request. This function returns the response from the request execution.</p>
+</div>
+<div class="section" id="set-service">
+<h4><a class="toc-backref" href="#id19">set_service()</a><a class="headerlink" href="#set-service" title="Permalink to this headline">¶</a></h4>
+<p><strong>set_service(self, service, service_path)</strong></p>
+<p>Specify the service context to use on operations. The arguments of this function are the name of the service to be used and the service path of the service to be used. This function has no returns.</p>
+</div>
+</div>
+<div class="section" id="context-py">
+<h3><a class="toc-backref" href="#id20">context.py</a><a class="headerlink" href="#context-py" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="create-attribute-change-rule">
+<h4><a class="toc-backref" href="#id21">ĉreate_attribute_change_rule()</a><a class="headerlink" href="#create-attribute-change-rule" title="Permalink to this headline">¶</a></h4>
+<p><strong>create_attribute_change_rule(self, attribute, attribute_type, condition, action=’post’, notification_url=None)</strong></p>
+<p>Register a new rule to be evaluated on attribute values change and a action to be taken when rule evaluated to true. The arguments of the function are the attribute to be monitored, the type of the attribute to be monitored, the condition to be evaluated on changes on attribute’s value, the action type to be taken when condition is evaluated true (Currently accepted values to this parameter are ‘email’ and ‘post’) and the endpoint to which POST notifications will be sent. This function returns the information of the created rule.</p>
+</div>
+<div class="section" id="get-entities-by-type">
+<h4><a class="toc-backref" href="#id22">get_entities_by_type()</a><a class="headerlink" href="#get-entities-by-type" title="Permalink to this headline">¶</a></h4>
+<p><strong>get_entities_by_type(self, entity_type)</strong></p>
+<p>Get entities from its entity type. The argument of this function is the type of the entities to be searched, and returns a list with the information of the entities found with the given type.</p>
+</div>
+<div class="section" id="get-entity-by-id">
+<h4><a class="toc-backref" href="#id23">get_entity_by_id()</a><a class="headerlink" href="#get-entity-by-id" title="Permalink to this headline">¶</a></h4>
+<p><strong>get_entity_by_id(self, entity_id)</strong></p>
+<p>Get an entity information from its entity id. The argument of this function is the id of the entity to be searched, and returns the information of the entity found with the given id or None if no entity was found with the id.</p>
+</div>
+<div class="section" id="get-historical-data">
+<h4><a class="toc-backref" href="#id24">get_historical_data()</a><a class="headerlink" href="#get-historical-data" title="Permalink to this headline">¶</a></h4>
+<p><strong>get_historical_data(self, entity_type, entity_id, attribute, items_number=10)</strong></p>
+<p>Get historical data from a specific attribute of an entity. The arguments of this function are the type of the entity to get historical data, the id of the entity to get historical data, the attribute of the entity to get historical data, and the number of last entries to be queried (If no value is provided, the default value (10 entries) will be used). This function returns the historical data on the specified attribute of the given entity.</p>
+</div>
+<div class="section" id="get-subscription-by-id">
+<h4><a class="toc-backref" href="#id25">get_subscription_by_id()</a><a class="headerlink" href="#get-subscription-by-id" title="Permalink to this headline">¶</a></h4>
+<p><strong>get_subscription_by_id(self, subscription_id)</strong></p>
+<p>Get subscription information from its subscription id. The argument of the function is the id of the subscription to be searched, and returns the information of the subscription found with the given id, or None if no subscription was found with the id.</p>
+</div>
+<div class="section" id="list-subscriptions">
+<h4><a class="toc-backref" href="#id26">list_subscriptions()</a><a class="headerlink" href="#list-subscriptions" title="Permalink to this headline">¶</a></h4>
+<p><strong>list_subscriptions(self)</strong></p>
+<p>Get all subscriptions. This function has no arguments and returns a list with the ids of all the subscriptions.</p>
+</div>
+<div class="section" id="subscribe-attributes-change">
+<h4><a class="toc-backref" href="#id27">subscribe_attributes_change()</a><a class="headerlink" href="#subscribe-attributes-change" title="Permalink to this headline">¶</a></h4>
+<p><strong>subscribe_attributes_change(self, device_id, attributes, notification_url)</strong></p>
+<p>Create a new subscription on given attributes of the device with id specified. The arguments of this function are the id of the device to be monitored, the list of attributes do be monitored and the URL to which the notification will be sent on changes. This function returns the information of the subscription.</p>
+</div>
+<div class="section" id="subscribe-cygnus">
+<h4><a class="toc-backref" href="#id28">subscribe_cygnus()</a><a class="headerlink" href="#subscribe-cygnus" title="Permalink to this headline">¶</a></h4>
+<p><strong>subscribe_cygnus(self, entity_id, attributes)</strong></p>
+<p>Create a new subscription on attributes to send changes on its values to Cygnus. The arguments of this function are the id of the entity to be monitored, the list of attributes do be monitored and returns the information of the subscription.</p>
+</div>
+<div class="section" id="subscribe-historical-data">
+<h4><a class="toc-backref" href="#id29">subscribe_historical_data()</a><a class="headerlink" href="#subscribe-historical-data" title="Permalink to this headline">¶</a></h4>
+<p><strong>subscribe_historical_data(self, entity_id, attributes)</strong></p>
+<p>Create a new subscription on attributes to store changes on its values as historical data. The parameters of this function are the id of the entity to be monitored and the list of attributes do be monitored, and returns the information of the subscription.</p>
+</div>
+<div class="section" id="unsubscribe">
+<h4><a class="toc-backref" href="#id30">unsubscribe()</a><a class="headerlink" href="#unsubscribe" title="Permalink to this headline">¶</a></h4>
+<p><strong>unsubscribe(self, subscription_id)</strong></p>
+<p>Remove a subscription with the given subscription id. The paramater of this function is the id of the subscription to be removed, and returns True if the subscription with the given id was removed False if no subscription with the given id was removed.</p>
+</div>
+</div>
+<div class="section" id="iot-py">
+<h3><a class="toc-backref" href="#id31">iot.py</a><a class="headerlink" href="#iot-py" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="create-service">
+<h4><a class="toc-backref" href="#id32">create_service()</a><a class="headerlink" href="#create-service" title="Permalink to this headline">¶</a></h4>
+<p><strong>create_service(self, service, service_path, api_key=None)</strong></p>
+<p>Creates a new service with the given information. The arguments of this function are the name of the service to be created, the service path of the service to be created and a specific api key to use to create the service (if no api key is provided, a random one will be generated). The function returns the information of the created service.</p>
+</div>
+<div class="section" id="id3">
+<h4><a class="toc-backref" href="#id33">_create_service()</a><a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<p><strong>_create_service(self, service, service_path, api_key)</strong></p>
+<p>Auxiliary method to try to create a service with the given information, and the arguments are the name of the service to be created, the service path of the service to be created and the api key to use to create the service. The function returns the response of the creation request.</p>
+</div>
+<div class="section" id="create-ul-payload">
+<h4><a class="toc-backref" href="#id34">_create_ul_payload()</a><a class="headerlink" href="#create-ul-payload" title="Permalink to this headline">¶</a></h4>
+<p><strong>_create_ul_payload_from_measurements(measurements)</strong></p>
+<p>Auxiliary method to create a UL formatted payload string from measurement group or a list of measurement groups to the FIWARE platform from a  device. the argument of this function is a measurement group (a dict where keys are device attributes and values are measurements for each attribute) or a list of measurement groups obtained in the device, and returns UL formatted payload string from measurement group.</p>
+</div>
+<div class="section" id="get-polling-commands">
+<h4><a class="toc-backref" href="#id35">get_polling_commands()</a><a class="headerlink" href="#get-polling-commands" title="Permalink to this headline">¶</a></h4>
+<p><strong>get_polling_commands(self, device_id, measurements)</strong></p>
+<p>Get a list of polling commands of the device with the given id when sending a measurement group or a list of measurement groups to the FIWARE platform from a device with POST request. The parameters of this function are the id of the device to verify pooling commands and a measurement group (a dict where keys are device attributes and values are measurements for each attribute) or a list of measurement groups obtained in the device. The function returns the list of pooling commands of the device.</p>
+</div>
+<div class="section" id="register-device">
+<h4><a class="toc-backref" href="#id36">register_device()</a><a class="headerlink" href="#register-device" title="Permalink to this headline">¶</a></h4>
+<p><strong>register_device(self, device_schema, device_id, entity_id, endpoint=’‘, protocol=’IoTA-UL’)</strong></p>
+<p>Register a new device with the given structure in the currently selected service. this function has the following arguments: a JSON string representing device schema, the id to the device to be created, the id to the NGSI entity created representing the device, the endpoint of the device to which actions will be sent on format IP:PORT and the protocol to be used on device registration. (If no value is provided the default protocol (IoTA-UL) will be used). this function returns the Information of the registered device.</p>
+</div>
+<div class="section" id="register-device-from-file">
+<h4><a class="toc-backref" href="#id37">register_device_from_file()</a><a class="headerlink" href="#register-device-from-file" title="Permalink to this headline">¶</a></h4>
+<p><strong>register_device_from_file(self, device_file_path, device_id, entity_id, endpoint=’‘, protocol=’IoTA-UL’)</strong></p>
+<p>Register a new device with the given structure in the currently selected service. this function has the following arguments: the path to the description file for the device, the id to the device to be created, the id to the NGSI entity created representing the device, the endpoint of the device to which actions will be sent on format IP:PORT and the protocol to be used on device registration. (If no value is provided the default protocol (IoTA-UL) will be used). this function returns the Information of the registered device.</p>
+</div>
+<div class="section" id="remove-device">
+<h4><a class="toc-backref" href="#id38">remove_device()</a><a class="headerlink" href="#remove-device" title="Permalink to this headline">¶</a></h4>
+<p><strong>remove_device(self, device_id)</strong></p>
+<p>Removes a device with the given id in the currently selected service, the argument of this function is the id to the device to be removed and returns a response of the removal request.</p>
+</div>
+<div class="section" id="remove-service">
+<h4><a class="toc-backref" href="#id39">remove_service()</a><a class="headerlink" href="#remove-service" title="Permalink to this headline">¶</a></h4>
+<p><strong>remove_service(self, service, service_path, api_key=”“, remove_devices=False)</strong></p>
+<p>Remove a subservice into a service (If Fiware-ServicePath is “/<a href="#id4"><span class="problematic" id="id5">*</span></a>” or “/#” remove service and all subservices). The arguments of this function are the name of the service to be removed, the service path of the service to be removed, the api key of the service, and the parameter “remove_devices”, in which it is a boolean that defines if either its to remove devices in service/subservice or not (If no value is provided, the default value (False) will be used).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This parameter is not valid when Fiware-ServicePath is ‘/<a href="#id6"><span class="problematic" id="id7">*</span></a>’ or ‘/#’.</p>
+</div>
+<p>this function returns the response of the removal request.</p>
+</div>
+<div class="section" id="send-command">
+<h4><a class="toc-backref" href="#id40">send_command()</a><a class="headerlink" href="#send-command" title="Permalink to this headline">¶</a></h4>
+<p><strong>send_command(self, entity_id, device_id, command, params=None)</strong></p>
+<p>Sends a command to a device the FIWARE platform (<a class="reference external" href="http://fiware-orion.readthedocs.io/en/latest/user/walkthrough_apiv1/index.html#ngsi10-standard-operations">http://fiware-orion.readthedocs.io/en/latest/user/walkthrough_apiv1/index.html#ngsi10-standard-operations</a> at “Update context elements” section). The arguments of this function are the id of the entity that represents the device, the id of the device to which the command will be sent, the name of the command to be called on the device and the command parameters to be sent. The function returns the result of the command call.</p>
+</div>
+<div class="section" id="send-observation">
+<h4><a class="toc-backref" href="#id41">send_observation()</a><a class="headerlink" href="#send-observation" title="Permalink to this headline">¶</a></h4>
+<p><strong>send_observation(self, device_id, measurements, protocol=’MQTT’)</strong></p>
+<p>Sends a measurement group or a list of measurement groups to the FIWARE platform from a device. The arguments of this function are the id of the device in which the measurement was obtained, a measurement group (a dict where keys are device attributes and values are measurements for each attribute) or a list of measurement groups obtained in the device and the transport protocol to be used to send measurements. Currently accepted values are ‘MQTT’ and ‘HTTP’.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If no value is provided the default value (MQTT) will be used</p>
+</div>
+<p>This function returns the summary of the sent measurements.</p>
+</div>
+<div class="section" id="set-api-key">
+<h4><a class="toc-backref" href="#id42">set_api_key()</a><a class="headerlink" href="#set-api-key" title="Permalink to this headline">¶</a></h4>
+<p><strong>set_api_key(self, api_key)</strong></p>
+<p>Sets the api key to use to send measurements from device. The argument of the function is the api key of the service to use and this function has no returns.</p>
+</div>
+</div>
+</div>
 </div>
 
 
@@ -182,7 +439,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Lucas Cristiano C Dantas.
+        &copy; Copyright 2018, Lucas Cristiano.
 
     </p>
   </div>
@@ -204,7 +461,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.0',
+            VERSION:'',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
