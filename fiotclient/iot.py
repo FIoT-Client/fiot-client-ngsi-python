@@ -263,7 +263,7 @@ class FiwareIotClient(SimpleClient):
 
         :param measurements: A measurement group (a dict where keys are device attributes and values are measurements
                              for each attribute) or a list of measurement groups obtained in the device
-        :return:
+        :return: A string containing the UL payload
         """
         if isinstance(measurements, list):
             # multiple measurement groups list
