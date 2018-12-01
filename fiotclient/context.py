@@ -1,3 +1,4 @@
+import json
 import logging
 
 from fiotclient import utils
@@ -45,7 +46,7 @@ class FiwareContextClient(SimpleClient):
         url = "http://{}:{}/v2/entities".format(self.cb_host, self.cb_port)
         additional_headers = {'Content-Type': 'application/json'}
         entity_schema = entity_schema.replace('[ENTITY_ID]', str(entity_id))
-        payload = ''
+        payload = json.loads(entity_schema)
 
         self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
