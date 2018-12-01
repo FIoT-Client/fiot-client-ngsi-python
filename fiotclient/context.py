@@ -34,16 +34,36 @@ class FiwareContextClient(SimpleClient):
         self.perseo_host = config_dict['perseo_host']
         self.perseo_port = config_dict['perseo_port']
 
-    def create_entity(self, entity_id, entity_schema):
+    def create_entity(self, entity_schema, entity_id):
         """Creates a new NGSI entity with the given structure in the currently selected service
 
-        :param entity_id: The id to the entity to be created
         :param entity_schema: JSON string representing entity schema
+        :param entity_id: The id to the entity to be created
 
         :return: Information of the registered entity
         """
-        # TODO Implement
-        pass
+        url = "http://{}:{}/v2/entities".format(self.cb_host, self.cb_port)
+        additional_headers = {'Content-Type': 'application/json'}
+        entity_schema = entity_schema.replace('[ENTITY_ID]', str(entity_id))
+        payload = ''
+
+        self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+
+    def create_entity_from_file(self, entity_file_path, entity_id):
+        """Creates a new NGSI entity loading its structure from a given file
+
+        :param entity_file_path: The path to the description file for the entity
+        :param entity_id: The id to the entity to be created
+
+        :return: Information of the registered entity
+        """
+        logging.info("Opening file '{}'".format(entity_file_path))
+        with open(entity_file_path) as json_entity_file:
+            payload = json.load(json_entity_file)
+
+        entity_schema_json_str = json.dumps(payload)
+
+        return self.create_entity(entity_schema_json_str, entity_id)
 
     def update_entity(self, entity_id, entity_schema):
         """Updates an entity with the given id for the new structure in the currently selected service
@@ -60,29 +80,29 @@ class FiwareContextClient(SimpleClient):
         """Removes an entity with the given id
 
         :param entity_id: The id to the entity to be removed
+        :param entity_type: The type of the entity to be removed
 
         :return: Information of the removed entity
         """
-        # TODO Implement
-        pass
+        url = "http://{}:{}/v2/entities/{}?type={}".format(self.cb_host, self.cb_port, entity_id, entity_type)
+        payload = ''
 
-    def get_entity_by_id(self, entity_id):
+        return self._send_request(url, payload, 'DELETE')
+
+    def get_entity_by_id(self, entity_id, entity_type):
         """Get entity information given its entity id
 
         :param entity_id: The id of the entity to be searched
+        :param entity_type: The type of the entity to be searched
         :return: The information of the entity found with the given id
                  or None if no entity was found with the id
         """
         logging.info("Getting entity by id '{}'".format(entity_id))
 
-        # TODO Remove hardcoded type from url
-        url = "http://{}:{}/v2/entities/{}/attrs?type=thing".format(self.cb_host, self.cb_port, entity_id)
-
+        url = "http://{}:{}/v2/entities/{}?type={}".format(self.cb_host, self.cb_port, entity_id, entity_type)
         payload = ''
 
         return self._send_request(url, payload, 'GET')
-
-    # TODO Implement get all entities of all types of selected service
 
     def get_entities_by_type(self, entity_type):
         """Get entities created with a given entity type
@@ -93,6 +113,18 @@ class FiwareContextClient(SimpleClient):
         logging.info("Getting entities by type '{}'".format(type))
 
         url = "http://{}:{}/v2/entities?type={}".format(self.cb_host, self.cb_port, entity_type)
+        payload = ''
+
+        return self._send_request(url, payload, 'GET')
+
+    def get_entities(self):
+        """Get all created entities
+
+        :return: A list with the information of all the created entities
+        """
+        logging.info("Getting all entities")
+
+        url = "http://{}:{}/v2/entities".format(self.cb_host, self.cb_port)
         payload = ''
 
         return self._send_request(url, payload, 'GET')
