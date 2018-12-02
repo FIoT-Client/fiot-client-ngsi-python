@@ -39,5 +39,6 @@ setup(
     keywords='fiware api iot things context development',
     py_modules=["fiotclient"],
     install_requires=['requests', 'paho-mqtt', 'configparser'],
+    test_suite='tests',
     python_requires='>=2.7, <4',
 )
