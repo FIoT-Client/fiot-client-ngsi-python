@@ -23,6 +23,8 @@ class FiwareContextClient(SimpleClient):
         """
         super(FiwareContextClient, self).__init__(config_file)
 
+        # TODO Check and notify mandatory parameters on input config file
+
         config_dict = utils.read_config_file(config_file)
 
         self.sth_host = config_dict['sth_host']
@@ -35,25 +37,30 @@ class FiwareContextClient(SimpleClient):
         self.perseo_host = config_dict['perseo_host']
         self.perseo_port = config_dict['perseo_port']
 
-    def create_entity(self, entity_schema, entity_id):
+    def create_entity(self, entity_schema, entity_type, entity_id):
         """Creates a new NGSI entity with the given structure in the currently selected service
 
         :param entity_schema: JSON string representing entity schema
+        :param entity_type: The type of the entity to be created
         :param entity_id: The id to the entity to be created
 
         :return: Information of the registered entity
         """
         url = "http://{}:{}/v2/entities".format(self.cb_host, self.cb_port)
         additional_headers = {'Content-Type': 'application/json'}
+
+        entity_schema = entity_schema.replace('[ENTITY_TYPE]', str(entity_type))
         entity_schema = entity_schema.replace('[ENTITY_ID]', str(entity_id))
+
         payload = json.loads(entity_schema)
 
-        self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
 
-    def create_entity_from_file(self, entity_file_path, entity_id):
+    def create_entity_from_file(self, entity_file_path, entity_type, entity_id):
         """Creates a new NGSI entity loading its structure from a given file
 
         :param entity_file_path: The path to the description file for the entity
+        :param entity_type: The type of the entity to be created
         :param entity_id: The id to the entity to be created
 
         :return: Information of the registered entity
@@ -64,7 +71,7 @@ class FiwareContextClient(SimpleClient):
 
         entity_schema_json_str = json.dumps(payload)
 
-        return self.create_entity(entity_schema_json_str, entity_id)
+        return self.create_entity(entity_schema_json_str, entity_type, entity_id)
 
     def update_entity(self, entity_id, entity_schema):
         """Updates an entity with the given id for the new structure in the currently selected service
@@ -77,11 +84,11 @@ class FiwareContextClient(SimpleClient):
         # TODO Implement
         pass
 
-    def remove_entity(self, entity_id):
+    def remove_entity(self, entity_type, entity_id):
         """Removes an entity with the given id
 
-        :param entity_id: The id to the entity to be removed
         :param entity_type: The type of the entity to be removed
+        :param entity_id: The id to the entity to be removed
 
         :return: Information of the removed entity
         """

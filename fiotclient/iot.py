@@ -25,6 +25,8 @@ class FiwareIotClient(SimpleClient):
         """
         super(FiwareIotClient, self).__init__(config_file)
 
+        # TODO Check and notify mandatory parameters on input config file
+
         config_dict = utils.read_config_file(config_file)
 
         self.idas_host = config_dict['idas_host']

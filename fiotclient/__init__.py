@@ -24,6 +24,8 @@ class SimpleClient(object):
         """
         logging.basicConfig(filename='fiotclient.log', level=logging.DEBUG)
 
+        # TODO Check and notify mandatory parameters on input config file
+
         config_dict = utils.read_config_file(config_file)
 
         self.fiware_service = config_dict['fiware_service']
@@ -31,6 +33,7 @@ class SimpleClient(object):
 
         self.cb_host = config_dict['cb_host']
         self.cb_port = config_dict['cb_port']
+        # TODO Include OAuth param
 
         self.idas_aaa = config_dict['idas_aaa']
         self.token = config_dict['token']
