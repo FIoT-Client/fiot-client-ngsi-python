@@ -54,7 +54,7 @@ class FiwareContextClient(SimpleClient):
 
         payload = json.loads(entity_schema)
 
-        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+        return self._send_request(url, 'POST', payload=payload, additional_headers=additional_headers)
 
     def create_entity_from_file(self, entity_file_path, entity_type, entity_id):
         """Creates a new NGSI entity loading its structure from a given file
@@ -92,10 +92,11 @@ class FiwareContextClient(SimpleClient):
 
         :return: Information of the removed entity
         """
-        url = "http://{}:{}/v2/entities/{}?type={}".format(self.cb_host, self.cb_port, entity_id, entity_type)
-        payload = ''
 
-        return self._send_request(url, payload, 'DELETE')
+        params = {'type': entity_type}
+        url = "http://{}:{}/v2/entities/{}".format(self.cb_host, self.cb_port, entity_id)
+
+        return self._send_request(url, 'DELETE', params=params)
 
     def get_entity_by_id(self, entity_id, entity_type):
         """Get entity information given its entity id
@@ -107,10 +108,10 @@ class FiwareContextClient(SimpleClient):
         """
         logging.info("Getting entity by id '{}'".format(entity_id))
 
-        url = "http://{}:{}/v2/entities/{}?type={}".format(self.cb_host, self.cb_port, entity_id, entity_type)
-        payload = ''
+        params = {'type': entity_type}
+        url = "http://{}:{}/v2/entities/{}".format(self.cb_host, self.cb_port, entity_id)
 
-        return self._send_request(url, payload, 'GET')
+        return self._send_request(url, 'GET', params=params)
 
     def get_entities_by_type(self, entity_type):
         """Get entities created with a given entity type
@@ -120,22 +121,37 @@ class FiwareContextClient(SimpleClient):
         """
         logging.info("Getting entities by type '{}'".format(type))
 
-        url = "http://{}:{}/v2/entities?type={}".format(self.cb_host, self.cb_port, entity_type)
-        payload = ''
+        params = {'type': entity_type}
 
-        return self._send_request(url, payload, 'GET')
+        url = "http://{}:{}/v2/entities".format(self.cb_host, self.cb_port)
 
-    def get_entities(self):
+        return self._send_request(url, 'GET', params=params)
+
+    def get_entities(self, entity_type=None, id_pattern=None, q=None, limit=None, offset=None, options=None):
         """Get all created entities
 
         :return: A list with the information of all the created entities
         """
         logging.info("Getting all entities")
 
-        url = "http://{}:{}/v2/entities".format(self.cb_host, self.cb_port)
-        payload = ''
+        params = {}
 
-        return self._send_request(url, payload, 'GET')
+        if entity_type:
+            params['type'] = entity_type
+        if id_pattern:
+            params['idPattern'] = id_pattern
+        if q:
+            params['q'] = q
+        if limit:
+            params['limit'] = limit
+        if offset:
+            params['offset'] = offset
+        if options:
+            params['options'] = options
+
+        url = "http://{}:{}/v2/entities".format(self.cb_host, self.cb_port)
+
+        return self._send_request(url, 'GET', params=params)
 
     def subscribe_attributes_change(self, device_id, attributes, notification_url):
         """Create a new subscription on given attributes of the device with the specified id
@@ -167,7 +183,7 @@ class FiwareContextClient(SimpleClient):
             "throttling": "PT1S"
         }
 
-        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+        return self._send_request(url, 'POST', payload=payload, additional_headers=additional_headers)
 
     def subscribe_attribute_change_with_rule(self, attribute, attribute_type, condition, action='post', notification_url=None):
         """Register a new rule to be evaluated on attribute values change and a action to be taken when rule evaluated to true
@@ -214,7 +230,7 @@ class FiwareContextClient(SimpleClient):
             logging.error(error_msg)
             return {'error': error_msg}
 
-        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+        return self._send_request(url, 'POST', payload=payload, additional_headers=additional_headers)
 
     def subscribe_cygnus(self, entity_id, attributes):
         """Create a new subscription on attributes to send changes on its values to sinks configured on Cygnus
@@ -252,17 +268,16 @@ class FiwareContextClient(SimpleClient):
         """
         logging.info("Getting historical data")
 
-        url = "http://{}:{}/STH/v1/contextEntities" \
-              "/type/{}/id/{}/attributes/{}?lastN={}".format(self.sth_host, self.sth_port, entity_type, entity_id,
-                                                             attribute, items_number)
+        params = {'lastN': items_number}
+
+        url = "http://{}:{}/STH/v1/contextEntities/type/{}/id/{}/attributes/{}".format(
+            self.sth_host, self.sth_port, entity_type, entity_id, attribute)
 
         additional_headers = {'Accept': 'application/json',
                               'Fiware-Service': str(self.fiware_service).lower(),
                               'Fiware-ServicePath': str(self.fiware_service_path).lower()}
 
-        payload = ''
-
-        return self._send_request(url, payload, 'GET', additional_headers=additional_headers)
+        return self._send_request(url, 'GET', params=params, additional_headers=additional_headers)
 
     def unsubscribe(self, subscription_id):
         """Remove a subscription with the given subscription id
@@ -278,9 +293,11 @@ class FiwareContextClient(SimpleClient):
         additional_headers = {'Accept': 'application/json',
                               'Content-Type': 'application/json'}
 
-        payload = {"subscriptionId": str(subscription_id)}
+        payload = {
+            "subscriptionId": str(subscription_id)
+        }
 
-        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+        return self._send_request(url, 'POST', payload=payload, additional_headers=additional_headers)
 
     def get_subscription_by_id(self, subscription_id):
         """Get subscription information given its subscription id
@@ -293,9 +310,7 @@ class FiwareContextClient(SimpleClient):
 
         url = "http://{}:{}/v2/subscriptions/{}".format(self.cb_host, self.cb_port, subscription_id)
 
-        payload = ''
-
-        return self._send_request(url, payload, 'GET')
+        return self._send_request(url, 'GET')
 
     def list_subscriptions(self):
         """Get all subscriptions
@@ -306,6 +321,4 @@ class FiwareContextClient(SimpleClient):
 
         url = "http://{}:{}/v2/subscriptions".format(self.cb_host, self.cb_port)
 
-        payload = ''
-
-        return self._send_request(url, payload, 'GET')
+        return self._send_request(url, 'GET')

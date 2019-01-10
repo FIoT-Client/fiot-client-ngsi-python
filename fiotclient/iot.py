@@ -104,7 +104,7 @@ class FiwareIotClient(SimpleClient):
                     ]
                   }
 
-        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+        return self._send_request(url, 'POST', payload=payload, additional_headers=additional_headers)
 
     def remove_service(self, service, service_path, api_key="", remove_devices=False):
         """Remove a subservice into a service.
@@ -121,7 +121,12 @@ class FiwareIotClient(SimpleClient):
         """
         logging.info("Removing service")
 
-        url = "http://{}:{}/iot/services?resource={}&apikey={}".format(self.idas_host, self.idas_admin_port, '/iot/d', api_key)
+        params = {
+            'resource': '/iot/d',
+            'apikey': api_key
+        }
+
+        url = "http://{}:{}/iot/services".format(self.idas_host, self.idas_admin_port)
 
         if service_path != '/*' and service_path != '/#':
             remove_devices_str = 'true' if remove_devices else 'false'
@@ -129,9 +134,8 @@ class FiwareIotClient(SimpleClient):
 
         additional_headers = {'Fiware-Service': service,
                               'Fiware-ServicePath': service_path}
-        payload = ''
 
-        return self._send_request(url, payload, 'DELETE', additional_headers=additional_headers)
+        return self._send_request(url, 'DELETE', params=params, additional_headers=additional_headers)
 
     def list_services(self):
         """Get all registered services
@@ -162,8 +166,8 @@ class FiwareIotClient(SimpleClient):
         """
         logging.info("Registering device")
 
-        url = "http://{}:{}/iot/devices?protocol={}".format(self.idas_host, self.idas_admin_port, protocol)
-
+        params = {'protocol': protocol}
+        url = "http://{}:{}/iot/devices".format(self.idas_host, self.idas_admin_port)
         additional_headers = {'Content-Type': 'application/json'}
 
         device_schema = device_schema.replace('[DEVICE_ID]', str(device_id)) \
@@ -178,7 +182,7 @@ class FiwareIotClient(SimpleClient):
 
         payload = json.loads(device_schema)
 
-        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+        return self._send_request(url, 'POST', params=params, payload=payload, additional_headers=additional_headers)
 
     def register_device_from_file(self, device_file_path, device_id, entity_id, endpoint='', protocol='IoTA-UL'):
         """Register a new device loading its structure from a given file
@@ -221,9 +225,8 @@ class FiwareIotClient(SimpleClient):
 
         url = "http://{}:{}/iot/devices/{}".format(self.idas_host, self.idas_admin_port, device_id)
         additional_headers = {'Content-Type': 'application/json'}
-        payload = ''
 
-        return self._send_request(url, payload, 'DELETE', additional_headers=additional_headers)
+        return self._send_request(url, 'DELETE', additional_headers=additional_headers)
 
     def get_device_by_id(self, device_id):
         """Get device information given its device id
@@ -244,9 +247,8 @@ class FiwareIotClient(SimpleClient):
 
         url = "http://{}:{}/iot/devices".format(self.idas_host, self.idas_admin_port)
         additional_headers = {'Content-Type': 'application/json'}
-        payload = ''
 
-        return self._send_request(url, payload, 'GET', additional_headers=additional_headers)
+        return self._send_request(url, 'GET', additional_headers=additional_headers)
 
     @staticmethod
     def _join_group_measurements(group_measurements):
@@ -311,10 +313,16 @@ class FiwareIotClient(SimpleClient):
 
         elif protocol == 'HTTP':
             logging.info("Transport protocol: UL-HTTP")
-            url = "http://{}:{}/iot/d?k={}&i={}".format(self.idas_host, self.idas_ul20_port, self.api_key, device_id)
+
+            params = {
+                'k': self.api_key,
+                'i': device_id
+            }
+
+            url = "http://{}:{}/iot/d".format(self.idas_host, self.idas_ul20_port)
             additional_headers = {'Content-Type': 'text/plain'}
 
-            self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+            self._send_request(url, 'POST', params=params, payload=payload, additional_headers=additional_headers)
             return {'result': 'OK'}
 
         else:
@@ -370,7 +378,7 @@ class FiwareIotClient(SimpleClient):
                     "updateAction": "UPDATE"
                   }
 
-        self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+        self._send_request(url, 'POST', payload=payload, additional_headers=additional_headers)
 
     def get_polling_commands(self, device_id, measurements):
         """Get a list of polling commands of the device with the given id when sending a measurement group
@@ -383,9 +391,14 @@ class FiwareIotClient(SimpleClient):
         """
         logging.info("Sending measurement and getting pooling commands")
 
-        url = "http://{}:{}/iot/d?k={}&i={}&getCmd=1".format(self.idas_host, self.idas_ul20_port, self.api_key,
-                                                             device_id)
+        params = {
+            'k': self.api_key,
+            'i': device_id,
+            'getCmd': 1
+        }
+
+        url = "http://{}:{}/iot/d".format(self.idas_host, self.idas_ul20_port)
         payload = self._create_ul_payload_from_measurements(measurements)
         additional_headers = {'Content-Type': 'text/plain'}
 
-        return self._send_request(url, payload, 'POST', additional_headers=additional_headers)
+        return self._send_request(url, 'POST', params=params, payload=payload, additional_headers=additional_headers)

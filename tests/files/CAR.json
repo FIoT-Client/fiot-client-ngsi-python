@@ -1,0 +1,12 @@
+{
+  "id": "[ENTITY_ID]",
+  "type": "[ENTITY_TYPE]",
+  "speed": {
+    "value": 120,
+    "type": "Integer"
+  },
+  "rpm": {
+    "value": 4200,
+    "type": "Integer"
+  }
+}

@@ -41,7 +41,7 @@ class SimpleClient(object):
 
         self.host_id = config_dict['host_id']
 
-    def _send_request(self, url, payload, method, additional_headers=None):
+    def _send_request(self, url, method, payload=None, additional_headers=None, params=None):
         """Auxiliary method to configure and execute a request to FIWARE APIs
 
         :param url: The url to be called on the request
@@ -63,10 +63,13 @@ class SimpleClient(object):
         logging.debug("Headers:")
         logging.debug(json.dumps(headers, indent=4))
 
-        if not isinstance(payload, str):
-            str_payload = json.dumps(payload, indent=4)
+        if payload:
+            if not isinstance(payload, str):
+                str_payload = json.dumps(payload, indent=4)
+            else:
+                str_payload = payload
         else:
-            str_payload = payload
+            str_payload = ''
 
         if str_payload != '':
             logging.debug("Sending payload:")
@@ -75,13 +78,13 @@ class SimpleClient(object):
         # TODO Adds timeout or verifications of servers on calls to APIs
 
         if method == 'GET':
-            r = requests.get(url, data=str_payload, headers=headers)
+            r = requests.get(url, params=params, data=str_payload, headers=headers)
         elif method == 'POST':
-            r = requests.post(url, data=str_payload, headers=headers)
+            r = requests.post(url, params=params, data=str_payload, headers=headers)
         elif method == 'PUT':
-            r = requests.put(url, data=str_payload, headers=headers)
+            r = requests.put(url, params=params, data=str_payload, headers=headers)
         elif method == 'DELETE':
-            r = requests.delete(url, data=str_payload, headers=headers)
+            r = requests.delete(url, params=params, data=str_payload, headers=headers)
         else:
             logging.error("Unsupported method '{}'".format(str(method)))
             error_msg = "Unsupported method. Select one of 'GET', 'POST', 'PUT' and 'DELETE'".format(method)
