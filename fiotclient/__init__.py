@@ -77,29 +77,34 @@ class SimpleClient(object):
 
         # TODO Adds timeout or verifications of servers on calls to APIs
 
-        if method == 'GET':
-            r = requests.get(url, params=params, data=str_payload, headers=headers)
-        elif method == 'POST':
-            r = requests.post(url, params=params, data=str_payload, headers=headers)
-        elif method == 'PUT':
-            r = requests.put(url, params=params, data=str_payload, headers=headers)
-        elif method == 'DELETE':
-            r = requests.delete(url, params=params, data=str_payload, headers=headers)
-        else:
-            logging.error("Unsupported method '{}'".format(str(method)))
-            error_msg = "Unsupported method. Select one of 'GET', 'POST', 'PUT' and 'DELETE'".format(method)
-            return {'error': error_msg}
+        try:
+            if method == 'GET':
+                r = requests.get(url, params=params, data=str_payload, headers=headers)
+            elif method == 'POST':
+                r = requests.post(url, params=params, data=str_payload, headers=headers)
+            elif method == 'PUT':
+                r = requests.put(url, params=params, data=str_payload, headers=headers)
+            elif method == 'DELETE':
+                r = requests.delete(url, params=params, data=str_payload, headers=headers)
+            else:
+                logging.error("Unsupported method '{}'".format(str(method)))
+                error_msg = "Unsupported method. Select one of 'GET', 'POST', 'PUT' and 'DELETE'".format(method)
+                return {'error': error_msg}
 
-        status_code = r.status_code
-        logging.debug("Status Code: {}".format(str(status_code)))
+            status_code = r.status_code
+            logging.debug("Status Code: {}".format(str(status_code)))
 
-        response = json.loads(r.text) if r.text != '' else {}
+            response = json.loads(r.text) if r.text != '' else {}
 
-        logging.debug("Response: ")
-        logging.debug(json.dumps(response, indent=4))
+            logging.debug("Response: ")
+            logging.debug(json.dumps(response, indent=4))
 
-        return {'status_code': status_code,
-                'response': response}
+            return {'status_code': status_code,
+                    'response': response}
+
+        except (ConnectionRefusedError, requests.exceptions.ConnectionError) as e:
+            return {'status_code': 0,
+                    'response': e.strerror}
 
     def authenticate(self, username, password):
         """Generates an authentication token based on user credentials using FIWARE Lab OAuth2.0 Authentication system
