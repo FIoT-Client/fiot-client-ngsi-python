@@ -219,9 +219,7 @@ class TestContextMethods(unittest.TestCase):
             self.assertEqual(entity['type'], 'Car')
 
     def test_update_entity(self):
-        # TODO Implement
-        pass
+        pass  # TODO Implement
 
     def test_update_entity_attribute_value(self):
-        # TODO Implement
-        pass
+        pass  # TODO Implement

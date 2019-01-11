@@ -238,17 +238,23 @@ class FiwareIotClient(SimpleClient):
         pass
         # TODO Implement
 
-    def list_devices(self):
+    def list_devices(self, limit=None, offset=None):
         """List the devices registered in the currently selected service
 
         :return: The list of devices registered in the service
         """
         logging.info("Listing devices")
 
+        params = {}
+        if limit:
+            params['limit'] = limit
+        if offset:
+            params['offset'] = offset
+
         url = "http://{}:{}/iot/devices".format(self.idas_host, self.idas_admin_port)
         additional_headers = {'Content-Type': 'application/json'}
 
-        return self._send_request(url, 'GET', additional_headers=additional_headers)
+        return self._send_request(url, 'GET', params=params, additional_headers=additional_headers)
 
     @staticmethod
     def _join_group_measurements(group_measurements):
