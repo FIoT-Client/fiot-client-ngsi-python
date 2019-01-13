@@ -87,22 +87,27 @@ class SimpleClient(object):
             elif method == 'DELETE':
                 r = requests.delete(url, params=params, data=str_payload, headers=headers)
             else:
-                logging.error("Unsupported method '{}'".format(str(method)))
+                logging.error("Error: Unsupported method '{}'".format(str(method)))
+
                 error_msg = "Unsupported method. Select one of 'GET', 'POST', 'PUT' and 'DELETE'".format(method)
                 return {'error': error_msg}
 
             status_code = r.status_code
-            logging.debug("Status Code: {}".format(str(status_code)))
-
+            headers = r.headers
             response = json.loads(r.text) if r.text != '' else {}
 
-            logging.debug("Response: ")
-            logging.debug(json.dumps(response, indent=4))
+            logging.debug("Status Code: {}".format(str(status_code)))
+            logging.debug("Headers: {}".format(str(headers)))
+            logging.debug("Response: {}".format(str(response)))
 
             return {'status_code': status_code,
+                    'headers': headers,
                     'response': response}
 
         except (ConnectionRefusedError, requests.exceptions.ConnectionError) as e:
+            logging.debug("Status Code: {}".format(0))
+            logging.debug("Response: Error: {}".format(e.strerror))
+
             return {'status_code': 0,
                     'response': e.strerror}
 
