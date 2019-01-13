@@ -1,9 +1,11 @@
-import unittest
 from os.path import dirname, realpath, join
+
+from fiotclient.context import FiwareContextClient
 from fiotclient.iot import FiwareIotClient
+from . import TestCommonMethods
 
 
-class TestContextMethods(unittest.TestCase):
+class TestContextMethods(TestCommonMethods):
 
     files_dir_path = join(dirname(realpath(__file__)), 'files')
 
@@ -43,26 +45,112 @@ class TestContextMethods(unittest.TestCase):
 
         # TODO Check local SO
 
-    def test_create_service(self):
-        pass  # TODO Implement
+    def _assert_entity_data(self, data, expected_data):
+        self.assertEqual(data['id'], expected_data['id'])
+        self.assertEqual(data['type'], expected_data['type'])
+        self.assertEqual(data['change_state_info']['type'], expected_data['change_state_info']['type'])
+        self.assertEqual(data['change_state_info']['value'], expected_data['change_state_info']['value'])
+        self.assertEqual(data['change_state_status']['type'], expected_data['change_state_status']['type'])
+        self.assertEqual(data['change_state_status']['value'], expected_data['change_state_status']['value'])
+        self.assertEqual(data['state']['type'], expected_data['state']['type'])
+        self.assertEqual(data['state']['value'], expected_data['state']['value'])
 
-    def test_remove_service(self):
-        pass  # TODO Implement
+    def _assert_device_data(self, data, expected_data):
+        self.assertEqual(data['device_id'], expected_data['device_id'])
+        self.assertEqual(data['entity_name'], expected_data['entity_name'])
+        self.assertEqual(data['entity_type'], expected_data['entity_type'])
+        self.assertEqual(data['transport'], expected_data['transport'])
 
-    def test_list_services(self):
-        pass  # TODO Implement
+        self.assertEqual(len(data['attributes']), len(expected_data['attributes']))
+        self.assertEqual(data['attributes'][0]['object_id'], expected_data['attributes'][0]['object_id'])
+        self.assertEqual(data['attributes'][0]['name'], expected_data['attributes'][0]['name'],)
+        self.assertEqual(data['attributes'][0]['type'], expected_data['attributes'][0]['type'])
+
+        self.assertEqual(len(data['lazy']), len(expected_data['lazy']))
+
+        self.assertEqual(len(data['commands']), len(expected_data['commands']))
+        self.assertEqual(data['commands'][0]['object_id'], expected_data['commands'][0]['object_id'])
+        self.assertEqual(data['commands'][0]['name'], expected_data['commands'][0]['name'])
+        self.assertEqual(data['commands'][0]['type'], expected_data['commands'][0]['type'])
+
+        self.assertEqual(len(data['static_attributes']), len(expected_data['static_attributes']))
+        self.assertEqual(data['static_attributes'][0]['name'], expected_data['static_attributes'][0]['name'])
+        self.assertEqual(data['static_attributes'][0]['type'], expected_data['static_attributes'][0]['type'])
+        self.assertEqual(data['static_attributes'][0]['value'], expected_data['static_attributes'][0]['value'])
 
     def test_register_device(self):
         pass  # TODO Implement
 
     def test_register_device_from_file(self):
-        pass  # TODO Implement
+        iot_client = FiwareIotClient(self._build_file_path('config.ini'))
+        context_client = FiwareContextClient(self._build_file_path('config.ini'))
+
+        response = iot_client.register_device_from_file(self._build_file_path('LED.json'), 'LED_001', 'TEST_LED')
+        self.assertEqual(response['status_code'], 201)
+
+        response = iot_client.get_device_by_id('LED_001')
+        self.assertEqual(response['status_code'], 200)
+        data = response['response']
+
+        expected_device_data = {
+            'device_id': 'LED_001',
+            'entity_name': 'TEST_LED',
+            'entity_type': 'thing',
+            'transport': 'MQTT',
+            'attributes': [{
+                'object_id': 's',
+                'name': 'state',
+                'type': 'int'
+            }],
+            'lazy': [],
+            'commands': [{
+                'object_id': 'change_state',
+                'name': 'change_state',
+                'type': 'command'
+            }],
+            'static_attributes': [{
+                'name': 'id',
+                'type': 'string',
+                'value': 'LED_001'}]
+        }
+        self._assert_device_data(data, expected_device_data)
+
+        response = context_client.get_entity_by_id('TEST_LED', 'thing')
+        self.assertEqual(response['status_code'], 200)
+        data = response['response']
+
+        expected_entity_data = {
+            'id': 'TEST_LED',
+            'type': 'thing',
+            'change_state_info': {
+                'type': 'commandResult',
+                'value': ' '
+            },
+            'change_state_status': {
+                'type': 'commandStatus',
+                'value': 'UNKNOWN'
+            },
+            'state': {
+                'type': 'int',
+                'value': ' '
+            }
+        }
+        self._assert_entity_data(data, expected_entity_data)
 
     def test_update_device(self):
         pass  # TODO Implement
 
     def test_remove_device(self):
-        pass  # TODO Implement
+        iot_client = FiwareIotClient(self._build_file_path('config.ini'))
+
+        response = iot_client.register_device_from_file(self._build_file_path('LED.json'), 'LED_001', 'TEST_LED')
+        self.assertEqual(response['status_code'], 201)
+
+        response = iot_client.remove_device('LED_001')
+        self.assertEqual(response['status_code'], 204)
+
+        response = iot_client.get_device_by_id('LED_001')
+        self.assertEqual(response['status_code'], 404)
 
     def test_get_device_by_id(self):
         pass  # TODO Implement

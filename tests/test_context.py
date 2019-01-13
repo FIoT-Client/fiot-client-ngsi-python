@@ -1,14 +1,18 @@
-import unittest
-from os.path import dirname, realpath, join
+from os.path import join
+
 from fiotclient.context import FiwareContextClient
+from . import TestCommonMethods
 
 
-class TestContextMethods(unittest.TestCase):
+class TestContextMethods(TestCommonMethods):
 
-    files_dir_path = join(dirname(realpath(__file__)), 'files')
-
-    def _build_file_path(self, filename):
-        return join(self.files_dir_path, filename)
+    def _assert_entity_data(self, data, expected_data):
+        self.assertEqual(data['id'], expected_data['id'])
+        self.assertEqual(data['type'], expected_data['type'])
+        self.assertEqual(data['pressure']['type'], expected_data['pressure']['type'])
+        self.assertEqual(data['pressure']['value'], expected_data['pressure']['value'])
+        self.assertEqual(data['temperature']['type'], expected_data['temperature']['type'])
+        self.assertEqual(data['temperature']['value'], expected_data['temperature']['value'])
 
     def test_config_file_init_inherited_params(self):
         context_client = FiwareContextClient(self._build_file_path('config.dummy.ini'))
@@ -44,18 +48,8 @@ class TestContextMethods(unittest.TestCase):
 
         # TODO Check local SO
 
-    def assert_entity_data(self, data):
-        self.assertEqual(data['id'], 'ROOM_001')
-        self.assertEqual(data['type'], 'Room')
-        self.assertEqual(data['pressure']['type'], 'Integer')
-        self.assertEqual(data['pressure']['value'], 720)
-        self.assertEqual(data['temperature']['type'], 'Float')
-        self.assertEqual(data['temperature']['value'], 23)
-
     def test_create_entity(self):
         context_client = FiwareContextClient(self._build_file_path('config.ini'))
-
-        context_client.remove_entity('Room', 'ROOM_001')  # Delete entity with id if exists
 
         entity_schema = """{
             "id": "[ENTITY_ID]",
@@ -76,16 +70,24 @@ class TestContextMethods(unittest.TestCase):
         response = context_client.get_entity_by_id('ROOM_001', 'Room')
         self.assertEqual(response['status_code'], 200)
 
-        # Delete created entity before running the asserts
-        context_client.remove_entity('Room', 'ROOM_001')
-
         data = response['response']
-        self.assert_entity_data(data)
+
+        expected_entity_data = {
+            'id': 'ROOM_001',
+            'type': 'Room',
+            'pressure': {
+                'type': 'Integer',
+                'value': 720
+            },
+            'temperature': {
+                'type': 'Float',
+                'value': 23
+            }
+        }
+        self._assert_entity_data(data, expected_entity_data)
 
     def test_create_entity_from_file(self):
         context_client = FiwareContextClient(self._build_file_path('config.ini'))
-
-        context_client.remove_entity('Room', 'ROOM_001')  # Delete entity with id if exists
 
         response = context_client.create_entity_from_file(self._build_file_path('ROOM.json'), 'Room', 'ROOM_001')
         self.assertEqual(response['status_code'], 201)
@@ -93,27 +95,30 @@ class TestContextMethods(unittest.TestCase):
         response = context_client.get_entity_by_id('ROOM_001', 'Room')
         self.assertEqual(response['status_code'], 200)
 
-        # Delete created entity before running the asserts
-        context_client.remove_entity('Room', 'ROOM_001')
-
         data = response['response']
-        self.assert_entity_data(data)
+
+        expected_entity_data = {
+            'id': 'ROOM_001',
+            'type': 'Room',
+            'pressure': {
+                'type': 'Integer',
+                'value': 720
+            },
+            'temperature': {
+                'type': 'Float',
+                'value': 23
+            }
+        }
+        self._assert_entity_data(data, expected_entity_data)
 
     def test_get_entities(self):
         context_client = FiwareContextClient(join(self.files_dir_path, 'config.ini'))
 
         entities_ids = ['ROOM_001', 'ROOM_002', 'ROOM_003']
-
-        # Delete entities with id if exists and recreate
         for entity_id in entities_ids:
-            context_client.remove_entity('Room', entity_id)
             context_client.create_entity_from_file(self._build_file_path('ROOM.json'), 'Room', entity_id)
 
         response = context_client.get_entities()
-
-        # Delete created entities before running the asserts
-        for entity_id in entities_ids:
-            context_client.remove_entity('Room', entity_id)
 
         self.assertEqual(response['status_code'], 200)
 
@@ -144,23 +149,14 @@ class TestContextMethods(unittest.TestCase):
         rooms_entities_ids = ['ROOM_001', 'ROOM_002', 'ROOM_003']
         cars_entities_ids = ['CAR_001', 'CAR_002']
 
-        # Delete entities with id if exists and recreate
         for entity_id in rooms_entities_ids:
-            context_client.remove_entity('Room', entity_id)
             context_client.create_entity_from_file(self._build_file_path('ROOM.json'), 'Room', entity_id)
 
         for entity_id in cars_entities_ids:
-            context_client.remove_entity('Car', entity_id)
             context_client.create_entity_from_file(self._build_file_path('CAR.json'), 'Car', entity_id)
 
         rooms_response = context_client.get_entities_by_type('Room')
         cars_response = context_client.get_entities_by_type('Car')
-
-        # Delete created entities before running the asserts
-        for entity_id in rooms_entities_ids:
-            context_client.remove_entity('Room', entity_id)
-        for entity_id in cars_entities_ids:
-            context_client.remove_entity('Car', entity_id)
 
         self.assertEqual(rooms_response['status_code'], 200)
         self.assertEqual(cars_response['status_code'], 200)
@@ -184,25 +180,15 @@ class TestContextMethods(unittest.TestCase):
         rooms_entities_ids = ['ROOM_001', 'ROOM_002', 'ROOM_003']
         cars_entities_ids = ['CAR_001', 'CAR_002']
 
-        # Delete entities with id if exists and recreate
         for entity_id in rooms_entities_ids:
-            context_client.remove_entity('Room', entity_id)
             context_client.create_entity_from_file(self._build_file_path('ROOM.json'), 'Room', entity_id)
 
         for entity_id in cars_entities_ids:
-            context_client.remove_entity('Car', entity_id)
             context_client.create_entity_from_file(self._build_file_path('CAR.json'), 'Car', entity_id)
 
         rooms_response = context_client.get_entities(entity_type='Room')
-        cars_response = context_client.get_entities(entity_type='Car')
-
-        # Delete created entities before running the asserts
-        for entity_id in rooms_entities_ids:
-            context_client.remove_entity('Room', entity_id)
-        for entity_id in cars_entities_ids:
-            context_client.remove_entity('Car', entity_id)
-
         self.assertEqual(rooms_response['status_code'], 200)
+        cars_response = context_client.get_entities(entity_type='Car')
         self.assertEqual(cars_response['status_code'], 200)
 
         rooms_data = rooms_response['response']
