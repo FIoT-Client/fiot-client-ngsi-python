@@ -235,8 +235,10 @@ class FiwareIotClient(SimpleClient):
         :return: The information of the device found with the given id
                  or None if no device was found with the id
         """
-        pass
-        # TODO Implement
+        url = "http://{}:{}/iot/devices/{}".format(self.idas_host, self.idas_admin_port, device_id)
+        additional_headers = {'Content-Type': 'application/json'}
+
+        return self._send_request(url, 'GET', additional_headers=additional_headers)
 
     def list_devices(self, limit=None, offset=None):
         """List the devices registered in the currently selected service
