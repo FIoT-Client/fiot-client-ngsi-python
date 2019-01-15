@@ -11,6 +11,8 @@ The FIoT-Client Python is a Python library that eases the use of IoT and Context
 
 ### Prerequisites
 
+Python 2.7+ (Python 3.5+ preferred)
+
 <!--
 What things you need to install the software and how to install them
 
@@ -20,6 +22,20 @@ Give examples
  -->
 
 ### Installing
+
+You can install the latest stable version of the library from the Python package index, with the following command: 
+
+```
+pip install fiotclient
+```
+
+or install directly from the cloned repository folder:
+
+```
+cd fiot-client-python/
+pip install -e .
+```
+
 
 <!--
 A step by step series of examples that tell you have to get a development env running
@@ -40,6 +56,18 @@ End with an example of getting some data out of the system or using it for a lit
 -->
 
 ## Running the tests
+
+To run the available unit tests, you should first configure a local FIWARE stack or use an external stack which you are granted access, so that the communication from the library to the FIWARE platform components can be tested.
+
+[Here](https://github.com/FIoT-Client/fiot-client-tutorial/tree/master/deploy/full) you can find a *docker-compose* file that can be used to run a local instance of the required components.
+
+Next, you should configure the *config.ini* file, placed on **tests/file** folder with the configured FIWARE stack params (addresses and ports).
+
+Finally, the tests can be executed using the following command:
+
+```
+python -m unittest
+```
 
 <!--
 Explain how to run the automated tests for this system
