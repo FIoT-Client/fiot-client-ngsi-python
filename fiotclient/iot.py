@@ -386,7 +386,7 @@ class FiwareIotClient(SimpleClient):
                     "updateAction": "UPDATE"
                   }
 
-        self._send_request(url, 'POST', payload=payload, additional_headers=additional_headers)
+        return self._send_request(url, 'POST', payload=payload, additional_headers=additional_headers)
 
     def get_polling_commands(self, device_id, measurements):
         """Get a list of polling commands of the device with the given id when sending a measurement group

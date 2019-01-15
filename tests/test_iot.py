@@ -1,6 +1,5 @@
 from os.path import dirname, realpath, join
 
-from fiotclient.context import FiwareContextClient
 from fiotclient.iot import FiwareIotClient
 from . import TestCommonMethods
 
@@ -11,39 +10,6 @@ class TestContextMethods(TestCommonMethods):
 
     def _build_file_path(self, filename):
         return join(self.files_dir_path, filename)
-
-    def test_config_file_init_inherited_params(self):
-        iot_client = FiwareIotClient(self._build_file_path('config.dummy.ini'))
-
-        self.assertEqual(iot_client.fiware_service, 'service_name')
-        self.assertEqual(iot_client.fiware_service_path, '/service_path')
-
-        self.assertEqual(iot_client.cb_host, 'contextbroker_address')
-        self.assertEqual(iot_client.cb_port, 1)
-        # TODO Check OAuth param
-
-        # TODO Check these verifications
-        self.assertEqual(iot_client.idas_aaa, 'no')
-        # self.assertEqual(iot_client.token, '')
-        # self.assertEqual(iot_client.expires_at, '')
-
-        self.assertEqual(iot_client.host_id, 'b4:b6:30')
-
-    def test_config_file_init_specific_params(self):
-        iot_client = FiwareIotClient(self._build_file_path('config.dummy.ini'))
-
-        self.assertEqual(iot_client.idas_host, 'idas_address')
-        self.assertEqual(iot_client.idas_admin_port, 2)
-        self.assertEqual(iot_client.idas_ul20_port, 3)
-        # check IDAS auth attr
-        self.assertEqual(iot_client.api_key, '1a2b3c4d5e6f')
-
-        self.assertEqual(iot_client.mosquitto_host, 'mosquitto_address')
-        self.assertEqual(iot_client.mosquitto_port, 6)
-
-        # TODO MQTT optional
-
-        # TODO Check local SO
 
     def _assert_entity_data(self, data, expected_data):
         self.assertEqual(data['id'], expected_data['id'])
@@ -78,17 +44,47 @@ class TestContextMethods(TestCommonMethods):
         self.assertEqual(data['static_attributes'][0]['type'], expected_data['static_attributes'][0]['type'])
         self.assertEqual(data['static_attributes'][0]['value'], expected_data['static_attributes'][0]['value'])
 
+    def test_config_file_init_inherited_params(self):
+        iot_client = FiwareIotClient(self._build_file_path('config.dummy.ini'))
+
+        self.assertEqual(iot_client.fiware_service, 'service_name')
+        self.assertEqual(iot_client.fiware_service_path, '/service_path')
+
+        self.assertEqual(iot_client.cb_host, 'contextbroker_address')
+        self.assertEqual(iot_client.cb_port, 1)
+        # TODO Check OAuth param
+
+        # TODO Check these verifications
+        self.assertEqual(iot_client.idas_aaa, 'no')
+        # self.assertEqual(iot_client.token, '')
+        # self.assertEqual(iot_client.expires_at, '')
+
+        self.assertEqual(iot_client.host_id, 'b4:b6:30')
+
+    def test_config_file_init_specific_params(self):
+        iot_client = FiwareIotClient(self._build_file_path('config.dummy.ini'))
+
+        self.assertEqual(iot_client.idas_host, 'idas_address')
+        self.assertEqual(iot_client.idas_admin_port, 2)
+        self.assertEqual(iot_client.idas_ul20_port, 3)
+        # check IDAS auth attr
+        self.assertEqual(iot_client.api_key, '1a2b3c4d5e6f')
+
+        self.assertEqual(iot_client.mosquitto_host, 'mosquitto_address')
+        self.assertEqual(iot_client.mosquitto_port, 6)
+
+        # TODO MQTT optional
+
+        # TODO Check local SO
+
     def test_register_device(self):
         pass  # TODO Implement
 
     def test_register_device_from_file(self):
-        iot_client = FiwareIotClient(self._build_file_path('config.ini'))
-        context_client = FiwareContextClient(self._build_file_path('config.ini'))
-
-        response = iot_client.register_device_from_file(self._build_file_path('LED.json'), 'LED_001', 'TEST_LED')
+        response = self.iot_client.register_device_from_file(self._build_file_path('LED.json'), 'LED_001', 'TEST_LED')
         self.assertEqual(response['status_code'], 201)
 
-        response = iot_client.get_device_by_id('LED_001')
+        response = self.iot_client.get_device_by_id('LED_001')
         self.assertEqual(response['status_code'], 200)
         data = response['response']
 
@@ -115,7 +111,7 @@ class TestContextMethods(TestCommonMethods):
         }
         self._assert_device_data(data, expected_device_data)
 
-        response = context_client.get_entity_by_id('TEST_LED', 'thing')
+        response = self.context_client.get_entity_by_id('TEST_LED', 'thing')
         self.assertEqual(response['status_code'], 200)
         data = response['response']
 
@@ -141,15 +137,13 @@ class TestContextMethods(TestCommonMethods):
         pass  # TODO Implement
 
     def test_remove_device(self):
-        iot_client = FiwareIotClient(self._build_file_path('config.ini'))
-
-        response = iot_client.register_device_from_file(self._build_file_path('LED.json'), 'LED_001', 'TEST_LED')
+        response = self.iot_client.register_device_from_file(self._build_file_path('LED.json'), 'LED_001', 'TEST_LED')
         self.assertEqual(response['status_code'], 201)
 
-        response = iot_client.remove_device('LED_001')
+        response = self.iot_client.remove_device('LED_001')
         self.assertEqual(response['status_code'], 204)
 
-        response = iot_client.get_device_by_id('LED_001')
+        response = self.iot_client.get_device_by_id('LED_001')
         self.assertEqual(response['status_code'], 404)
 
     def test_get_device_by_id(self):
@@ -162,7 +156,55 @@ class TestContextMethods(TestCommonMethods):
         pass  # TODO Implement
 
     def test_send_command(self):
-        pass  # TODO Implement
+        response = self.iot_client.register_device_from_file(self._build_file_path('LED.json'), 'LED_001', 'TEST_LED')
+        self.assertEqual(response['status_code'], 201)
+
+        response = self.context_client.get_entity_by_id('TEST_LED', 'thing')
+        self.assertEqual(response['status_code'], 200)
+        data = response['response']
+
+        expected_entity_data = {
+            'id': 'TEST_LED',
+            'type': 'thing',
+            'change_state_info': {
+                'type': 'commandResult',
+                'value': ' '
+            },
+            'change_state_status': {
+                'type': 'commandStatus',
+                'value': 'UNKNOWN'
+            },
+            'state': {
+                'type': 'int',
+                'value': ' '
+            }
+        }
+        self._assert_entity_data(data, expected_entity_data)
+
+        response = self.iot_client.send_command('TEST_LED', 'LED_001', 'change_state', {'state': 'ON'})
+        self.assertEqual(response['status_code'], 200)
+
+        response = self.context_client.get_entity_by_id('TEST_LED', 'thing')
+        self.assertEqual(response['status_code'], 200)
+        data = response['response']
+
+        expected_entity_data = {
+            'id': 'TEST_LED',
+            'type': 'thing',
+            'change_state_info': {
+                'type': 'commandResult',
+                'value': ' '
+            },
+            'change_state_status': {
+                'type': 'commandStatus',
+                'value': 'PENDING'
+            },
+            'state': {
+                'type': 'int',
+                'value': ' '
+            }
+        }
+        self._assert_entity_data(data, expected_entity_data)
 
     def test_get_pooling_commands(self):
         pass  # TODO Implement

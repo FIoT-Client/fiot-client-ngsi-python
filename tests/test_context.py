@@ -1,5 +1,3 @@
-from os.path import join
-
 from fiotclient.context import FiwareContextClient
 from . import TestCommonMethods
 
@@ -49,8 +47,6 @@ class TestContextMethods(TestCommonMethods):
         # TODO Check local SO
 
     def test_create_entity(self):
-        context_client = FiwareContextClient(self._build_file_path('config.ini'))
-
         entity_schema = """{
             "id": "[ENTITY_ID]",
             "type": "[ENTITY_TYPE]",
@@ -64,10 +60,10 @@ class TestContextMethods(TestCommonMethods):
             }
         }"""
 
-        response = context_client.create_entity(entity_schema, 'Room', 'ROOM_001')
+        response = self.context_client.create_entity(entity_schema, 'Room', 'ROOM_001')
         self.assertEqual(response['status_code'], 201)
 
-        response = context_client.get_entity_by_id('ROOM_001', 'Room')
+        response = self.context_client.get_entity_by_id('ROOM_001', 'Room')
         self.assertEqual(response['status_code'], 200)
 
         data = response['response']
@@ -87,12 +83,10 @@ class TestContextMethods(TestCommonMethods):
         self._assert_entity_data(data, expected_entity_data)
 
     def test_create_entity_from_file(self):
-        context_client = FiwareContextClient(self._build_file_path('config.ini'))
-
-        response = context_client.create_entity_from_file(self._build_file_path('ROOM.json'), 'Room', 'ROOM_001')
+        response = self.context_client.create_entity_from_file(self._build_file_path('ROOM.json'), 'Room', 'ROOM_001')
         self.assertEqual(response['status_code'], 201)
 
-        response = context_client.get_entity_by_id('ROOM_001', 'Room')
+        response = self.context_client.get_entity_by_id('ROOM_001', 'Room')
         self.assertEqual(response['status_code'], 200)
 
         data = response['response']
@@ -112,13 +106,11 @@ class TestContextMethods(TestCommonMethods):
         self._assert_entity_data(data, expected_entity_data)
 
     def test_get_entities(self):
-        context_client = FiwareContextClient(join(self.files_dir_path, 'config.ini'))
-
         entities_ids = ['ROOM_001', 'ROOM_002', 'ROOM_003']
         for entity_id in entities_ids:
-            context_client.create_entity_from_file(self._build_file_path('ROOM.json'), 'Room', entity_id)
+            self.context_client.create_entity_from_file(self._build_file_path('ROOM.json'), 'Room', entity_id)
 
-        response = context_client.get_entities()
+        response = self.context_client.get_entities()
 
         self.assertEqual(response['status_code'], 200)
 
@@ -130,33 +122,28 @@ class TestContextMethods(TestCommonMethods):
             self.assertEqual(entity['type'], 'Room')
 
     def test_get_nonexistent_entity(self):
-        context_client = FiwareContextClient(join(self.files_dir_path, 'config.ini'))
-        response = context_client.get_entity_by_id('NON_EXIST', 'NonexistentType')
+        response = self.context_client.get_entity_by_id('NON_EXIST', 'NonexistentType')
         self.assertEqual(response['status_code'], 404)
 
     def test_get_entities_by_nonexistent_type(self):
-        context_client = FiwareContextClient(join(self.files_dir_path, 'config.ini'))
-
-        response = context_client.get_entities_by_type('NonexistentType')
+        response = self.context_client.get_entities_by_type('NonexistentType')
         self.assertEqual(response['status_code'], 200)
 
         data = response['response']
         self.assertEqual(len(data), 0)
 
     def test_get_entities_by_type(self):
-        context_client = FiwareContextClient(join(self.files_dir_path, 'config.ini'))
-
         rooms_entities_ids = ['ROOM_001', 'ROOM_002', 'ROOM_003']
         cars_entities_ids = ['CAR_001', 'CAR_002']
 
         for entity_id in rooms_entities_ids:
-            context_client.create_entity_from_file(self._build_file_path('ROOM.json'), 'Room', entity_id)
+            self.context_client.create_entity_from_file(self._build_file_path('ROOM.json'), 'Room', entity_id)
 
         for entity_id in cars_entities_ids:
-            context_client.create_entity_from_file(self._build_file_path('CAR.json'), 'Car', entity_id)
+            self.context_client.create_entity_from_file(self._build_file_path('CAR.json'), 'Car', entity_id)
 
-        rooms_response = context_client.get_entities_by_type('Room')
-        cars_response = context_client.get_entities_by_type('Car')
+        rooms_response = self.context_client.get_entities_by_type('Room')
+        cars_response = self.context_client.get_entities_by_type('Car')
 
         self.assertEqual(rooms_response['status_code'], 200)
         self.assertEqual(cars_response['status_code'], 200)
@@ -175,20 +162,18 @@ class TestContextMethods(TestCommonMethods):
             self.assertEqual(entity['type'], 'Car')
 
     def test_get_entities_by_type_param(self):
-        context_client = FiwareContextClient(join(self.files_dir_path, 'config.ini'))
-
         rooms_entities_ids = ['ROOM_001', 'ROOM_002', 'ROOM_003']
         cars_entities_ids = ['CAR_001', 'CAR_002']
 
         for entity_id in rooms_entities_ids:
-            context_client.create_entity_from_file(self._build_file_path('ROOM.json'), 'Room', entity_id)
+            self.context_client.create_entity_from_file(self._build_file_path('ROOM.json'), 'Room', entity_id)
 
         for entity_id in cars_entities_ids:
-            context_client.create_entity_from_file(self._build_file_path('CAR.json'), 'Car', entity_id)
+            self.context_client.create_entity_from_file(self._build_file_path('CAR.json'), 'Car', entity_id)
 
-        rooms_response = context_client.get_entities(entity_type='Room')
+        rooms_response = self.context_client.get_entities(entity_type='Room')
         self.assertEqual(rooms_response['status_code'], 200)
-        cars_response = context_client.get_entities(entity_type='Car')
+        cars_response = self.context_client.get_entities(entity_type='Car')
         self.assertEqual(cars_response['status_code'], 200)
 
         rooms_data = rooms_response['response']
