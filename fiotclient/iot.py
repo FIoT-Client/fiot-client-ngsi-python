@@ -18,24 +18,46 @@ __status__ = "Development"
 
 class FiwareIotClient(SimpleClient):
 
-    def __init__(self, config_file):
+    def __init__(self, fiware_service='', fiware_service_path='', cb_host='', cb_port='',
+                 idas_aaa='', token='', expires_at='', host_id='',
+                 idas_host='', idas_admin_port='', idas_ul20_port='', api_key='',
+                 mosquitto_host='', mosquitto_port=''):
         """Client for doing IoT management operations on FIWARE platform
 
         :param config_file: The file in which load the default configuration
         """
-        super(FiwareIotClient, self).__init__(config_file)
+
+        super(FiwareIotClient, self).__init__(fiware_service=fiware_service, fiware_service_path=fiware_service_path,
+                                              cb_host=cb_host, cb_port=cb_port,
+                                              idas_aaa=idas_aaa, token=token, expires_at=expires_at,
+                                              host_id=host_id)
+
+        self.idas_host = idas_host
+        self.idas_admin_port = idas_admin_port
+        self.idas_ul20_port = idas_ul20_port
+        self.api_key = api_key
+
+        self.mosquitto_host = mosquitto_host
+        self.mosquitto_port = mosquitto_port
+
+    @classmethod
+    def from_config_file(cls, config_file):
+        """Client for doing IoT management operations on FIWARE platform
+
+        :param config_file: The file in which load the default configuration
+        """
 
         # TODO Check and notify mandatory parameters on input config file
-
         config_dict = utils.read_config_file(config_file)
 
-        self.idas_host = config_dict['idas_host']
-        self.idas_admin_port = config_dict['idas_admin_port']
-        self.idas_ul20_port = config_dict['idas_ul20_port']
-        self.api_key = config_dict['api_key']
-
-        self.mosquitto_host = config_dict['mosquitto_host']
-        self.mosquitto_port = config_dict['mosquitto_port']
+        return cls(fiware_service=config_dict['fiware_service'],
+                   fiware_service_path=config_dict['fiware_service_path'],
+                   cb_host=config_dict['cb_host'], cb_port=config_dict['cb_port'],
+                   idas_aaa=config_dict['idas_aaa'], token=config_dict['token'], expires_at='',
+                   host_id=config_dict['host_id'],
+                   idas_host=config_dict['idas_host'], idas_admin_port=config_dict['idas_admin_port'],
+                   idas_ul20_port=config_dict['idas_ul20_port'], api_key=config_dict['api_key'],
+                   mosquitto_host=config_dict['mosquitto_host'], mosquitto_port=config_dict['mosquitto_port'])
 
     @staticmethod
     def generate_api_key():

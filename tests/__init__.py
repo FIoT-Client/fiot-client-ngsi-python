@@ -11,8 +11,8 @@ class TestCommonMethods(unittest.TestCase):
 
     def __init__(self, method_name):
         super().__init__(methodName=method_name)
-        self.context_client = FiwareContextClient(self._build_file_path('config.ini'))
-        self.iot_client = FiwareIotClient(self._build_file_path('config.ini'))
+        self.context_client = FiwareContextClient.from_config_file(self._build_file_path('config.ini'))
+        self.iot_client = FiwareIotClient.from_config_file(self._build_file_path('config.ini'))
 
     def setUp(self):
         self._remove_all_entities()
@@ -22,7 +22,7 @@ class TestCommonMethods(unittest.TestCase):
         return join(self.files_dir_path, filename)
 
     def _remove_all_entities(self):
-        context_client = FiwareContextClient(self._build_file_path('config.ini'))
+        context_client = FiwareContextClient.from_config_file(self._build_file_path('config.ini'))
         response = context_client.get_entities()
         data = response['response']
 
@@ -30,7 +30,7 @@ class TestCommonMethods(unittest.TestCase):
             context_client.remove_entity(entity['type'], entity['id'])
 
     def _remove_all_devices(self):
-        iot_client = FiwareIotClient(self._build_file_path('config.ini'))
+        iot_client = FiwareIotClient.from_config_file(self._build_file_path('config.ini'))
         response = iot_client.list_devices()
         data = response['response']
         devices = data['devices']

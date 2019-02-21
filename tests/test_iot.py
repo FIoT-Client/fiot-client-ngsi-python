@@ -45,7 +45,7 @@ class TestContextMethods(TestCommonMethods):
         self.assertEqual(data['static_attributes'][0]['value'], expected_data['static_attributes'][0]['value'])
 
     def test_config_file_init_inherited_params(self):
-        iot_client = FiwareIotClient(self._build_file_path('config.dummy.ini'))
+        iot_client = FiwareIotClient.from_config_file(self._build_file_path('config.dummy.ini'))
 
         self.assertEqual(iot_client.fiware_service, 'service_name')
         self.assertEqual(iot_client.fiware_service_path, '/service_path')
@@ -62,7 +62,7 @@ class TestContextMethods(TestCommonMethods):
         self.assertEqual(iot_client.host_id, 'b4:b6:30')
 
     def test_config_file_init_specific_params(self):
-        iot_client = FiwareIotClient(self._build_file_path('config.dummy.ini'))
+        iot_client = FiwareIotClient.from_config_file(self._build_file_path('config.dummy.ini'))
 
         self.assertEqual(iot_client.idas_host, 'idas_address')
         self.assertEqual(iot_client.idas_admin_port, 2)

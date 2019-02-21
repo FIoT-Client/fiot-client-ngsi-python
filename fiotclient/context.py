@@ -16,26 +16,50 @@ __status__ = "Development"
 
 class FiwareContextClient(SimpleClient):
 
-    def __init__(self, config_file):
+    def __init__(self, fiware_service='', fiware_service_path='', cb_host='', cb_port='',
+                 idas_aaa='', token='', expires_at='', host_id='',
+                 sth_host='', sth_port='',
+                 cygnus_host='', cygnus_notification_host='', cygnus_port='',
+                 perseo_host='', perseo_port=''):
+        """Client for doing context management operations on FIWARE platform"""
+
+        super(FiwareContextClient, self).__init__(fiware_service=fiware_service,
+                                                  fiware_service_path=fiware_service_path,
+                                                  cb_host=cb_host, cb_port=cb_port,
+                                                  idas_aaa=idas_aaa, token=token, expires_at=expires_at,
+                                                  host_id=host_id)
+
+        self.sth_host = sth_host
+        self.sth_port = sth_port
+
+        self.cygnus_host = cygnus_host
+        self.cygnus_notification_host = cygnus_notification_host
+        self.cygnus_port = cygnus_port
+
+        self.perseo_host = perseo_host
+        self.perseo_port = perseo_port
+
+    @classmethod
+    def from_config_file(cls, config_file):
         """Client for doing context management operations on FIWARE platform
 
         :param config_file: The file in which load the default configuration
         """
-        super(FiwareContextClient, self).__init__(config_file)
 
         # TODO Check and notify mandatory parameters on input config file
-
         config_dict = utils.read_config_file(config_file)
 
-        self.sth_host = config_dict['sth_host']
-        self.sth_port = config_dict['sth_port']
-
-        self.cygnus_host = config_dict['cygnus_host']
-        self.cygnus_notification_host = config_dict['cygnus_notification_host']
-        self.cygnus_port = config_dict['cygnus_port']
-
-        self.perseo_host = config_dict['perseo_host']
-        self.perseo_port = config_dict['perseo_port']
+        return cls(fiware_service=config_dict['fiware_service'],
+                   fiware_service_path=config_dict['fiware_service_path'],
+                   cb_host=config_dict['cb_host'], cb_port=config_dict['cb_port'],
+                   idas_aaa=config_dict['idas_aaa'], token=config_dict['token'], expires_at='',
+                   host_id=config_dict['host_id'],
+                   sth_host=config_dict['sth_host'], sth_port=config_dict['sth_port'],
+                   cygnus_host=config_dict['cygnus_host'],
+                   cygnus_notification_host=config_dict['cygnus_notification_host'],
+                   cygnus_port=config_dict['cygnus_port'],
+                   perseo_host=config_dict['perseo_host'],
+                   perseo_port=config_dict['perseo_port'])
 
     def create_entity(self, entity_schema, entity_type, entity_id):
         """Creates a new NGSI entity with the given structure in the currently selected service

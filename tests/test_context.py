@@ -13,7 +13,7 @@ class TestContextMethods(TestCommonMethods):
         self.assertEqual(data['temperature']['value'], expected_data['temperature']['value'])
 
     def test_config_file_init_inherited_params(self):
-        context_client = FiwareContextClient(self._build_file_path('config.dummy.ini'))
+        context_client = FiwareContextClient.from_config_file(self._build_file_path('config.dummy.ini'))
 
         self.assertEqual(context_client.fiware_service, 'service_name')
         self.assertEqual(context_client.fiware_service_path, '/service_path')
@@ -30,7 +30,7 @@ class TestContextMethods(TestCommonMethods):
         self.assertEqual(context_client.host_id, 'b4:b6:30')
 
     def test_config_file_init_specific_params(self):
-        context_client = FiwareContextClient(self._build_file_path('config.dummy.ini'))
+        context_client = FiwareContextClient.from_config_file(self._build_file_path('config.dummy.ini'))
 
         self.assertEqual(context_client.sth_host, 'sthcomet_address')
         self.assertEqual(context_client.sth_port, 4)

@@ -17,29 +17,41 @@ __status__ = "Development"
 
 class SimpleClient(object):
 
-    def __init__(self, config_file):
-        """Default client for making requests to FIWARE APIs
-
-        :param config_file: The file in which load the default configuration
-        """
+    def __init__(self, fiware_service='', fiware_service_path='', cb_host='', cb_port='',
+                 idas_aaa='', token='', expires_at='', host_id=''):
+        """Default client for making requests to FIWARE APIs"""
         logging.basicConfig(filename='fiotclient.log', level=logging.DEBUG)
 
         # TODO Check and notify mandatory parameters on input config file
 
-        config_dict = utils.read_config_file(config_file)
+        self.fiware_service = fiware_service
+        self.fiware_service_path = fiware_service_path
 
-        self.fiware_service = config_dict['fiware_service']
-        self.fiware_service_path = config_dict['fiware_service_path']
-
-        self.cb_host = config_dict['cb_host']
-        self.cb_port = config_dict['cb_port']
+        self.cb_host = cb_host
+        self.cb_port = cb_port
         # TODO Include OAuth param
 
-        self.idas_aaa = config_dict['idas_aaa']
-        self.token = config_dict['token']
-        self.expires_at = ''
+        self.idas_aaa = idas_aaa
+        self.token = token
+        self.expires_at = expires_at
 
-        self.host_id = config_dict['host_id']
+        self.host_id = host_id
+
+    @classmethod
+    def from_config_file(cls, config_file):
+        """Default client for making requests to FIWARE APIs
+
+        :param config_file: The file in which load the default configuration
+        """
+        config_dict = utils.read_config_file(config_file)
+
+        # TODO Check and notify mandatory parameters on input config file
+        # TODO Include OAuth param'
+        return cls(fiware_service=config_dict['fiware_service'],
+                   fiware_service_path=config_dict['fiware_service_path'],
+                   cb_host=config_dict['cb_host'], cb_port=config_dict['cb_port'],
+                   idas_aaa=config_dict['idas_aaa'], token=config_dict['token'], expires_at='',
+                   host_id=config_dict['host_id'])
 
     def _send_request(self, url, method, payload=None, additional_headers=None, params=None):
         """Auxiliary method to configure and execute a request to FIWARE APIs
