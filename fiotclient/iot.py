@@ -41,6 +41,22 @@ class FiwareIotClient(SimpleClient):
         self.mosquitto_port = mosquitto_port
 
     @classmethod
+    def from_config_dict(cls, config_dict):
+        """Client for doing IoT management operations on FIWARE platform
+
+        :param config_dict: The python dict from which to load the default configuration
+        """
+
+        # TODO Check and notify mandatory parameters on input config dict
+
+        return cls(fiware_service=config_dict['service']['name'],
+                   fiware_service_path=config_dict['service']['path'],
+                   cb_host=config_dict['context_broker']['host'], cb_port=config_dict['context_broker']['port'],
+                   idas_host=config_dict['iot_agent']['host'], idas_admin_port=config_dict['iot_agent']['admin_port'],
+                   idas_ul20_port=config_dict['iot_agent']['ul20_port'], api_key=config_dict['iot_agent']['api_key'],
+                   mosquitto_host=config_dict['mqtt_broker']['host'], mosquitto_port=config_dict['mqtt_broker']['port'])
+
+    @classmethod
     def from_config_file(cls, config_file):
         """Client for doing IoT management operations on FIWARE platform
 

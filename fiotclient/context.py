@@ -40,6 +40,25 @@ class FiwareContextClient(SimpleClient):
         self.perseo_port = perseo_port
 
     @classmethod
+    def from_config_dict(cls, config_dict):
+        """Client for doing context management operations on FIWARE platform
+
+        :param config_dict: The python dict from which to load the default configuration
+        """
+
+        # TODO Check and notify mandatory parameters on input config dict
+
+        return cls(fiware_service=config_dict['service']['name'],
+                   fiware_service_path=config_dict['service']['path'],
+                   cb_host=config_dict['context_broker']['host'], cb_port=config_dict['context_broker']['port'],
+                   sth_host=config_dict['sth']['host'], sth_port=config_dict['sth']['port'],
+                   cygnus_host=config_dict['cygnus']['host'],
+                   cygnus_port=config_dict['cygnus']['port'],
+                   cygnus_notification_host=config_dict['cygnus']['notification_host'],
+                   perseo_host=config_dict['perseo']['host'],
+                   perseo_port=config_dict['perseo']['port'])
+
+    @classmethod
     def from_config_file(cls, config_file):
         """Client for doing context management operations on FIWARE platform
 
