@@ -106,7 +106,13 @@ class SimpleClient(object):
 
             status_code = r.status_code
             headers = r.headers
-            response = json.loads(r.text) if r.text != '' else {}
+            response_str = r.text
+
+            try:
+                response = json.loads(response_str)
+            except json.decoder.JSONDecodeError as e:
+                logging.debug("Error: {}".format(e))
+                response = {}
 
             logging.debug("Status Code: {}".format(str(status_code)))
             logging.debug("Headers: {}".format(str(headers)))
