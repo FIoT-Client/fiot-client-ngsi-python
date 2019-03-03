@@ -4,15 +4,15 @@ from fiotclient.iot import FiwareIotClient
 from . import TestCommonMethods
 
 
-class TestContextMethods(TestCommonMethods):
+class TestIotMethods(TestCommonMethods):
 
     files_dir_path = join(dirname(realpath(__file__)), 'files')
 
     def _build_file_path(self, filename):
         return join(self.files_dir_path, filename)
 
-    def _assert_entity_data(self, data, expected_data):
-        self.assertEqual(data['id'], expected_data['id'])
+    def _assert_device_entity_data(self, data, expected_data):
+        self.assertEqual(data['id']['value'], expected_data['id']['value'])
         self.assertEqual(data['type'], expected_data['type'])
         self.assertEqual(data['change_state_info']['type'], expected_data['change_state_info']['type'])
         self.assertEqual(data['change_state_info']['value'], expected_data['change_state_info']['value'])
@@ -50,12 +50,12 @@ class TestContextMethods(TestCommonMethods):
         self.assertEqual(iot_client.fiware_service, 'service_name')
         self.assertEqual(iot_client.fiware_service_path, '/service_path')
 
-        self.assertEqual(iot_client.cb_host, 'contextbroker_address')
+        self.assertEqual(iot_client.cb_host, 'context_broker_address')
         self.assertEqual(iot_client.cb_port, 1)
         # TODO Check OAuth param
 
         # TODO Check these verifications
-        self.assertEqual(iot_client.idas_aaa, 'no')
+        self.assertEqual(iot_client.iota_aaa, 'no')
         # self.assertEqual(iot_client.token, '')
         # self.assertEqual(iot_client.expires_at, '')
 
@@ -64,14 +64,14 @@ class TestContextMethods(TestCommonMethods):
     def test_config_file_init_specific_params(self):
         iot_client = FiwareIotClient.from_config_file(self._build_file_path('config.dummy.ini'))
 
-        self.assertEqual(iot_client.idas_host, 'idas_address')
-        self.assertEqual(iot_client.idas_admin_port, 2)
-        self.assertEqual(iot_client.idas_ul20_port, 3)
-        # check IDAS auth attr
+        self.assertEqual(iot_client.iota_host, 'iota_address')
+        self.assertEqual(iot_client.iota_north_port, 2)
+        self.assertEqual(iot_client.iota_protocol_port, 3)
+        # check IOTA auth attr
         self.assertEqual(iot_client.api_key, '1a2b3c4d5e6f')
 
-        self.assertEqual(iot_client.mosquitto_host, 'mosquitto_address')
-        self.assertEqual(iot_client.mosquitto_port, 6)
+        self.assertEqual(iot_client.mqtt_broker_host, 'mqtt_broker_address')
+        self.assertEqual(iot_client.mqtt_broker_port, 6)
 
         # TODO MQTT optional
 
@@ -116,7 +116,11 @@ class TestContextMethods(TestCommonMethods):
         data = response['response']
 
         expected_entity_data = {
-            'id': 'TEST_LED',
+            'id': {
+                'type': 'string',
+                'value': 'LED_001',
+                'metadata': {}
+            },
             'type': 'thing',
             'change_state_info': {
                 'type': 'commandResult',
@@ -131,7 +135,7 @@ class TestContextMethods(TestCommonMethods):
                 'value': ' '
             }
         }
-        self._assert_entity_data(data, expected_entity_data)
+        self._assert_device_entity_data(data, expected_entity_data)
 
     def test_update_device(self):
         pass  # TODO Implement
@@ -164,7 +168,11 @@ class TestContextMethods(TestCommonMethods):
         data = response['response']
 
         expected_entity_data = {
-            'id': 'TEST_LED',
+            'id': {
+                'type': 'string',
+                'value': 'LED_001',
+                'metadata': {}
+            },
             'type': 'thing',
             'change_state_info': {
                 'type': 'commandResult',
@@ -179,7 +187,7 @@ class TestContextMethods(TestCommonMethods):
                 'value': ' '
             }
         }
-        self._assert_entity_data(data, expected_entity_data)
+        self._assert_device_entity_data(data, expected_entity_data)
 
         response = self.iot_client.send_command('TEST_LED', 'LED_001', 'change_state', {'state': 'ON'})
         self.assertEqual(response['status_code'], 200)
@@ -189,7 +197,11 @@ class TestContextMethods(TestCommonMethods):
         data = response['response']
 
         expected_entity_data = {
-            'id': 'TEST_LED',
+            'id': {
+                'type': 'string',
+                'value': 'LED_001',
+                'metadata': {}
+            },
             'type': 'thing',
             'change_state_info': {
                 'type': 'commandResult',
@@ -204,7 +216,7 @@ class TestContextMethods(TestCommonMethods):
                 'value': ' '
             }
         }
-        self._assert_entity_data(data, expected_entity_data)
+        self._assert_device_entity_data(data, expected_entity_data)
 
     def test_get_pooling_commands(self):
         pass  # TODO Implement

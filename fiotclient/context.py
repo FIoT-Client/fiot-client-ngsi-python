@@ -17,7 +17,7 @@ __status__ = "Development"
 class FiwareContextClient(SimpleClient):
 
     def __init__(self, fiware_service='', fiware_service_path='', cb_host='', cb_port='',
-                 idas_aaa='', token='', expires_at='', host_id='',
+                 iota_aaa='', token='', expires_at='', host_id='',
                  sth_host='', sth_port='',
                  cygnus_host='', cygnus_notification_host='', cygnus_port='',
                  perseo_host='', perseo_port=''):
@@ -26,7 +26,7 @@ class FiwareContextClient(SimpleClient):
         super(FiwareContextClient, self).__init__(fiware_service=fiware_service,
                                                   fiware_service_path=fiware_service_path,
                                                   cb_host=cb_host, cb_port=cb_port,
-                                                  idas_aaa=idas_aaa, token=token, expires_at=expires_at,
+                                                  iota_aaa=iota_aaa, token=token, expires_at=expires_at,
                                                   host_id=host_id)
 
         self.sth_host = sth_host
@@ -71,7 +71,7 @@ class FiwareContextClient(SimpleClient):
         return cls(fiware_service=config_dict['fiware_service'],
                    fiware_service_path=config_dict['fiware_service_path'],
                    cb_host=config_dict['cb_host'], cb_port=config_dict['cb_port'],
-                   idas_aaa=config_dict['idas_aaa'], token=config_dict['token'], expires_at='',
+                   iota_aaa=config_dict['iota_aaa'], token=config_dict['token'], expires_at='',
                    host_id=config_dict['host_id'],
                    sth_host=config_dict['sth_host'], sth_port=config_dict['sth_port'],
                    cygnus_host=config_dict['cygnus_host'],

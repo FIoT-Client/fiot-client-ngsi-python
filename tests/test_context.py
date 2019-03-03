@@ -18,12 +18,12 @@ class TestContextMethods(TestCommonMethods):
         self.assertEqual(context_client.fiware_service, 'service_name')
         self.assertEqual(context_client.fiware_service_path, '/service_path')
 
-        self.assertEqual(context_client.cb_host, 'contextbroker_address')
+        self.assertEqual(context_client.cb_host, 'context_broker_address')
         self.assertEqual(context_client.cb_port, 1)
         # TODO Check OAuth param
 
         # TODO Check these verifications
-        self.assertEqual(context_client.idas_aaa, 'no')
+        self.assertEqual(context_client.iota_aaa, 'no')
         # self.assertEqual(context_client.token, '')
         # self.assertEqual(context_client.expires_at, '')
 
@@ -32,7 +32,7 @@ class TestContextMethods(TestCommonMethods):
     def test_config_file_init_specific_params(self):
         context_client = FiwareContextClient.from_config_file(self._build_file_path('config.dummy.ini'))
 
-        self.assertEqual(context_client.sth_host, 'sthcomet_address')
+        self.assertEqual(context_client.sth_host, 'sth_comet_address')
         self.assertEqual(context_client.sth_port, 4)
 
         self.assertEqual(context_client.cygnus_host, 'cygnus_address')

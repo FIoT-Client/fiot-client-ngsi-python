@@ -18,7 +18,7 @@ __status__ = "Development"
 class SimpleClient(object):
 
     def __init__(self, fiware_service='', fiware_service_path='', cb_host='', cb_port='',
-                 idas_aaa='', token='', expires_at='', host_id=''):
+                 iota_aaa='', token='', expires_at='', host_id=''):
         """Default client for making requests to FIWARE APIs"""
         logging.basicConfig(filename='fiotclient.log', level=logging.DEBUG)
 
@@ -31,7 +31,7 @@ class SimpleClient(object):
         self.cb_port = cb_port
         # TODO Include OAuth param
 
-        self.idas_aaa = idas_aaa
+        self.iota_aaa = iota_aaa
         self.token = token
         self.expires_at = expires_at
 
@@ -50,7 +50,7 @@ class SimpleClient(object):
         return cls(fiware_service=config_dict['fiware_service'],
                    fiware_service_path=config_dict['fiware_service_path'],
                    cb_host=config_dict['cb_host'], cb_port=config_dict['cb_port'],
-                   idas_aaa=config_dict['idas_aaa'], token=config_dict['token'], expires_at='',
+                   iota_aaa=config_dict['iota_aaa'], token=config_dict['token'], expires_at='',
                    host_id=config_dict['host_id'])
 
     def _send_request(self, url, method, payload=None, additional_headers=None, params=None):

@@ -19,9 +19,9 @@ __status__ = "Development"
 class FiwareIotClient(SimpleClient):
 
     def __init__(self, fiware_service='', fiware_service_path='', cb_host='', cb_port='',
-                 idas_aaa='', token='', expires_at='', host_id='',
-                 idas_host='', idas_admin_port='', idas_ul20_port='', api_key='',
-                 mosquitto_host='', mosquitto_port=''):
+                 iota_aaa='', token='', expires_at='', host_id='',
+                 iota_host='', iota_north_port='', iota_protocol_port='', api_key='',
+                 mqtt_broker_host='', mqtt_broker_port=''):
         """Client for doing IoT management operations on FIWARE platform
 
         :param config_file: The file in which load the default configuration
@@ -29,16 +29,16 @@ class FiwareIotClient(SimpleClient):
 
         super(FiwareIotClient, self).__init__(fiware_service=fiware_service, fiware_service_path=fiware_service_path,
                                               cb_host=cb_host, cb_port=cb_port,
-                                              idas_aaa=idas_aaa, token=token, expires_at=expires_at,
+                                              iota_aaa=iota_aaa, token=token, expires_at=expires_at,
                                               host_id=host_id)
 
-        self.idas_host = idas_host
-        self.idas_admin_port = idas_admin_port
-        self.idas_ul20_port = idas_ul20_port
+        self.iota_host = iota_host
+        self.iota_north_port = iota_north_port
+        self.iota_protocol_port = iota_protocol_port
         self.api_key = api_key
 
-        self.mosquitto_host = mosquitto_host
-        self.mosquitto_port = mosquitto_port
+        self.mqtt_broker_host = mqtt_broker_host
+        self.mqtt_broker_port = mqtt_broker_port
 
     @classmethod
     def from_config_dict(cls, config_dict):
@@ -52,9 +52,10 @@ class FiwareIotClient(SimpleClient):
         return cls(fiware_service=config_dict['service']['name'],
                    fiware_service_path=config_dict['service']['path'],
                    cb_host=config_dict['context_broker']['host'], cb_port=config_dict['context_broker']['port'],
-                   idas_host=config_dict['iot_agent']['host'], idas_admin_port=config_dict['iot_agent']['admin_port'],
-                   idas_ul20_port=config_dict['iot_agent']['ul20_port'], api_key=config_dict['iot_agent']['api_key'],
-                   mosquitto_host=config_dict['mqtt_broker']['host'], mosquitto_port=config_dict['mqtt_broker']['port'])
+                   iota_host=config_dict['iot_agent']['host'], iota_north_port=config_dict['iot_agent']['north_port'],
+                   iota_protocol_port=config_dict['iot_agent']['protocol_port'], api_key=config_dict['iot_agent']['api_key'],
+                   mqtt_broker_host=config_dict['mqtt_broker']['host'],
+                   mqtt_broker_port=config_dict['mqtt_broker']['port'])
 
     @classmethod
     def from_config_file(cls, config_file):
@@ -69,11 +70,11 @@ class FiwareIotClient(SimpleClient):
         return cls(fiware_service=config_dict['fiware_service'],
                    fiware_service_path=config_dict['fiware_service_path'],
                    cb_host=config_dict['cb_host'], cb_port=config_dict['cb_port'],
-                   idas_aaa=config_dict['idas_aaa'], token=config_dict['token'], expires_at='',
+                   iota_aaa=config_dict['iota_aaa'], token=config_dict['token'], expires_at='',
                    host_id=config_dict['host_id'],
-                   idas_host=config_dict['idas_host'], idas_admin_port=config_dict['idas_admin_port'],
-                   idas_ul20_port=config_dict['idas_ul20_port'], api_key=config_dict['api_key'],
-                   mosquitto_host=config_dict['mosquitto_host'], mosquitto_port=config_dict['mosquitto_port'])
+                   iota_host=config_dict['iota_host'], iota_north_port=config_dict['iota_north_port'],
+                   iota_protocol_port=config_dict['iota_protocol_port'], api_key=config_dict['api_key'],
+                   mqtt_broker_host=config_dict['mqtt_broker_host'], mqtt_broker_port=config_dict['mqtt_broker_port'])
 
     @staticmethod
     def generate_api_key():
@@ -123,7 +124,7 @@ class FiwareIotClient(SimpleClient):
         :param api_key: The api key to use to create the service
         :return: The response of the creation request
         """
-        url = "http://{}:{}/iot/services".format(self.idas_host, self.idas_admin_port)
+        url = "http://{}:{}/iot/services".format(self.iota_host, self.iota_north_port)
 
         additional_headers = {'Content-Type': 'application/json',
                               'Fiware-Service': service,
@@ -164,7 +165,7 @@ class FiwareIotClient(SimpleClient):
             'apikey': api_key
         }
 
-        url = "http://{}:{}/iot/services".format(self.idas_host, self.idas_admin_port)
+        url = "http://{}:{}/iot/services".format(self.iota_host, self.iota_north_port)
 
         if service_path != '/*' and service_path != '/#':
             remove_devices_str = 'true' if remove_devices else 'false'
@@ -205,7 +206,7 @@ class FiwareIotClient(SimpleClient):
         logging.info("Registering device")
 
         params = {'protocol': protocol}
-        url = "http://{}:{}/iot/devices".format(self.idas_host, self.idas_admin_port)
+        url = "http://{}:{}/iot/devices".format(self.iota_host, self.iota_north_port)
         additional_headers = {'Content-Type': 'application/json'}
 
         device_schema = device_schema.replace('[DEVICE_ID]', str(device_id)) \
@@ -261,7 +262,7 @@ class FiwareIotClient(SimpleClient):
         :return: Response of the removal request
         """
 
-        url = "http://{}:{}/iot/devices/{}".format(self.idas_host, self.idas_admin_port, device_id)
+        url = "http://{}:{}/iot/devices/{}".format(self.iota_host, self.iota_north_port, device_id)
         additional_headers = {'Content-Type': 'application/json'}
 
         return self._send_request(url, 'DELETE', additional_headers=additional_headers)
@@ -273,7 +274,7 @@ class FiwareIotClient(SimpleClient):
         :return: The information of the device found with the given id
                  or None if no device was found with the id
         """
-        url = "http://{}:{}/iot/devices/{}".format(self.idas_host, self.idas_admin_port, device_id)
+        url = "http://{}:{}/iot/devices/{}".format(self.iota_host, self.iota_north_port, device_id)
         additional_headers = {'Content-Type': 'application/json'}
 
         return self._send_request(url, 'GET', additional_headers=additional_headers)
@@ -291,7 +292,7 @@ class FiwareIotClient(SimpleClient):
         if offset:
             params['offset'] = offset
 
-        url = "http://{}:{}/iot/devices".format(self.idas_host, self.idas_admin_port)
+        url = "http://{}:{}/iot/devices".format(self.iota_host, self.iota_north_port)
         additional_headers = {'Content-Type': 'application/json'}
 
         return self._send_request(url, 'GET', params=params, additional_headers=additional_headers)
@@ -349,11 +350,11 @@ class FiwareIotClient(SimpleClient):
             logging.info("Transport protocol: MQTT")
             topic = "/{}/{}/attrs".format(self.api_key, device_id)
 
-            logging.info("Publishing to {} on topic {}".format(self.idas_host, topic))
+            logging.info("Publishing to {}:{} on topic {}".format(self.mqtt_broker_host, self.mqtt_broker_port, topic))
             logging.info("Sending payload: ")
             logging.info(payload)
 
-            publish.single(topic, payload=payload, hostname=self.mosquitto_host, port=self.mosquitto_port)
+            publish.single(topic, payload=payload, hostname=self.mqtt_broker_host, port=self.mqtt_broker_port)
             logging.info("Message sent")
             return {'result': 'OK'}
 
@@ -365,7 +366,7 @@ class FiwareIotClient(SimpleClient):
                 'i': device_id
             }
 
-            url = "http://{}:{}/iot/d".format(self.idas_host, self.idas_ul20_port)
+            url = "http://{}:{}/iot/d".format(self.iota_host, self.iota_protocol_port)
             additional_headers = {'Content-Type': 'text/plain'}
 
             self._send_request(url, 'POST', params=params, payload=payload, additional_headers=additional_headers)
@@ -392,7 +393,7 @@ class FiwareIotClient(SimpleClient):
         if params is None:
             params = {}
 
-        url = "http://{}:{}/v1/updateContext".format(self.idas_host, self.idas_admin_port)
+        url = "http://{}:{}/v1/updateContext".format(self.iota_host, self.iota_north_port)
 
         additional_headers = {'Content-Type': 'application/json',
                               'Accept': 'application/json'}
@@ -443,7 +444,7 @@ class FiwareIotClient(SimpleClient):
             'getCmd': 1
         }
 
-        url = "http://{}:{}/iot/d".format(self.idas_host, self.idas_ul20_port)
+        url = "http://{}:{}/iot/d".format(self.iota_host, self.iota_protocol_port)
         payload = self._create_ul_payload_from_measurements(measurements)
         additional_headers = {'Content-Type': 'text/plain'}
 
