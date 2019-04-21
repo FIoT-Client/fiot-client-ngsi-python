@@ -212,7 +212,7 @@ class FiwareIotClient(SimpleClient):
         device_schema = device_schema.replace('[DEVICE_ID]', str(device_id)) \
             .replace('[ENTITY_ID]', str(entity_id))
 
-        if '"endpoint"' in device_schema:
+        if endpoint and '"endpoint"' in device_schema:
             endpoint_split = endpoint.split(':')
             device_ip = endpoint_split[0]
             device_port = endpoint_split[1]
