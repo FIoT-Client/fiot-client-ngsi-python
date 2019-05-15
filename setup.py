@@ -21,6 +21,7 @@ setup(
     license='MIT',
     description='Python client library for IoT and Context related API management on FIWARE platform',
     long_description=open(README).read(),
+    long_description_content_type="text/markdown",
     url='https://github.com/FIoT-Client/fiot-client-python',
     author='Lucas Cristiano Calixto Dantas',
     author_email='lucascristiano27@gmail.com',
