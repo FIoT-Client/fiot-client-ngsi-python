@@ -53,13 +53,14 @@ class SimpleClient(object):
                    iota_aaa=config_dict['iota_aaa'], token=config_dict['token'], expires_at='',
                    host_id=config_dict['host_id'])
 
-    def _send_request(self, url, method, payload=None, additional_headers=None, params=None):
+    def _send_request(self, url, method, payload=None, additional_headers=None, params=None, timeout=30):
         """Auxiliary method to configure and execute a request to FIWARE APIs
 
         :param url: The url to be called on the request
         :param payload: The payload to be sent on the request
         :param method: The method to be used on the request
         :param additional_headers: Additional http headers to be used in the request
+        :param timeout: The request's timeout
         :return: The response from the request execution
         """
         default_headers = {'X-Auth-Token': self.token,
@@ -87,17 +88,15 @@ class SimpleClient(object):
             logging.debug("Sending payload:")
             logging.debug(str_payload)
 
-        # TODO Adds timeout or verifications of servers on calls to APIs
-
         try:
             if method == 'GET':
-                r = requests.get(url, params=params, data=str_payload, headers=headers)
+                r = requests.get(url, params=params, data=str_payload, headers=headers, timeout=timeout)
             elif method == 'POST':
-                r = requests.post(url, params=params, data=str_payload, headers=headers)
+                r = requests.post(url, params=params, data=str_payload, headers=headers, timeout=timeout)
             elif method == 'PUT':
-                r = requests.put(url, params=params, data=str_payload, headers=headers)
+                r = requests.put(url, params=params, data=str_payload, headers=headers, timeout=timeout)
             elif method == 'DELETE':
-                r = requests.delete(url, params=params, data=str_payload, headers=headers)
+                r = requests.delete(url, params=params, data=str_payload, headers=headers, timeout=timeout)
             else:
                 logging.error("Error: Unsupported method '{}'".format(str(method)))
 
@@ -129,12 +128,13 @@ class SimpleClient(object):
             return {'status_code': 0,
                     'response': e.strerror}
 
-    def authenticate(self, username, password):
+    def authenticate(self, username, password, timeout=30):
         """Generates an authentication token based on user credentials using FIWARE Lab OAuth2.0 Authentication system
            If you didn't have a user, go and register first at http://cloud.fiware.org
 
         :param username: the user's username from Fiware authentication account
         :param password: the user's password from Fiware authentication account
+        :param timeout: the authentication request timeout
         :return: the generated token and expiration
         """
 
@@ -154,7 +154,7 @@ class SimpleClient(object):
         headers = {'Content-Type': 'application/json'}
         url = tokens_url
 
-        resp = requests.post(url, data=json.dumps(payload), headers=headers)
+        resp = requests.post(url, data=json.dumps(payload), headers=headers, timeout=timeout)
 
         self.token = resp.json()["access"]["token"]["id"]
         self.expires_at = resp.json()["access"]["token"]["expires"]

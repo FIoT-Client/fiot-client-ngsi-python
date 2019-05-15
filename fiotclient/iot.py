@@ -331,7 +331,7 @@ class FiwareIotClient(SimpleClient):
 
         return payload
 
-    def send_observation(self, device_id, measurements, protocol='MQTT'):
+    def send_observation(self, device_id, measurements, protocol='MQTT', timeout=10):
         """Sends a measurement group or a list of measurement groups from a device to the FIWARE platform
 
         :param device_id: The id of the device in which the measurement was obtained
@@ -340,6 +340,7 @@ class FiwareIotClient(SimpleClient):
         :param protocol: The transport protocol to be used to send measurements.
                          Currently accepted values are 'MQTT' and 'HTTP'.
                          If no value is provided the default value (MQTT) will be used
+        :param timeout: The timeout for the observation send request
         :return: The summary of the sent measurements
         """
         logging.info("Sending observation")
@@ -354,7 +355,8 @@ class FiwareIotClient(SimpleClient):
             logging.info("Sending payload: ")
             logging.info(payload)
 
-            publish.single(topic, payload=payload, hostname=self.mqtt_broker_host, port=self.mqtt_broker_port)
+            publish.single(topic, payload=payload, hostname=self.mqtt_broker_host, port=self.mqtt_broker_port,
+                           keepalive=timeout)
             logging.info("Message sent")
             return {'result': 'OK'}
 
@@ -369,7 +371,8 @@ class FiwareIotClient(SimpleClient):
             url = "http://{}:{}/iot/d".format(self.iota_host, self.iota_protocol_port)
             additional_headers = {'Content-Type': 'text/plain'}
 
-            self._send_request(url, 'POST', params=params, payload=payload, additional_headers=additional_headers)
+            self._send_request(url, 'POST', params=params, payload=payload, additional_headers=additional_headers,
+                               timeout=timeout)
             return {'result': 'OK'}
 
         else:
