@@ -4,54 +4,39 @@ import logging
 import requests
 
 from fiotclient import utils
-
-__author__ = "Lucas Cristiano Calixto Dantas"
-__copyright__ = "Copyright 2017, Lucas Cristiano Calixto Dantas"
-__credits__ = ["Lucas Cristiano Calixto Dantas"]
-__license__ = "MIT"
-__version__ = "0.1.0"
-__maintainer__ = "Lucas Cristiano Calixto Dantas"
-__email__ = "lucascristiano27@gmail.com"
-__status__ = "Development"
+from fiotclient.config import FiwareConfig
 
 
-class SimpleClient(object):
+class BaseClient(object):
 
-    def __init__(self, fiware_service='', fiware_service_path='', cb_host='', cb_port='',
-                 iota_aaa='', token='', expires_at='', host_id=''):
-        """Default client for making requests to FIWARE APIs"""
-        logging.basicConfig(filename='fiotclient.log', level=logging.DEBUG)
-
-        # TODO Check and notify mandatory parameters on input config file
-
-        self.fiware_service = fiware_service
-        self.fiware_service_path = fiware_service_path
-
-        self.cb_host = cb_host
-        self.cb_port = cb_port
-        # TODO Include OAuth param
-
-        self.iota_aaa = iota_aaa
-        self.token = token
-        self.expires_at = expires_at
-
-        self.host_id = host_id
-
-    @classmethod
-    def from_config_file(cls, config_file):
+    def __init__(self, fiware_config: FiwareConfig):
         """Default client for making requests to FIWARE APIs
 
-        :param config_file: The file in which load the default configuration
+        :param fiware_config: The FiwareConfig object from which load the default configuration
         """
-        config_dict = utils.read_config_file(config_file)
-
         # TODO Check and notify mandatory parameters on input config file
-        # TODO Include OAuth param'
-        return cls(fiware_service=config_dict['fiware_service'],
-                   fiware_service_path=config_dict['fiware_service_path'],
-                   cb_host=config_dict['cb_host'], cb_port=config_dict['cb_port'],
-                   iota_aaa=config_dict['iota_aaa'], token=config_dict['token'], expires_at='',
-                   host_id=config_dict['host_id'])
+        self.fiware_config = fiware_config
+
+        self.token = self.fiware_config.token
+        self.expires_at = None
+
+    @classmethod
+    def from_config_file(cls, config_file_path):
+        """Default client for making requests to FIWARE APIs
+
+        :param config_file_path: The file in which load the default configuration
+        """
+        fiware_config = utils.read_config_file(config_file_path)
+        return cls(fiware_config)
+
+    @classmethod
+    def from_config_json(cls, config_json: str):
+        """Default client for making requests to FIWARE APIs
+
+        :param config_json: The json string from which to load the default configuration
+        """
+        fiware_config = utils.parse_config_json(config_json)
+        return cls(fiware_config)
 
     def _send_request(self, url, method, payload=None, additional_headers=None, params=None, timeout=30):
         """Auxiliary method to configure and execute a request to FIWARE APIs
@@ -63,16 +48,17 @@ class SimpleClient(object):
         :param timeout: The request's timeout
         :return: The response from the request execution
         """
-        default_headers = {'X-Auth-Token': self.token,
-                           'Fiware-Service': self.fiware_service,
-                           'Fiware-ServicePath': self.fiware_service_path}
+        default_headers = {
+            'X-Auth-Token': self.fiware_config.token,
+            'Fiware-Service': self.fiware_config.service,
+            'Fiware-ServicePath': self.fiware_config.service_path
+        }
 
-        if additional_headers is None:
-            additional_headers = {}
+        additional_headers = additional_headers or {}
 
         headers = utils.merge_dicts(default_headers, additional_headers)
 
-        logging.debug("Asking to {}".format(url))
+        logging.debug(f"Asking to {url}")
         logging.debug("Headers:")
         logging.debug(json.dumps(headers, indent=4))
 
@@ -98,10 +84,8 @@ class SimpleClient(object):
             elif method == 'DELETE':
                 r = requests.delete(url, params=params, data=str_payload, headers=headers, timeout=timeout)
             else:
-                logging.error("Error: Unsupported method '{}'".format(str(method)))
-
-                error_msg = "Unsupported method. Select one of 'GET', 'POST', 'PUT' and 'DELETE'".format(method)
-                return {'error': error_msg}
+                logging.error(f"Error: Unsupported method '{str(method)}'")
+                return {'error': "Unsupported method. Select one of 'GET', 'POST', 'PUT' and 'DELETE'"}
 
             status_code = r.status_code
             headers = r.headers
@@ -110,23 +94,27 @@ class SimpleClient(object):
             try:
                 response = json.loads(response_str)
             except json.decoder.JSONDecodeError as e:
-                logging.debug("Error: {}".format(e))
+                logging.debug(f"Error: {e}")
                 response = {}
 
-            logging.debug("Status Code: {}".format(str(status_code)))
-            logging.debug("Headers: {}".format(str(headers)))
-            logging.debug("Response: {}".format(str(response)))
+            logging.debug(f"Status Code: {status_code}")
+            logging.debug(f"Headers: {headers}")
+            logging.debug(f"Response: {response}")
 
-            return {'status_code': status_code,
-                    'headers': headers,
-                    'response': response}
+            return {
+                'status_code': status_code,
+                'headers': headers,
+                'response': response
+            }
 
         except (ConnectionRefusedError, requests.exceptions.ConnectionError) as e:
-            logging.debug("Status Code: {}".format(0))
-            logging.debug("Response: Error: {}".format(e.strerror))
+            logging.debug("Status Code: 0")
+            logging.debug(f"Response: Error: {e.strerror}")
 
-            return {'status_code': 0,
-                    'response': e.strerror}
+            return {
+                'status_code': 0,
+                'response': e.strerror
+            }
 
     def authenticate(self, username, password, timeout=30):
         """Generates an authentication token based on user credentials using FIWARE Lab OAuth2.0 Authentication system
@@ -137,7 +125,6 @@ class SimpleClient(object):
         :param timeout: the authentication request timeout
         :return: the generated token and expiration
         """
-
         logging.info('Generating token')
 
         tokens_url = "http://cloud.lab.fi-ware.org:4730/v2.0/tokens"
@@ -159,8 +146,8 @@ class SimpleClient(object):
         self.token = resp.json()["access"]["token"]["id"]
         self.expires_at = resp.json()["access"]["token"]["expires"]
 
-        logging.debug("FIWARE OAuth2.0 Token: {}".format(self.token))
-        logging.debug("Token expiration: {}".format(self.expires_at))
+        logging.debug(f"FIWARE OAuth2.0 Token: {self.token}")
+        logging.debug(f"Token expiration: {self.expires_at}")
 
     def set_service(self, service, service_path):
         """Specify the service context to use on operations
@@ -169,5 +156,5 @@ class SimpleClient(object):
         :param service_path: The service path of the service to be used
         :return: None
         """
-        self.fiware_service = service
-        self.fiware_service_path = service_path
+        self.fiware_config.fiware_service = service
+        self.fiware_config.fiware_service_path = service_path

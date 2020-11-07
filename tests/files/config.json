@@ -1,0 +1,42 @@
+{
+  "fiwareService": "Test",
+  "fiwareServicePath": "/testService",
+  "contextBroker": {
+    "host": "localhost",
+    "port": 1026,
+    "oauth": false,
+    "apiKey": ""
+  },
+  "iota": {
+    "host": "localhost",
+    "northPort": 4041,
+    "protocolPort": 7896,
+    "oauth": false,
+    "apiKey": "",
+    "aaa": true
+  },
+  "sthComet": {
+    "host": "localhost",
+    "port": 8666
+  },
+  "cygnus": {
+    "host": "localhost",
+    "port": 5050,
+    "notificationHost": "localhost"
+  },
+  "mqttBroker": {
+    "host": "localhost",
+    "port": 1883
+  },
+  "perseo": {
+    "host": "localhost",
+    "port": 9090
+  },
+  "local": {
+    "hostType": "Linux",
+    "hostId": "b4:b6:30"
+  },
+  "user": {
+    "token": "1a2b3c4d5e6f7h"
+  }
+}

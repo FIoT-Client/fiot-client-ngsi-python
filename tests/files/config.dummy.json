@@ -1,0 +1,42 @@
+{
+  "fiwareService": "service_name",
+  "fiwareServicePath": "/service_path",
+  "contextBroker": {
+    "host": "context_broker_address",
+    "port": 1,
+    "oauth": false,
+    "apiKey": "1a2b3c4d5e6f"
+  },
+  "iota": {
+    "host": "iota_address",
+    "northPort": 2,
+    "protocolPort": 3,
+    "oauth": false,
+    "apiKey": "1a2b3c4d5e6f",
+    "aaa": true
+  },
+  "sthComet": {
+    "host": "sth_comet_address",
+    "port": 4
+  },
+  "cygnus": {
+    "host": "cygnus_address",
+    "port": 5,
+    "notificationHost": "cygnus_notification_host_address"
+  },
+  "mqttBroker": {
+    "host": "mqtt_broker_address",
+    "port": 6
+  },
+  "perseo": {
+    "host": "perseo_address",
+    "port": 7
+  },
+  "local": {
+    "hostType": "local_so",
+    "hostId": "b4:b6:30"
+  },
+  "user": {
+    "token": "1a2b3c4d5e6f7h"
+  }
+}

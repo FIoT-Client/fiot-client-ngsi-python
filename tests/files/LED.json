@@ -22,7 +22,7 @@
          ],
          "static_attributes":[
             {
-               "name":"id",
+               "name":"device_id",
                "type":"string",
                "value":"[DEVICE_ID]"
             }

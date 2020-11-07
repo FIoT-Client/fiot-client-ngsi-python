@@ -1,84 +1,23 @@
 import json
 import logging
 
-from fiotclient import utils
-from . import SimpleClient
-
-__author__ = "Lucas Cristiano Calixto Dantas"
-__copyright__ = "Copyright 2017, Lucas Cristiano Calixto Dantas"
-__credits__ = ["Lucas Cristiano Calixto Dantas"]
-__license__ = "MIT"
-__version__ = "0.1.0"
-__maintainer__ = "Lucas Cristiano Calixto Dantas"
-__email__ = "lucascristiano27@gmail.com"
-__status__ = "Development"
+from . import BaseClient
+from .config import FiwareConfig
 
 
-class FiwareContextClient(SimpleClient):
+class FiwareContextClient(BaseClient):
 
-    def __init__(self, fiware_service='', fiware_service_path='', cb_host='', cb_port='',
-                 iota_aaa='', token='', expires_at='', host_id='',
-                 sth_host='', sth_port='',
-                 cygnus_host='', cygnus_notification_host='', cygnus_port='',
-                 perseo_host='', perseo_port=''):
-        """Client for doing context management operations on FIWARE platform"""
-
-        super(FiwareContextClient, self).__init__(fiware_service=fiware_service,
-                                                  fiware_service_path=fiware_service_path,
-                                                  cb_host=cb_host, cb_port=cb_port,
-                                                  iota_aaa=iota_aaa, token=token, expires_at=expires_at,
-                                                  host_id=host_id)
-
-        self.sth_host = sth_host
-        self.sth_port = sth_port
-
-        self.cygnus_host = cygnus_host
-        self.cygnus_notification_host = cygnus_notification_host
-        self.cygnus_port = cygnus_port
-
-        self.perseo_host = perseo_host
-        self.perseo_port = perseo_port
-
-    @classmethod
-    def from_config_dict(cls, config_dict):
+    def __init__(self, fiware_config: FiwareConfig):
         """Client for doing context management operations on FIWARE platform
 
-        :param config_dict: The python dict from which to load the default configuration
+        :param fiware_config: The FiwareConfig object from which to load the default configuration
         """
+        super(FiwareContextClient, self).__init__(fiware_config)
 
-        # TODO Check and notify mandatory parameters on input config dict
-
-        return cls(fiware_service=config_dict['service']['name'],
-                   fiware_service_path=config_dict['service']['path'],
-                   cb_host=config_dict['context_broker']['host'], cb_port=config_dict['context_broker']['port'],
-                   sth_host=config_dict['sth']['host'], sth_port=config_dict['sth']['port'],
-                   cygnus_host=config_dict['cygnus']['host'],
-                   cygnus_port=config_dict['cygnus']['port'],
-                   cygnus_notification_host=config_dict['cygnus']['notification_host'],
-                   perseo_host=config_dict['perseo']['host'],
-                   perseo_port=config_dict['perseo']['port'])
-
-    @classmethod
-    def from_config_file(cls, config_file):
-        """Client for doing context management operations on FIWARE platform
-
-        :param config_file: The file in which load the default configuration
-        """
-
-        # TODO Check and notify mandatory parameters on input config file
-        config_dict = utils.read_config_file(config_file)
-
-        return cls(fiware_service=config_dict['fiware_service'],
-                   fiware_service_path=config_dict['fiware_service_path'],
-                   cb_host=config_dict['cb_host'], cb_port=config_dict['cb_port'],
-                   iota_aaa=config_dict['iota_aaa'], token=config_dict['token'], expires_at='',
-                   host_id=config_dict['host_id'],
-                   sth_host=config_dict['sth_host'], sth_port=config_dict['sth_port'],
-                   cygnus_host=config_dict['cygnus_host'],
-                   cygnus_notification_host=config_dict['cygnus_notification_host'],
-                   cygnus_port=config_dict['cygnus_port'],
-                   perseo_host=config_dict['perseo_host'],
-                   perseo_port=config_dict['perseo_port'])
+        self.cb_url = f"http://{self.fiware_config.cb_host}:{self.fiware_config.cb_port}"
+        self.perseo_url = f"http://{self.fiware_config.perseo_host}:{self.fiware_config.perseo_port}"
+        self.cygnus_notification_url = f"http://{self.fiware_config.cygnus_notification_host}:{self.fiware_config.cygnus_port}"
+        self.sth_url = f"http://{self.fiware_config.sth_host}:{self.fiware_config.sth_port}"
 
     def create_entity(self, entity_schema, entity_type, entity_id):
         """Creates a new NGSI entity with the given structure in the currently selected service
@@ -89,7 +28,7 @@ class FiwareContextClient(SimpleClient):
 
         :return: Information of the registered entity
         """
-        url = "http://{}:{}/v2/entities".format(self.cb_host, self.cb_port)
+        url = f"{self.cb_url}/v2/entities"
         additional_headers = {'Content-Type': 'application/json'}
 
         entity_schema = entity_schema.replace('[ENTITY_TYPE]', str(entity_type))
@@ -108,7 +47,8 @@ class FiwareContextClient(SimpleClient):
 
         :return: Information of the registered entity
         """
-        logging.info("Opening file '{}'".format(entity_file_path))
+        logging.info(f"Opening file '{entity_file_path}'")
+
         with open(entity_file_path) as json_entity_file:
             payload = json.load(json_entity_file)
 
@@ -135,9 +75,8 @@ class FiwareContextClient(SimpleClient):
 
         :return: Information of the removed entity
         """
-
         params = {'type': entity_type}
-        url = "http://{}:{}/v2/entities/{}".format(self.cb_host, self.cb_port, entity_id)
+        url = f"{self.cb_url}/v2/entities/{entity_id}"
 
         return self._send_request(url, 'DELETE', params=params)
 
@@ -149,10 +88,10 @@ class FiwareContextClient(SimpleClient):
         :return: The information of the entity found with the given id
                  or None if no entity was found with the id
         """
-        logging.info("Getting entity by id '{}'".format(entity_id))
+        logging.info(f"Getting entity by id '{entity_id}'")
 
         params = {'type': entity_type}
-        url = "http://{}:{}/v2/entities/{}".format(self.cb_host, self.cb_port, entity_id)
+        url = f"{self.cb_url}/v2/entities/{entity_id}"
 
         return self._send_request(url, 'GET', params=params)
 
@@ -162,11 +101,11 @@ class FiwareContextClient(SimpleClient):
         :param entity_type: The type of the entities to be searched
         :return: A list with the information of the entities found with the given type
         """
-        logging.info("Getting entities by type '{}'".format(type))
+        logging.info(f"Getting entities by type '{type}'")
 
         params = {'type': entity_type}
 
-        url = "http://{}:{}/v2/entities".format(self.cb_host, self.cb_port)
+        url = f"{self.cb_url}/v2/entities"
 
         return self._send_request(url, 'GET', params=params)
 
@@ -192,7 +131,7 @@ class FiwareContextClient(SimpleClient):
         if options:
             params['options'] = options
 
-        url = "http://{}:{}/v2/entities".format(self.cb_host, self.cb_port)
+        url = f"{self.cb_url}/v2/entities"
 
         return self._send_request(url, 'GET', params=params)
 
@@ -204,18 +143,21 @@ class FiwareContextClient(SimpleClient):
         :param notification_url: The URL to which the notification will be sent on changes
         :return: The information of the subscription
         """
-        logging.info("Subscribing for change on attributes '{}' on device with id '{}'".format(attributes, device_id))
+        logging.info(f"Subscribing for change on attributes '{attributes}' on device with id '{device_id}'")
 
-        url = "http://{}:{}/v1/subscribeContext".format(self.cb_host, self.cb_port)
+        url = f"{self.cb_url}/v1/subscribeContext"
 
-        additional_headers = {'Accept': 'application/json',
-                              'Content-Type': 'application/json'}
+        additional_headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
 
-        payload = {"entities": [{
-            "type": "thing",
-            "isPattern": "false",
-            "id": str(device_id)
-        }],
+        payload = {
+            "entities": [{
+                "type": "thing",
+                "isPattern": "false",
+                "id": str(device_id)
+            }],
             "attributes": attributes,
             "notifyConditions": [{
                 "type": "ONCHANGE",
@@ -241,19 +183,19 @@ class FiwareContextClient(SimpleClient):
         """
         logging.info("Creating attribute change rule")
 
-        url = "http://{}:{}/rules".format(self.perseo_host, self.perseo_port)
+        url = f"{self.perseo_url}/rules"
 
-        additional_headers = {'Accept': 'application/json',
-                              'Content-Type': 'application/json'}
+        additional_headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
 
-        rule_template = "select *,\"{}-rule\" as ruleName from pattern " \
-                        "[every ev=iotEvent(cast(cast(ev.{}?,String),{}){})]"
         payload = {
-            "name": "{}-rule".format(attribute),
-            "text": rule_template.format(attribute, attribute, attribute_type, condition),
+            "name": f"{attribute}-rule",
+            "text": f"select *,\"{attribute}-rule\" as ruleName from pattern [every ev=iotEvent(cast(cast(ev.{attribute}?,String),{attribute_type}){condition})]",
             "action": {
                 "type": "",
-                "template": "Alert! {0} is now ${{ev.{1}}}.".format(attribute, attribute),
+                "template": f"Alert! {attribute} is now ${{ev.{attribute}}}.",
                 "parameters": {}
             }
         }
@@ -261,15 +203,15 @@ class FiwareContextClient(SimpleClient):
         if action == 'email':
             payload["action"]["type"] = "email"
             # TODO Remove hardcoded info
-            payload["action"]["parameters"] = {"to": "{}".format("lucascristiano27@gmail.com"),
-                                               "from": "{}".format("lucas.calixto.dantas@gmail.com"),
-                                               "subject": "Alert! High {} Detected".format(attribute.capitalize())}
+            payload["action"]["parameters"] = {"to": f"{'lucascristiano27@gmail.com'}",
+                                               "from": f"{'lucas.calixto.dantas@gmail.com'}",
+                                               "subject": f"Alert! High {attribute.capitalize()} detected"}
         elif action == 'post':
             payload["action"]["type"] = "post"
-            payload["action"]["parameters"] = {"url": "{}".format(notification_url)}
+            payload["action"]["parameters"] = {"url": f"{notification_url}"}
 
         else:
-            error_msg = "Unknown action '{}'".format(action)
+            error_msg = f"Unknown action '{action}'"
             logging.error(error_msg)
             return {'error': error_msg}
 
@@ -284,7 +226,7 @@ class FiwareContextClient(SimpleClient):
         """
         logging.info("Subscribing Cygnus")
 
-        notification_url = "http://{}:{}/notify".format(self.cygnus_notification_host, self.cygnus_port)
+        notification_url = f"{self.cygnus_notification_url}/notify"
         return self.subscribe_attributes_change(entity_id, attributes, notification_url)
 
     def subscribe_historical_data(self, entity_id, attributes):
@@ -296,7 +238,7 @@ class FiwareContextClient(SimpleClient):
         """
         logging.info("Subscribing to historical data")
 
-        notification_url = "http://{}:{}/notify".format(self.sth_host, self.sth_port)
+        notification_url = f"{self.sth_url}/notify"
         return self.subscribe_attributes_change(entity_id, attributes, notification_url)
 
     def get_historical_data(self, entity_type, entity_id, attribute, items_number=10):
@@ -313,12 +255,13 @@ class FiwareContextClient(SimpleClient):
 
         params = {'lastN': items_number}
 
-        url = "http://{}:{}/STH/v1/contextEntities/type/{}/id/{}/attributes/{}".format(
-            self.sth_host, self.sth_port, entity_type, entity_id, attribute)
+        url = f"http://{self.sth_url}/STH/v1/contextEntities/type/{entity_type}/id/{entity_id}/attributes/{attribute}"
 
-        additional_headers = {'Accept': 'application/json',
-                              'Fiware-Service': str(self.fiware_service).lower(),
-                              'Fiware-ServicePath': str(self.fiware_service_path).lower()}
+        additional_headers = {
+            'Accept': 'application/json',
+            'Fiware-Service': str(self.fiware_config.service).lower(),
+            'Fiware-ServicePath': str(self.fiware_config.service_path).lower()
+        }
 
         return self._send_request(url, 'GET', params=params, additional_headers=additional_headers)
 
@@ -331,10 +274,12 @@ class FiwareContextClient(SimpleClient):
         """
         logging.info("Removing subscriptions")
 
-        url = "http://{}:{}/v1/unsubscribeContext".format(self.cb_host, self.cb_port)
+        url = f"{self.cb_url}/v1/unsubscribeContext"
 
-        additional_headers = {'Accept': 'application/json',
-                              'Content-Type': 'application/json'}
+        additional_headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
 
         payload = {
             "subscriptionId": str(subscription_id)
@@ -349,9 +294,9 @@ class FiwareContextClient(SimpleClient):
         :return: The information of the subscription found with the given id
                  or None if no subscription was found with the id
         """
-        logging.info("Getting subscription by id '{}'".format(subscription_id))
+        logging.info(f"Getting subscription by id '{subscription_id}'")
 
-        url = "http://{}:{}/v2/subscriptions/{}".format(self.cb_host, self.cb_port, subscription_id)
+        url = f"{self.cb_url}/v2/subscriptions/{subscription_id}"
 
         return self._send_request(url, 'GET')
 
@@ -362,6 +307,6 @@ class FiwareContextClient(SimpleClient):
         """
         logging.info("Listing subscriptions")
 
-        url = "http://{}:{}/v2/subscriptions".format(self.cb_host, self.cb_port)
+        url = f"{self.cb_url}/v2/subscriptions"
 
         return self._send_request(url, 'GET')

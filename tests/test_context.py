@@ -4,43 +4,35 @@ from . import TestCommonMethods
 
 class TestContextMethods(TestCommonMethods):
 
-    def _assert_entity_data(self, data, expected_data):
-        self.assertEqual(data['id'], expected_data['id'])
-        self.assertEqual(data['type'], expected_data['type'])
-        self.assertEqual(data['pressure']['type'], expected_data['pressure']['type'])
-        self.assertEqual(data['pressure']['value'], expected_data['pressure']['value'])
-        self.assertEqual(data['temperature']['type'], expected_data['temperature']['type'])
-        self.assertEqual(data['temperature']['value'], expected_data['temperature']['value'])
-
     def test_config_file_init_inherited_params(self):
-        context_client = FiwareContextClient.from_config_file(self._build_file_path('config.dummy.ini'))
+        context_client = FiwareContextClient.from_config_file(self._build_file_path('config.dummy.json'))
 
-        self.assertEqual(context_client.fiware_service, 'service_name')
-        self.assertEqual(context_client.fiware_service_path, '/service_path')
+        self.assertEqual(context_client.fiware_config.service, 'service_name')
+        self.assertEqual(context_client.fiware_config.service_path, '/service_path')
 
-        self.assertEqual(context_client.cb_host, 'context_broker_address')
-        self.assertEqual(context_client.cb_port, 1)
+        self.assertEqual(context_client.fiware_config.cb_host, 'context_broker_address')
+        self.assertEqual(context_client.fiware_config.cb_port, 1)
         # TODO Check OAuth param
 
         # TODO Check these verifications
-        self.assertEqual(context_client.iota_aaa, 'no')
+        self.assertEqual(context_client.fiware_config.iota_aaa, False)
         # self.assertEqual(context_client.token, '')
         # self.assertEqual(context_client.expires_at, '')
 
-        self.assertEqual(context_client.host_id, 'b4:b6:30')
+        self.assertEqual(context_client.fiware_config.host_id, 'b4:b6:30')
 
     def test_config_file_init_specific_params(self):
-        context_client = FiwareContextClient.from_config_file(self._build_file_path('config.dummy.ini'))
+        context_client = FiwareContextClient.from_config_file(self._build_file_path('config.dummy.json'))
 
-        self.assertEqual(context_client.sth_host, 'sth_comet_address')
-        self.assertEqual(context_client.sth_port, 4)
+        self.assertEqual(context_client.fiware_config.sth_host, 'sth_comet_address')
+        self.assertEqual(context_client.fiware_config.sth_port, 4)
 
-        self.assertEqual(context_client.cygnus_host, 'cygnus_address')
-        self.assertEqual(context_client.cygnus_notification_host, 'cygnus_notification_host_address')
-        self.assertEqual(context_client.cygnus_port, 5)
+        self.assertEqual(context_client.fiware_config.cygnus_host, 'cygnus_address')
+        self.assertEqual(context_client.fiware_config.cygnus_notification_host, 'cygnus_notification_host_address')
+        self.assertEqual(context_client.fiware_config.cygnus_port, 5)
 
-        self.assertEqual(context_client.perseo_host, 'perseo_address')
-        self.assertEqual(context_client.perseo_port, 7)
+        self.assertEqual(context_client.fiware_config.perseo_host, 'perseo_address')
+        self.assertEqual(context_client.fiware_config.perseo_port, 7)
 
         # TODO MQTT optional
 
@@ -194,3 +186,11 @@ class TestContextMethods(TestCommonMethods):
 
     def test_update_entity_attribute_value(self):
         pass  # TODO Implement
+
+    def _assert_entity_data(self, data, expected_data):
+        self.assertEqual(data['id'], expected_data['id'])
+        self.assertEqual(data['type'], expected_data['type'])
+        self.assertEqual(data['pressure']['type'], expected_data['pressure']['type'])
+        self.assertEqual(data['pressure']['value'], expected_data['pressure']['value'])
+        self.assertEqual(data['temperature']['type'], expected_data['temperature']['type'])
+        self.assertEqual(data['temperature']['value'], expected_data['temperature']['value'])

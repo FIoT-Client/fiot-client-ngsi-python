@@ -8,70 +8,34 @@ class TestIotMethods(TestCommonMethods):
 
     files_dir_path = join(dirname(realpath(__file__)), 'files')
 
-    def _build_file_path(self, filename):
-        return join(self.files_dir_path, filename)
-
-    def _assert_device_entity_data(self, data, expected_data):
-        self.assertEqual(data['id']['value'], expected_data['id']['value'])
-        self.assertEqual(data['type'], expected_data['type'])
-        self.assertEqual(data['change_state_info']['type'], expected_data['change_state_info']['type'])
-        self.assertEqual(data['change_state_info']['value'], expected_data['change_state_info']['value'])
-        self.assertEqual(data['change_state_status']['type'], expected_data['change_state_status']['type'])
-        self.assertEqual(data['change_state_status']['value'], expected_data['change_state_status']['value'])
-        self.assertEqual(data['state']['type'], expected_data['state']['type'])
-        self.assertEqual(data['state']['value'], expected_data['state']['value'])
-
-    def _assert_device_data(self, data, expected_data):
-        self.assertEqual(data['device_id'], expected_data['device_id'])
-        self.assertEqual(data['entity_name'], expected_data['entity_name'])
-        self.assertEqual(data['entity_type'], expected_data['entity_type'])
-        self.assertEqual(data['transport'], expected_data['transport'])
-
-        self.assertEqual(len(data['attributes']), len(expected_data['attributes']))
-        self.assertEqual(data['attributes'][0]['object_id'], expected_data['attributes'][0]['object_id'])
-        self.assertEqual(data['attributes'][0]['name'], expected_data['attributes'][0]['name'],)
-        self.assertEqual(data['attributes'][0]['type'], expected_data['attributes'][0]['type'])
-
-        self.assertEqual(len(data['lazy']), len(expected_data['lazy']))
-
-        self.assertEqual(len(data['commands']), len(expected_data['commands']))
-        self.assertEqual(data['commands'][0]['object_id'], expected_data['commands'][0]['object_id'])
-        self.assertEqual(data['commands'][0]['name'], expected_data['commands'][0]['name'])
-        self.assertEqual(data['commands'][0]['type'], expected_data['commands'][0]['type'])
-
-        self.assertEqual(len(data['static_attributes']), len(expected_data['static_attributes']))
-        self.assertEqual(data['static_attributes'][0]['name'], expected_data['static_attributes'][0]['name'])
-        self.assertEqual(data['static_attributes'][0]['type'], expected_data['static_attributes'][0]['type'])
-        self.assertEqual(data['static_attributes'][0]['value'], expected_data['static_attributes'][0]['value'])
-
     def test_config_file_init_inherited_params(self):
-        iot_client = FiwareIotClient.from_config_file(self._build_file_path('config.dummy.ini'))
+        iot_client = FiwareIotClient.from_config_file(self._build_file_path('config.dummy.json'))
 
-        self.assertEqual(iot_client.fiware_service, 'service_name')
-        self.assertEqual(iot_client.fiware_service_path, '/service_path')
+        self.assertEqual(iot_client.fiware_config.service, 'service_name')
+        self.assertEqual(iot_client.fiware_config.service_path, '/service_path')
 
-        self.assertEqual(iot_client.cb_host, 'context_broker_address')
-        self.assertEqual(iot_client.cb_port, 1)
+        self.assertEqual(iot_client.fiware_config.cb_host, 'context_broker_address')
+        self.assertEqual(iot_client.fiware_config.cb_port, 1)
         # TODO Check OAuth param
 
         # TODO Check these verifications
-        self.assertEqual(iot_client.iota_aaa, 'no')
+        self.assertEqual(iot_client.fiware_config.iota_aaa, False)
         # self.assertEqual(iot_client.token, '')
         # self.assertEqual(iot_client.expires_at, '')
 
-        self.assertEqual(iot_client.host_id, 'b4:b6:30')
+        self.assertEqual(iot_client.fiware_config.host_id, 'b4:b6:30')
 
     def test_config_file_init_specific_params(self):
-        iot_client = FiwareIotClient.from_config_file(self._build_file_path('config.dummy.ini'))
+        iot_client = FiwareIotClient.from_config_file(self._build_file_path('config.dummy.json'))
 
-        self.assertEqual(iot_client.iota_host, 'iota_address')
-        self.assertEqual(iot_client.iota_north_port, 2)
-        self.assertEqual(iot_client.iota_protocol_port, 3)
+        self.assertEqual(iot_client.fiware_config.iota_host, 'iota_address')
+        self.assertEqual(iot_client.fiware_config.iota_north_port, 2)
+        self.assertEqual(iot_client.fiware_config.iota_protocol_port, 3)
         # check IOTA auth attr
-        self.assertEqual(iot_client.api_key, '1a2b3c4d5e6f')
+        self.assertEqual(iot_client.fiware_config.api_key, '1a2b3c4d5e6f')
 
-        self.assertEqual(iot_client.mqtt_broker_host, 'mqtt_broker_address')
-        self.assertEqual(iot_client.mqtt_broker_port, 6)
+        self.assertEqual(iot_client.fiware_config.mqtt_broker_host, 'mqtt_broker_address')
+        self.assertEqual(iot_client.fiware_config.mqtt_broker_port, 6)
 
         # TODO MQTT optional
 
@@ -105,7 +69,7 @@ class TestIotMethods(TestCommonMethods):
                 'type': 'command'
             }],
             'static_attributes': [{
-                'name': 'id',
+                'name': 'device_id',
                 'type': 'string',
                 'value': 'LED_001'}]
         }
@@ -116,11 +80,7 @@ class TestIotMethods(TestCommonMethods):
         data = response['response']
 
         expected_entity_data = {
-            'id': {
-                'type': 'string',
-                'value': 'LED_001',
-                'metadata': {}
-            },
+            'id': 'TEST_LED',
             'type': 'thing',
             'change_state_info': {
                 'type': 'commandResult',
@@ -133,6 +93,10 @@ class TestIotMethods(TestCommonMethods):
             'state': {
                 'type': 'int',
                 'value': ' '
+            },
+            'device_id': {
+                'type': 'string',
+                'value': 'LED_001'
             }
         }
         self._assert_device_entity_data(data, expected_entity_data)
@@ -168,11 +132,7 @@ class TestIotMethods(TestCommonMethods):
         data = response['response']
 
         expected_entity_data = {
-            'id': {
-                'type': 'string',
-                'value': 'LED_001',
-                'metadata': {}
-            },
+            'id': 'TEST_LED',
             'type': 'thing',
             'change_state_info': {
                 'type': 'commandResult',
@@ -185,6 +145,10 @@ class TestIotMethods(TestCommonMethods):
             'state': {
                 'type': 'int',
                 'value': ' '
+            },
+            'device_id': {
+                'type': 'string',
+                'value': 'LED_001'
             }
         }
         self._assert_device_entity_data(data, expected_entity_data)
@@ -197,11 +161,7 @@ class TestIotMethods(TestCommonMethods):
         data = response['response']
 
         expected_entity_data = {
-            'id': {
-                'type': 'string',
-                'value': 'LED_001',
-                'metadata': {}
-            },
+            'id': 'TEST_LED',
             'type': 'thing',
             'change_state_info': {
                 'type': 'commandResult',
@@ -214,6 +174,10 @@ class TestIotMethods(TestCommonMethods):
             'state': {
                 'type': 'int',
                 'value': ' '
+            },
+            'device_id': {
+                'type': 'string',
+                'value': 'LED_001'
             }
         }
         self._assert_device_entity_data(data, expected_entity_data)
@@ -226,3 +190,50 @@ class TestIotMethods(TestCommonMethods):
 
     def test_create_ul_payload_from_measurements(self):
         pass  # TODO Implement
+
+    def test_create_service(self):
+        pass  # TODO Implement
+
+    def test_remove_service(self):
+        pass  # TODO Implement
+
+    def test_list_services(self):
+        pass  # TODO Implement
+
+    def _build_file_path(self, filename):
+        return join(self.files_dir_path, filename)
+
+    def _assert_device_entity_data(self, data, expected_data):
+        self.assertEqual(data['id'], expected_data['id'])
+        self.assertEqual(data['type'], expected_data['type'])
+        self.assertEqual(data['change_state_info']['type'], expected_data['change_state_info']['type'])
+        self.assertEqual(data['change_state_info']['value'], expected_data['change_state_info']['value'])
+        self.assertEqual(data['change_state_status']['type'], expected_data['change_state_status']['type'])
+        self.assertEqual(data['change_state_status']['value'], expected_data['change_state_status']['value'])
+        self.assertEqual(data['device_id']['type'], expected_data['device_id']['type'])
+        self.assertEqual(data['device_id']['value'], expected_data['device_id']['value'])
+        self.assertEqual(data['state']['type'], expected_data['state']['type'])
+        self.assertEqual(data['state']['value'], expected_data['state']['value'])
+
+    def _assert_device_data(self, data, expected_data):
+        self.assertEqual(data['device_id'], expected_data['device_id'])
+        self.assertEqual(data['entity_name'], expected_data['entity_name'])
+        self.assertEqual(data['entity_type'], expected_data['entity_type'])
+        self.assertEqual(data['transport'], expected_data['transport'])
+
+        self.assertEqual(len(data['attributes']), len(expected_data['attributes']))
+        self.assertEqual(data['attributes'][0]['object_id'], expected_data['attributes'][0]['object_id'])
+        self.assertEqual(data['attributes'][0]['name'], expected_data['attributes'][0]['name'],)
+        self.assertEqual(data['attributes'][0]['type'], expected_data['attributes'][0]['type'])
+
+        self.assertEqual(len(data['lazy']), len(expected_data['lazy']))
+
+        self.assertEqual(len(data['commands']), len(expected_data['commands']))
+        self.assertEqual(data['commands'][0]['object_id'], expected_data['commands'][0]['object_id'])
+        self.assertEqual(data['commands'][0]['name'], expected_data['commands'][0]['name'])
+        self.assertEqual(data['commands'][0]['type'], expected_data['commands'][0]['type'])
+
+        self.assertEqual(len(data['static_attributes']), len(expected_data['static_attributes']))
+        self.assertEqual(data['static_attributes'][0]['name'], expected_data['static_attributes'][0]['name'])
+        self.assertEqual(data['static_attributes'][0]['type'], expected_data['static_attributes'][0]['type'])
+        self.assertEqual(data['static_attributes'][0]['value'], expected_data['static_attributes'][0]['value'])

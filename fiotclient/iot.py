@@ -3,78 +3,25 @@ import logging
 
 import paho.mqtt.publish as publish
 
-from fiotclient import utils
-from . import SimpleClient
-
-__author__ = "Lucas Cristiano Calixto Dantas"
-__copyright__ = "Copyright 2017, Lucas Cristiano Calixto Dantas"
-__credits__ = ["Lucas Cristiano Calixto Dantas"]
-__license__ = "MIT"
-__version__ = "0.1.0"
-__maintainer__ = "Lucas Cristiano Calixto Dantas"
-__email__ = "lucascristiano27@gmail.com"
-__status__ = "Development"
+from . import BaseClient
+from .config import FiwareConfig
 
 
-class FiwareIotClient(SimpleClient):
+class FiwareIotClient(BaseClient):
 
-    def __init__(self, fiware_service='', fiware_service_path='', cb_host='', cb_port='',
-                 iota_aaa='', token='', expires_at='', host_id='',
-                 iota_host='', iota_north_port='', iota_protocol_port='', api_key='',
-                 mqtt_broker_host='', mqtt_broker_port=''):
+    def __init__(self, fiware_config: FiwareConfig):
         """Client for doing IoT management operations on FIWARE platform
 
-        :param config_file: The file in which load the default configuration
+        :param fiware_config: The FiwareConfig object from which to load the default configuration
         """
+        super(FiwareIotClient, self).__init__(fiware_config)
 
-        super(FiwareIotClient, self).__init__(fiware_service=fiware_service, fiware_service_path=fiware_service_path,
-                                              cb_host=cb_host, cb_port=cb_port,
-                                              iota_aaa=iota_aaa, token=token, expires_at=expires_at,
-                                              host_id=host_id)
+        self.api_key = self.fiware_config.api_key
 
-        self.iota_host = iota_host
-        self.iota_north_port = iota_north_port
-        self.iota_protocol_port = iota_protocol_port
-        self.api_key = api_key
-
-        self.mqtt_broker_host = mqtt_broker_host
-        self.mqtt_broker_port = mqtt_broker_port
-
-    @classmethod
-    def from_config_dict(cls, config_dict):
-        """Client for doing IoT management operations on FIWARE platform
-
-        :param config_dict: The python dict from which to load the default configuration
-        """
-
-        # TODO Check and notify mandatory parameters on input config dict
-
-        return cls(fiware_service=config_dict['service']['name'],
-                   fiware_service_path=config_dict['service']['path'],
-                   cb_host=config_dict['context_broker']['host'], cb_port=config_dict['context_broker']['port'],
-                   iota_host=config_dict['iot_agent']['host'], iota_north_port=config_dict['iot_agent']['north_port'],
-                   iota_protocol_port=config_dict['iot_agent']['protocol_port'], api_key=config_dict['iot_agent']['api_key'],
-                   mqtt_broker_host=config_dict['mqtt_broker']['host'],
-                   mqtt_broker_port=config_dict['mqtt_broker']['port'])
-
-    @classmethod
-    def from_config_file(cls, config_file):
-        """Client for doing IoT management operations on FIWARE platform
-
-        :param config_file: The file in which load the default configuration
-        """
-
-        # TODO Check and notify mandatory parameters on input config file
-        config_dict = utils.read_config_file(config_file)
-
-        return cls(fiware_service=config_dict['fiware_service'],
-                   fiware_service_path=config_dict['fiware_service_path'],
-                   cb_host=config_dict['cb_host'], cb_port=config_dict['cb_port'],
-                   iota_aaa=config_dict['iota_aaa'], token=config_dict['token'], expires_at='',
-                   host_id=config_dict['host_id'],
-                   iota_host=config_dict['iota_host'], iota_north_port=config_dict['iota_north_port'],
-                   iota_protocol_port=config_dict['iota_protocol_port'], api_key=config_dict['api_key'],
-                   mqtt_broker_host=config_dict['mqtt_broker_host'], mqtt_broker_port=config_dict['mqtt_broker_port'])
+        self.cb_url = f"http://{self.fiware_config.cb_host}:{self.fiware_config.cb_port}"
+        self.iota_north_url = f"http://{self.fiware_config.iota_host}:{self.fiware_config.iota_north_port}"
+        self.iota_protocol_url = f"http://{self.fiware_config.iota_host}:{self.fiware_config.iota_protocol_port}"
+        self.mqtt_broker_url = f"{self.fiware_config.mqtt_broker_host}:{self.fiware_config.mqtt_broker_port}"
 
     @staticmethod
     def generate_api_key():
@@ -124,24 +71,26 @@ class FiwareIotClient(SimpleClient):
         :param api_key: The api key to use to create the service
         :return: The response of the creation request
         """
-        url = "http://{}:{}/iot/services".format(self.iota_host, self.iota_north_port)
+        url = f"{self.iota_north_url}/iot/services"
 
-        additional_headers = {'Content-Type': 'application/json',
-                              'Fiware-Service': service,
-                              'Fiware-ServicePath': service_path}
+        additional_headers = {
+            'Content-Type': 'application/json',
+            'Fiware-Service': service,
+            'Fiware-ServicePath': service_path
+        }
 
         payload = {
-                    "services": [
-                        {
-                          "protocol": ["IoTA-UL"],  # TODO Remove hardcoded protocol
-                          "apikey": str(api_key),
-                          "token": "token2",
-                          "cbroker": "http://{}:{}".format(self.cb_host, self.cb_port),
-                          "entity_type": "thing",
-                          "resource": "/iot/d"
-                        }
-                    ]
-                  }
+            "services": [
+                {
+                  "protocol": ["IoTA-UL"],  # TODO Remove hardcoded protocol
+                  "apikey": str(api_key),
+                  "token": "token2",
+                  "cbroker": f"{self.cb_url}",
+                  "entity_type": "thing",
+                  "resource": "/iot/d"
+                }
+            ]
+        }
 
         return self._send_request(url, 'POST', payload=payload, additional_headers=additional_headers)
 
@@ -165,14 +114,16 @@ class FiwareIotClient(SimpleClient):
             'apikey': api_key
         }
 
-        url = "http://{}:{}/iot/services".format(self.iota_host, self.iota_north_port)
+        url = f"{self.iota_north_url}/iot/services"
 
         if service_path != '/*' and service_path != '/#':
             remove_devices_str = 'true' if remove_devices else 'false'
-            url += '&device={}'.format(remove_devices_str)
+            url += f'&device={remove_devices_str}'
 
-        additional_headers = {'Fiware-Service': service,
-                              'Fiware-ServicePath': service_path}
+        additional_headers = {
+            'Fiware-Service': service,
+            'Fiware-ServicePath': service_path
+        }
 
         return self._send_request(url, 'DELETE', params=params, additional_headers=additional_headers)
 
@@ -206,7 +157,7 @@ class FiwareIotClient(SimpleClient):
         logging.info("Registering device")
 
         params = {'protocol': protocol}
-        url = "http://{}:{}/iot/devices".format(self.iota_host, self.iota_north_port)
+        url = f"{self.iota_north_url}/iot/devices"
         additional_headers = {'Content-Type': 'application/json'}
 
         device_schema = device_schema.replace('[DEVICE_ID]', str(device_id)) \
@@ -234,7 +185,7 @@ class FiwareIotClient(SimpleClient):
                          If no value is provided the default protocol (IoTA-UL) will be used
         :return: Information of the registered device
         """
-        logging.info("Opening file '{}'".format(device_file_path))
+        logging.info(f"Opening file '{device_file_path}'")
         with open(device_file_path) as json_device_file:
             payload = json.load(json_device_file)
 
@@ -261,8 +212,7 @@ class FiwareIotClient(SimpleClient):
         :param device_id: The id to the device to be removed
         :return: Response of the removal request
         """
-
-        url = "http://{}:{}/iot/devices/{}".format(self.iota_host, self.iota_north_port, device_id)
+        url = f"{self.iota_north_url}/iot/devices/{device_id}"
         additional_headers = {'Content-Type': 'application/json'}
 
         return self._send_request(url, 'DELETE', additional_headers=additional_headers)
@@ -274,7 +224,7 @@ class FiwareIotClient(SimpleClient):
         :return: The information of the device found with the given id
                  or None if no device was found with the id
         """
-        url = "http://{}:{}/iot/devices/{}".format(self.iota_host, self.iota_north_port, device_id)
+        url = f"{self.iota_north_url}/iot/devices/{device_id}"
         additional_headers = {'Content-Type': 'application/json'}
 
         return self._send_request(url, 'GET', additional_headers=additional_headers)
@@ -292,7 +242,7 @@ class FiwareIotClient(SimpleClient):
         if offset:
             params['offset'] = offset
 
-        url = "http://{}:{}/iot/devices".format(self.iota_host, self.iota_north_port)
+        url = f"{self.iota_north_url}/iot/devices"
         additional_headers = {'Content-Type': 'application/json'}
 
         return self._send_request(url, 'GET', params=params, additional_headers=additional_headers)
@@ -349,13 +299,15 @@ class FiwareIotClient(SimpleClient):
 
         if protocol == 'MQTT':
             logging.info("Transport protocol: MQTT")
-            topic = "/{}/{}/attrs".format(self.api_key, device_id)
+            topic = f"/{self.api_key}/{device_id}/attrs"
 
-            logging.info("Publishing to {}:{} on topic {}".format(self.mqtt_broker_host, self.mqtt_broker_port, topic))
+            logging.info(f"Publishing to {self.mqtt_broker_url} on topic {topic}")
             logging.info("Sending payload: ")
             logging.info(payload)
 
-            publish.single(topic, payload=payload, hostname=self.mqtt_broker_host, port=self.mqtt_broker_port,
+            publish.single(topic, payload=payload,
+                           hostname=self.fiware_config.mqtt_broker_host,
+                           port=self.fiware_config.mqtt_broker_port,
                            keepalive=timeout)
             logging.info("Message sent")
             return {'result': 'OK'}
@@ -368,7 +320,7 @@ class FiwareIotClient(SimpleClient):
                 'i': device_id
             }
 
-            url = "http://{}:{}/iot/d".format(self.iota_host, self.iota_protocol_port)
+            url = f"{self.iota_protocol_url}/iot/d"
             additional_headers = {'Content-Type': 'text/plain'}
 
             self._send_request(url, 'POST', params=params, payload=payload, additional_headers=additional_headers,
@@ -376,59 +328,9 @@ class FiwareIotClient(SimpleClient):
             return {'result': 'OK'}
 
         else:
-            logging.error("Unknown transport protocol '{}'".format(protocol))
+            logging.error(f"Unknown transport protocol '{protocol}'")
             error_msg = "Unknown transport protocol. Accepted values are 'MQTT' and 'HTTP'"
             return {'error': error_msg}
-
-    def send_command(self, entity_id, device_id, command, params=None):
-        """Sends a command from the FIWARE platform to a specific device
-           (http://fiware-orion.readthedocs.io/en/latest/user/walkthrough_apiv1/index.html#ngsi10-standard-operations at
-           "Update context elements" section)
-
-        :param entity_id: The id of the entity that represents the device
-        :param device_id: The id of the device to which the command will be sent
-        :param command: The name of the command to be called on the device
-        :param params: The command parameters to be sent
-        :return: The result of the command call
-        """
-        logging.info("Sending command")
-
-        if params is None:
-            params = {}
-
-        url = "http://{}:{}/v1/updateContext".format(self.iota_host, self.iota_north_port)
-
-        additional_headers = {'Content-Type': 'application/json',
-                              'Accept': 'application/json'}
-
-        params = '|'.join(['%s' % (str(value)) for (key, value) in params.items()])
-        # if params != '':
-        #     params = '|' + params
-        #
-        # value = '{}@{}{}'.format(device_id, command, params)
-        # logging.info("Command value:", value)
-
-        value = params
-
-        payload = {
-                    "contextElements": [
-                      {
-                        "type": "thing",
-                        "isPattern": "false",
-                        "id": entity_id,
-                        "attributes": [
-                          {
-                            "name": command,
-                            "type": "command",
-                            "value": value
-                          }
-                        ]
-                      }
-                    ],
-                    "updateAction": "UPDATE"
-                  }
-
-        return self._send_request(url, 'POST', payload=payload, additional_headers=additional_headers)
 
     def get_polling_commands(self, device_id, measurements):
         """Get a list of polling commands of the device with the given id when sending a measurement group
@@ -447,8 +349,60 @@ class FiwareIotClient(SimpleClient):
             'getCmd': 1
         }
 
-        url = "http://{}:{}/iot/d".format(self.iota_host, self.iota_protocol_port)
+        url = f"{self.iota_protocol_url}/iot/d"
         payload = self._create_ul_payload_from_measurements(measurements)
         additional_headers = {'Content-Type': 'text/plain'}
 
         return self._send_request(url, 'POST', params=params, payload=payload, additional_headers=additional_headers)
+
+    def send_command(self, entity_id, device_id, command, params=None):
+        """Sends a command from the FIWARE platform to a specific device
+           (http://fiware-orion.readthedocs.io/en/latest/user/walkthrough_apiv1/index.html#ngsi10-standard-operations at
+           "Update context elements" section)
+
+        :param entity_id: The id of the entity that represents the device
+        :param device_id: The id of the device to which the command will be sent
+        :param command: The name of the command to be called on the device
+        :param params: The command parameters to be sent
+        :return: The result of the command call
+        """
+        logging.info("Sending command")
+
+        if params is None:
+            params = {}
+
+        url = f"{self.iota_north_url}/v1/updateContext"
+
+        additional_headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+
+        params = '|'.join(['%s' % (str(value)) for (key, value) in params.items()])
+        # if params != '':
+        #     params = '|' + params
+        #
+        # value = f'{device_id}@{command}{params}'
+        # logging.info("Command value:", value)
+
+        value = params
+
+        payload = {
+            "contextElements": [
+                {
+                    "type": "thing",
+                    "isPattern": "false",
+                    "id": entity_id,
+                    "attributes": [
+                        {
+                            "name": command,
+                            "type": "command",
+                            "value": value
+                        }
+                    ]
+                }
+            ],
+            "updateAction": "UPDATE"
+        }
+
+        return self._send_request(url, 'POST', payload=payload, additional_headers=additional_headers)
