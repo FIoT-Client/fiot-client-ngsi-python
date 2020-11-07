@@ -43,20 +43,20 @@ class FiwareIotClient(BaseClient):
         """
         logging.info("Creating service")
 
+        response = None
+
         if api_key:
             response = self._create_service(service, service_path, api_key)
-        else:
-            created = False
-            response = None
-            retries = 0
-            while not created and retries < 5:
-                api_key = self.generate_api_key()
-                response = self._create_service(service, service_path, api_key)
-                if response and response['status_code'] == 201:
-                    response['api_key'] = api_key
-                    created = True
-                else:
-                    retries += 1
+            response['api_key'] = api_key
+
+        retries = 0
+        while retries < 5:
+            generated_api_key = self.generate_api_key()
+            response = self._create_service(service, service_path, generated_api_key)
+            if response and response['status_code'] == 201:
+                response['api_key'] = generated_api_key
+                break
+            retries += 1
 
         return response
 
