@@ -38,6 +38,15 @@ class BaseClient(object):
         fiware_config = utils.parse_config_json(config_json)
         return cls(fiware_config)
 
+    @classmethod
+    def from_config_dict(cls, config_dict: dict):
+        """Default client for making requests to FIWARE APIs
+
+        :param config_dict: The config dict from which to load the default configuration
+        """
+        fiware_config = utils.parse_config_dict(config_dict)
+        return cls(fiware_config)
+
     def _send_request(self, url, method, payload=None, additional_headers=None, params=None, timeout=30):
         """Auxiliary method to configure and execute a request to FIWARE APIs
 

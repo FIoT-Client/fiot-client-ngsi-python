@@ -27,5 +27,9 @@ def read_config_file(config_file_path) -> FiwareConfig:
 
 
 def parse_config_json(config_json_str: str) -> FiwareConfig:
-    config_json = json.loads(config_json_str)
-    return FiwareConfig(config_json)
+    config_dict = json.loads(config_json_str)
+    return parse_config_dict(config_dict)
+
+
+def parse_config_dict(config_dict: dict) -> FiwareConfig:
+    return FiwareConfig(config_dict)
