@@ -3,9 +3,6 @@ class FiwareConfig:
 
     # TODO Check and notify mandatory parameters on input config dict
 
-    def __init__(self):
-        self.__init__({})
-
     def __init__(self, config_json: dict):
         self.service = config_json.get('fiwareService', '')
         self.service_path = config_json.get('fiwareServicePath', '')
