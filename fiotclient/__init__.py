@@ -7,23 +7,22 @@ from fiotclient import utils
 from fiotclient.config import FiwareConfig
 
 
-def _log_request_url(method: str, url: str, params: dict):
+def _log_request_url(method: str, url: str, params: dict, headers: dict):
     params_str = '&'.join(map(lambda key: f'{key}={params[key]}', params.keys())) if params else ''
     if params_str:
-        logging.info(f"{method} {url}?{params_str}")
+        logging.info(f"{method} {url}?{params_str} {headers}")
     else:
-        logging.info(f"{method} {url}")
+        logging.info(f"{method} {url} {headers}")
 
 
 def _log_request(method, url, params, headers, str_payload):
-    _log_request_url(method, url, params)
-    logging.debug(f"Headers: {headers}")
+    _log_request_url(method, url, params, headers)
     if str_payload != '':
-        logging.debug(f"Payload: {str_payload}")
+        logging.info(f"Request payload: {str_payload}")
 
 
-def _log_response(status_code, response):
-    logging.info(f"Response {status_code} {response}")
+def _log_response(status_code, response, headers):
+    logging.info(f"Response {status_code} {response} {headers}")
 
 
 class BaseClient(object):
@@ -94,6 +93,8 @@ class BaseClient(object):
         else:
             str_payload = ''
 
+        _log_request(method, url, params, headers, str_payload)
+
         try:
             if method == 'GET':
                 r = requests.get(url, params=params, data=str_payload, headers=headers, timeout=timeout)
@@ -117,8 +118,7 @@ class BaseClient(object):
                 logging.error(f"Error: {e}")
                 response = {}
 
-            _log_request(method, url, params, headers, str_payload)
-            _log_response(status_code, response_str)
+            _log_response(status_code, response_str, headers)
 
             return {
                 'status_code': status_code,
@@ -172,5 +172,5 @@ class BaseClient(object):
         :param service_path: The service path of the service to be used
         :return: None
         """
-        self.fiware_config.fiware_service = service
-        self.fiware_config.fiware_service_path = service_path
+        self.fiware_config.service = service
+        self.fiware_config.service_path = service_path
