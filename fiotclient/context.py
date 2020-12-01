@@ -47,8 +47,7 @@ class FiwareContextClient(BaseClient):
 
         :return: Information of the registered entity
         """
-        logging.info(f"Opening file '{entity_file_path}'")
-
+        logging.debug(f"Reading file '{entity_file_path}'")
         with open(entity_file_path) as json_entity_file:
             payload = json.load(json_entity_file)
 
@@ -88,8 +87,6 @@ class FiwareContextClient(BaseClient):
         :return: The information of the entity found with the given id
                  or None if no entity was found with the id
         """
-        logging.info(f"Getting entity by id '{entity_id}'")
-
         params = {'type': entity_type}
         url = f"{self.cb_url}/v2/entities/{entity_id}"
 
@@ -101,8 +98,6 @@ class FiwareContextClient(BaseClient):
         :param entity_type: The type of the entities to be searched
         :return: A list with the information of the entities found with the given type
         """
-        logging.info(f"Getting entities by type '{type}'")
-
         params = {'type': entity_type}
 
         url = f"{self.cb_url}/v2/entities"
@@ -114,8 +109,6 @@ class FiwareContextClient(BaseClient):
 
         :return: A list with the information of all the created entities
         """
-        logging.info("Getting all entities")
-
         params = {}
 
         if entity_type:
@@ -143,8 +136,6 @@ class FiwareContextClient(BaseClient):
         :param notification_url: The URL to which the notification will be sent on changes
         :return: The information of the subscription
         """
-        logging.info(f"Subscribing for change on attributes '{attributes}' on device with id '{device_id}'")
-
         url = f"{self.cb_url}/v1/subscribeContext"
 
         additional_headers = {
@@ -181,8 +172,6 @@ class FiwareContextClient(BaseClient):
         :param notification_url: The endpoint to which POST notifications will be sent
         :return: The information of the created rule
         """
-        logging.info("Creating attribute change rule")
-
         url = f"{self.perseo_url}/rules"
 
         additional_headers = {
@@ -224,8 +213,6 @@ class FiwareContextClient(BaseClient):
         :param attributes: The list of attributes do be monitored
         :return: The information of the subscription
         """
-        logging.info("Subscribing Cygnus")
-
         notification_url = f"{self.cygnus_notification_url}/notify"
         return self.subscribe_attributes_change(entity_id, attributes, notification_url)
 
@@ -236,8 +223,6 @@ class FiwareContextClient(BaseClient):
         :param attributes: The list of attributes do be monitored
         :return: The information of the subscription
         """
-        logging.info("Subscribing to historical data")
-
         notification_url = f"{self.sth_url}/notify"
         return self.subscribe_attributes_change(entity_id, attributes, notification_url)
 
@@ -251,8 +236,6 @@ class FiwareContextClient(BaseClient):
                              If no value is provided, the default value (10 entries) will be used
         :return: The historical data on the specified attribute of the given entity
         """
-        logging.info("Getting historical data")
-
         params = {'lastN': items_number}
 
         url = f"http://{self.sth_url}/STH/v1/contextEntities/type/{entity_type}/id/{entity_id}/attributes/{attribute}"
@@ -272,8 +255,6 @@ class FiwareContextClient(BaseClient):
         :return: True if the subscription with the given id was removed
                  False if no subscription with the given id was removed
         """
-        logging.info("Removing subscriptions")
-
         url = f"{self.cb_url}/v1/unsubscribeContext"
 
         additional_headers = {
@@ -294,8 +275,6 @@ class FiwareContextClient(BaseClient):
         :return: The information of the subscription found with the given id
                  or None if no subscription was found with the id
         """
-        logging.info(f"Getting subscription by id '{subscription_id}'")
-
         url = f"{self.cb_url}/v2/subscriptions/{subscription_id}"
 
         return self._send_request(url, 'GET')
@@ -305,8 +284,6 @@ class FiwareContextClient(BaseClient):
 
         :return: A list with the ids of all the subscriptions
         """
-        logging.info("Listing subscriptions")
-
         url = f"{self.cb_url}/v2/subscriptions"
 
         return self._send_request(url, 'GET')

@@ -41,8 +41,6 @@ class FiwareIotClient(BaseClient):
                         If no api key is provided, a random one will be generated.
         :return: The information of the created service
         """
-        logging.info("Creating service")
-
         response = None
         if api_key:
             response = self._create_service(service, service_path, api_key)
@@ -78,11 +76,9 @@ class FiwareIotClient(BaseClient):
         payload = {
             "services": [
                 {
-                  "protocol": ["IoTA-UL"],  # TODO Remove hardcoded protocol
                   "apikey": str(api_key),
-                  "token": "token2",
                   "cbroker": f"{self.cb_url}",
-                  "entity_type": "thing",
+                  "entity_type": "Thing",
                   "resource": "/iot/d"
                 }
             ]
@@ -103,8 +99,6 @@ class FiwareIotClient(BaseClient):
                                This parameter is not valid when Fiware-ServicePath is '/\*' or '/#'.
         :return: The response of the removal request
         """
-        logging.info("Removing service")
-
         params = {
             'resource': '/iot/d',
             'apikey': api_key
@@ -150,8 +144,6 @@ class FiwareIotClient(BaseClient):
                          If no value is provided the default protocol (IoTA-UL) will be used
         :return: Information of the registered device
         """
-        logging.info("Registering device")
-
         params = {'protocol': protocol}
         url = f"{self.iota_north_url}/iot/devices"
         additional_headers = {'Content-Type': 'application/json'}
@@ -181,7 +173,7 @@ class FiwareIotClient(BaseClient):
                          If no value is provided the default protocol (IoTA-UL) will be used
         :return: Information of the registered device
         """
-        logging.info(f"Opening file '{device_file_path}'")
+        logging.debug(f"Reading file '{device_file_path}'")
         with open(device_file_path) as json_device_file:
             payload = json.load(json_device_file)
 
@@ -230,8 +222,6 @@ class FiwareIotClient(BaseClient):
 
         :return: The list of devices registered in the service
         """
-        logging.info("Listing devices")
-
         params = {}
         if limit:
             params['limit'] = limit
@@ -289,27 +279,23 @@ class FiwareIotClient(BaseClient):
         :param timeout: The timeout for the observation send request
         :return: The summary of the sent measurements
         """
-        logging.info("Sending observation")
-
         payload = self._create_ul_payload_from_measurements(measurements)
 
         if protocol == 'MQTT':
-            logging.info("Transport protocol: MQTT")
+            logging.debug("Transport protocol: MQTT")
             topic = f"/{self.api_key}/{device_id}/attrs"
 
             logging.info(f"Publishing to {self.mqtt_broker_url} on topic {topic}")
-            logging.info("Sending payload: ")
-            logging.info(payload)
+            logging.debug(f"Payload: {payload}")
 
             publish.single(topic, payload=payload,
                            hostname=self.fiware_config.mqtt_broker_host,
                            port=self.fiware_config.mqtt_broker_port,
                            keepalive=timeout)
-            logging.info("Message sent")
             return {'result': 'OK'}
 
         elif protocol == 'HTTP':
-            logging.info("Transport protocol: UL-HTTP")
+            logging.debug("Transport protocol: UL-HTTP")
 
             params = {
                 'k': self.api_key,
@@ -337,8 +323,6 @@ class FiwareIotClient(BaseClient):
                              for each attribute) or a list of measurement groups obtained in the device
         :return: The list of pooling commands of the device
         """
-        logging.info("Sending measurement and getting pooling commands")
-
         params = {
             'k': self.api_key,
             'i': device_id,
@@ -362,8 +346,6 @@ class FiwareIotClient(BaseClient):
         :param params: The command parameters to be sent
         :return: The result of the command call
         """
-        logging.info("Sending command")
-
         if params is None:
             params = {}
 

@@ -7,6 +7,25 @@ from fiotclient import utils
 from fiotclient.config import FiwareConfig
 
 
+def _log_request_url(method: str, url: str, params: dict):
+    params_str = '&'.join(map(lambda key: f'{key}={params[key]}', params.keys())) if params else ''
+    if params_str:
+        logging.info(f"{method} {url}?{params_str}")
+    else:
+        logging.info(f"{method} {url}")
+
+
+def _log_request(method, url, params, headers, str_payload):
+    _log_request_url(method, url, params)
+    logging.debug(f"Headers: {headers}")
+    if str_payload != '':
+        logging.debug(f"Payload: {str_payload}")
+
+
+def _log_response(status_code, response):
+    logging.info(f"Response {status_code} {response}")
+
+
 class BaseClient(object):
 
     def __init__(self, fiware_config: FiwareConfig):
@@ -67,10 +86,6 @@ class BaseClient(object):
 
         headers = utils.merge_dicts(default_headers, additional_headers)
 
-        logging.debug(f"Asking to {url}")
-        logging.debug("Headers:")
-        logging.debug(json.dumps(headers, indent=4))
-
         if payload:
             if not isinstance(payload, str):
                 str_payload = json.dumps(payload, indent=4)
@@ -78,10 +93,6 @@ class BaseClient(object):
                 str_payload = payload
         else:
             str_payload = ''
-
-        if str_payload != '':
-            logging.debug("Sending payload:")
-            logging.debug(str_payload)
 
         try:
             if method == 'GET':
@@ -93,7 +104,7 @@ class BaseClient(object):
             elif method == 'DELETE':
                 r = requests.delete(url, params=params, data=str_payload, headers=headers, timeout=timeout)
             else:
-                logging.error(f"Error: Unsupported method '{str(method)}'")
+                logging.error(f"Unsupported method '{str(method)}'")
                 return {'error': "Unsupported method. Select one of 'GET', 'POST', 'PUT' and 'DELETE'"}
 
             status_code = r.status_code
@@ -103,12 +114,11 @@ class BaseClient(object):
             try:
                 response = json.loads(response_str)
             except json.decoder.JSONDecodeError as e:
-                logging.debug(f"Error: {e}")
+                logging.error(f"Error: {e}")
                 response = {}
 
-            logging.debug(f"Status Code: {status_code}")
-            logging.debug(f"Headers: {headers}")
-            logging.debug(f"Response: {response}")
+            _log_request(method, url, params, headers, str_payload)
+            _log_response(status_code, response_str)
 
             return {
                 'status_code': status_code,
@@ -117,8 +127,7 @@ class BaseClient(object):
             }
 
         except (ConnectionRefusedError, requests.exceptions.ConnectionError) as e:
-            logging.debug("Status Code: 0")
-            logging.debug(f"Response: Error: {e.strerror}")
+            logging.error(f"Response Error: {e.strerror}")
 
             return {
                 'status_code': 0,
@@ -134,8 +143,6 @@ class BaseClient(object):
         :param timeout: the authentication request timeout
         :return: the generated token and expiration
         """
-        logging.info('Generating token')
-
         tokens_url = "http://cloud.lab.fi-ware.org:4730/v2.0/tokens"
 
         payload = {
