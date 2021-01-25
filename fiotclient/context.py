@@ -128,10 +128,11 @@ class FiwareContextClient(BaseClient):
 
         return self._send_request(url, 'GET', params=params)
 
-    def subscribe_attributes_change(self, device_id, attributes, notification_url):
-        """Create a new subscription on given attributes of the device with the specified id
+    def subscribe_attributes_change(self, entity_id, entity_type, attributes, notification_url):
+        """Create a new subscription on given attributes of the entity with the specified id and type
 
-        :param device_id: The id of the device to be monitored
+        :param entity_id: The id of the entity to be monitored
+        :param entity_type: The type of the entity to be monitored
         :param attributes: The list of attributes do be monitored
         :param notification_url: The URL to which the notification will be sent on changes
         :return: The information of the subscription
@@ -145,9 +146,9 @@ class FiwareContextClient(BaseClient):
 
         payload = {
             "entities": [{
-                "type": "thing",
+                "type": str(entity_type),
                 "isPattern": "false",
-                "id": str(device_id)
+                "id": str(entity_id)
             }],
             "attributes": attributes,
             "notifyConditions": [{
