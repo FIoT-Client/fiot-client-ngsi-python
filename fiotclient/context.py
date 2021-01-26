@@ -128,13 +128,16 @@ class FiwareContextClient(BaseClient):
 
         return self._send_request(url, 'GET', params=params)
 
-    def subscribe_attributes_change(self, entity_id, entity_type, attributes, notification_url):
+    def subscribe_attributes_change(self, entity_id, entity_type, attributes, notification_url, duration, throttling):
         """Create a new subscription on given attributes of the entity with the specified id and type
 
         :param entity_id: The id of the entity to be monitored
         :param entity_type: The type of the entity to be monitored
         :param attributes: The list of attributes do be monitored
         :param notification_url: The URL to which the notification will be sent on changes
+        :param duration: The duration of the subscription
+        :param throttling: Minimal period of time in seconds which must elapse between two consecutive notifications
+
         :return: The information of the subscription
         """
         url = f"{self.cb_url}/v1/subscribeContext"
@@ -156,8 +159,8 @@ class FiwareContextClient(BaseClient):
                 "condValues": attributes
             }],
             "reference": notification_url,
-            "duration": "P1Y",
-            "throttling": "PT1S"
+            "duration": str(duration),
+            "throttling": str(throttling)
         }
 
         return self._send_request(url, 'POST', payload=payload, additional_headers=additional_headers)
