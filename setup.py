@@ -15,7 +15,7 @@ README = os.path.join(os.path.dirname(__file__), 'README.md')
 
 setup(
     name='fiotclient',
-    version='0.7.14',
+    version='0.7.16',
     packages=find_packages(),
     include_package_data=True,
     license='MIT',
